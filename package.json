@@ -1,0 +1,39 @@
+{
+  "name": "int-devops",
+  "version": "0.0.1",
+  "description": "SAP Integration Suite DevOps Utilities",
+  "license": "ISC",
+  "author": "Da Chen <da.chen@me.com>",
+  "type": "commonjs",
+  "keywords": [
+    "SAP",
+    "Integration",
+    "DevOps",
+    "TMS"
+  ],
+  "homepage": "https://github.com/sap-pilot/int-devops#readme",
+  "bugs": {
+    "url": "https://github.com/sap-pilot/int-devops/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sap-pilot/int-devops.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "main": "srv/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node srv/server.js",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > ./srv/build-info.json",
+    "build": "mbt build --mtar=int-devops.mtar",
+    "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
+    "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1"
+  },
+  "dependencies": {
+    "express": "^5",
+    "http-proxy-middleware": "^3",
+    "winston": "^3.17.0"
+  }
+}

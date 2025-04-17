@@ -1,0 +1,37 @@
+_schema-version: 3.3.0
+ID: int-devops
+version: 0.0.1
+description: "SAP Integration Suite DevOps Utilities"
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm run build-info # update build timestamp
+        # - npm ci # run npm ci after checking out repo or npm install after updating package.json, instead of during build
+
+modules:
+  - name: int-devops-proxy
+    type: nodejs
+    path: ./
+    parameters:
+      buildpack: nodejs_buildpack
+      readiness-health-check-type: http
+      readiness-health-check-http-endpoint: /health
+      instances: 1 # TODO: minimal 2 in case one instance crash the other one can take over (multi-AZ)
+      memory: 128M
+      disk-quota: 1G
+      keep-existing-routes: true
+      enable-ssh: true # for develoopment/troubleshooting
+      host: int-devops-${org}
+    properties:
+      LOG_LEVEL: "info" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
+    build-parameters:
+      builder: npm-ci
+      ignore: ["node_modules/","mta_archives/","default-*.json",".env"]                  
+
+# resources:
+  # bind to existing-service so we can switch between lite (free for non-prod) to standard (charagable for pre/prod) service plan
+  # - name: application-logging
+  #   type: org.cloudfoundry.existing-service

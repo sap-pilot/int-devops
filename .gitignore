@@ -1,0 +1,12 @@
+dist/
+edmx/
+gen/
+node_modules/
+target/
+resources/
+mta_archives/
+
+default-env.json
+Makefile*.mta
+*_mta_build_tmp/
+build-info.json

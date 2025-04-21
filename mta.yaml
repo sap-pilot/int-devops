@@ -31,7 +31,7 @@ modules:
       TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
     build-parameters:
       builder: npm-ci
-      ignore: ["node_modules/","mta_archives/","test/","default-*.json",".env"]                  
+      ignore: ["node_modules/","mta_archives/","upload/","test/","tmp/","default-*.json",".env"]                  
 
 # resources:
   # bind to existing-service so we can switch between lite (free for non-prod) to standard (charagable for pre/prod) service plan

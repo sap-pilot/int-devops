@@ -14,13 +14,14 @@ try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`build-
 // env variables
 const prettyResponse = process.env.PRETTY_RESPONSE != "false";
 const tmsUrl = process.env.TMS_URL ? process.env.TMS_URL : 'https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com'
+//const tmsUrl = 'https://int-devops.free.beeceptor.com';
 const port = process.env.PORT || 4004;
 
 const app = express();
 
 /* http-proxy middleware */
 const tmsProxyConfig = {
-    target: tmsUrl, 
+    target: tmsUrl,
     changeOrigin: true,
     selfHandleResponse: true, // res.end() will be called internally by responseInterceptor()
     on: {
@@ -31,15 +32,20 @@ const tmsProxyConfig = {
             logger.debug(`[req-headers]: ${JSON.stringify(req.headers, null, 2)}`);
             if (req.file) {
                 const formData = new FormData();
-                formData.append('file', req.file.path, req.file.originalname);
-                // append other form fields to FormData
+                //append other form fields to FormData
                 for (const key in req.body) {
                     formData.append(key, req.body[key]);
                 }
+                const buffer = fs.readFileSync(req.file.path);
+                formData.append('file', buffer, req.file.originalname);
+                //formData.append('file', fs.createReadStream(req.file.path), req.file.originalname);
+                //formData.append('file', new Blob([fs.readFileSync(req.file.path)]), req.file.originalname);
                 proxyReq.setHeader('Content-Type', `multipart/form-data; boundary=${formData._boundary}`);
+                //proxyReq.setHeader('Content-Type', undefined);
                 proxyReq.setHeader('Content-Length', formData.getLengthSync());
                 // upload the file to tms
                 formData.pipe(proxyReq);
+                //proxyReq.write(formData);
             }
         },
         proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
@@ -57,25 +63,25 @@ const tmsProxyConfig = {
             }
             // pretty print response
             const nodesUrlPattern = /^\/v2\/nodes$/;
-            if (prettyResponse && !proxyRes.req.path.match(nodesUrlPattern) && obj ) {
-                logger.debug(JSON.stringify(obj,null,2)); // pretty print json object
+            if (prettyResponse && !proxyRes.req.path.match(nodesUrlPattern) && obj) {
+                logger.debug(`[res-body]: ${JSON.stringify(obj, null, 2)}`); // pretty print json object
             } else if (response) {
-                logger.debug(response); // log raw response body
+                logger.debug(`[res-body]: ${response}`); // log raw response body
             }
             // try renaming uploaded file 
-            if (req.file && obj) {
-                 try {
+            if (req.file && obj && obj.fileId) {
+                try {
                     const newFileName = `${uploadPath}/${obj.fileId}-${obj.fileName}`;
                     logger.info(`renaming ${req.file.path} to ${newFileName}`);
                     fs.renameSync(req.file.path, newFileName);
-                 } catch (e) {
-                    logger.error(`failed to rename`, e);
-                 }
+                } catch (e) {
+                    logger.error(`failed to rename: ${e}`);
+                }
             }
             return responseBuffer;
         }),
         error: (err, req, res) => {
-            logger.error(err);
+            logger.error(`failed to proxy tms request: ${err}`);
         }
     }
 };
@@ -89,7 +95,6 @@ app.get('/build-info', (req, res) => {
 });
 
 const proxy = createProxyMiddleware(tmsProxyConfig);
-//app.use('/v2/files/upload', upload.single('file'), proxy);
 app.use('/', upload.single('file'), proxy);
 
 app.listen(port, () => {

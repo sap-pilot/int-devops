@@ -1,14 +1,15 @@
 //@baseUrl = http://localhost:4004
 //@baseUrl = https://int-devops-cf-aws-use-sandbox-dcore.cfapps.us10.hana.ondemand.com
-@baseUrl = https://sapux.org/tms
-
+//@baseUrl = https://sapux.org/tms
+// define tmsUrl, tmsOauthUrl,  tmsClientId and tmsClientSecret in .vscode/settings.json -> rest-client.environmentVariables
+@baseUrl = {{tmsUrl}
 
 ### Get OAuth Token
 # @name tmsLogin
 POST {{tmsOauthUrl}}
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&client_id={{tmsClientid}}&client_secret={{tmsClientsecret}}
+grant_type=client_credentials&client_id={{tmsClientId}}&client_secret={{tmsClientSecret}}
 
 ###
 # @name tmsGetNodes
@@ -41,6 +42,12 @@ Content-Type: application/zip
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
+# @name tmsFileDelete
+DELETE {{baseUrl}}/v2/files/{{tmsFileUpload.response.body.fileId}}
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+
+###
 # @name tmsCreateTransport
 POST {{baseUrl}}/v2/nodes/export
 Authorization: Bearer {{tmsLogin.response.body.access_token}}
@@ -51,7 +58,7 @@ Content-Type: application/json
     "nodeName": "DCORE_INT_PREPROD2",
     "contentType": "MTA",
     "storageType": "FILE", 
-    "description": "cpi_util_fileupload_1.0.14.mtar",
+    "description": "cpi-iflow.mtar",
     "namedUser": "int-devops@sap-test.de",
     "entries": [
         {

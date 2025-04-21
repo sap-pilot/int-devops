@@ -23,10 +23,12 @@ modules:
       memory: 128M
       disk-quota: 1G
       keep-existing-routes: true
-      enable-ssh: true # for develoopment/troubleshooting
+      enable-ssh: true # for development/troubleshooting
       host: int-devops-${org}
     properties:
       LOG_LEVEL: "debug" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
+      PRETTY_RESPONSE: "true" # [true|false]
+      TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
     build-parameters:
       builder: npm-ci
       ignore: ["node_modules/","mta_archives/","test/","default-*.json",".env"]                  

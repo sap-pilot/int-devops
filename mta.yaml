@@ -26,10 +26,10 @@ modules:
       enable-ssh: true # for develoopment/troubleshooting
       host: int-devops-${org}
     properties:
-      LOG_LEVEL: "info" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
+      LOG_LEVEL: "debug" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
     build-parameters:
       builder: npm-ci
-      ignore: ["node_modules/","mta_archives/","default-*.json",".env"]                  
+      ignore: ["node_modules/","mta_archives/","test/","default-*.json",".env"]                  
 
 # resources:
   # bind to existing-service so we can switch between lite (free for non-prod) to standard (charagable for pre/prod) service plan

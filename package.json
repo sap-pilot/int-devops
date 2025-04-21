@@ -20,7 +20,7 @@
     "url": "git+https://github.com/sap-pilot/int-devops.git"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22"
   },
   "main": "srv/server.js",
   "scripts": {
@@ -34,6 +34,11 @@
   "dependencies": {
     "express": "^5",
     "http-proxy-middleware": "^3",
-    "winston": "^3.17.0"
+    "winston": "^3"
+  },
+  "overrides": {
+    "http-proxy-middleware": {
+      "http-proxy": "github:nikeee/node-http-proxy#b42c38fc3486ee8ad4374cc2397458b6e4cd99ca"
+    }
   }
 }

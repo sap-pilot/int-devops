@@ -1,6 +1,8 @@
 // config variables
 const config = {
-    uploadPath: './upload',
+    uploadPath: './upload', // mtars get uploaded to this folder
+    tmpPath: './tmp', // then extracted to this folder
+    workPath: './work', // then moved to this folder (git-repos)
     prettyResponse: process.env.PRETTY_RESPONSE != 'false',
     redactAuthHeader: !process.env.REDACT_AUTH_HEADER || process.env.REDACT_AUTH_HEADER != 'false',
     //tmsUrl: 'https://int-devops.free.beeceptor.com',

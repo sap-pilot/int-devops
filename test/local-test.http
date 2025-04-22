@@ -38,7 +38,7 @@ int-devops@sap-test.de
 Content-Disposition: form-data; name="file"; filename="cpi-iflow.mtar"
 Content-Type: application/zip
 
-< ../tmp/cpi-iflow.mtar
+< ../upload/cpi-iflow.mtar
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
@@ -48,7 +48,7 @@ Authorization: Bearer {{tmsLogin.response.body.access_token}}
 Accept: application/json
 
 ###
-# @name tmsCreateTransport
+# @name tmsNodeExport
 POST {{baseUrl}}/v2/nodes/export
 Authorization: Bearer {{tmsLogin.response.body.access_token}}
 Accept: application/json

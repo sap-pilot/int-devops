@@ -29,8 +29,9 @@ app.get('/version', (req, res) => {
 });
 
 // create tms proxy with file upload handling
-const proxy = createProxyMiddleware(tmsProxyConfig);
-app.use('/tms', upload.single('file'), proxy);
+const tmsProxy = createProxyMiddleware(tmsProxyConfig);
+// at /tms path: handle file upload -> handle json body (export) -> then do tms-proxy
+app.use('/tms', upload.single('file'), express.json(), tmsProxy);
 
 app.use(express.static('./app/webapp'));
 

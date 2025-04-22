@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
 const { logger } = require("./logger");
 
 // const { config } = require('../config');
@@ -6,18 +6,12 @@ const { logger } = require("./logger");
 // const destDir = `${config.tmpPath}/cpi-all`;
 
 const extractMtar = (mtarFile, destDir) => {
-    exec(`./srv/helper/mtar-extractor.sh ${mtarFile} ${destDir}`, (error, stdout, stderr) => {
-        if (error) {
-            logger.error(`failed to extract $${mtarFile}:\n${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`error during extraction ${mtarFile}:\n${stderr}`);
-            return;
-        }
-        logger.info(`extracted ${mtarFile}`);
-        logger.debug(`${stdout}`);
-    });
+    try {
+        const result = execSync(`./srv/helper/mtar-extractor.sh ${mtarFile} ${destDir}`);
+        logger.info(`extracted ${mtarFile}: ${result}`);
+    } catch (error) {
+        console.error(`error during extracting ${mtarFile}: ${error}`);
+    }
 }
 
 module.exports = { extractMtar };

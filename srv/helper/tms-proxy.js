@@ -4,6 +4,7 @@ const { responseInterceptor } = require('http-proxy-middleware');
 const { logger } = require("./logger");
 const { config } = require('../config');
 const { extractMtar } = require('./mtar-extractor');
+const { repoMan } = require('./repo-man');
 
 /* http-proxy middleware */
 const tmsProxyConfig = {
@@ -85,6 +86,10 @@ const tmsProxyConfig = {
             const exportUrlPattern = /^\/v2\/nodes\/export$/;
             if ( proxyRes.req.path.match(exportUrlPattern) ) {
                 const fileId = req.body && req.body.entries && req.body.entries.length > 0? req.body.entries[0].uri : null;
+                const trDesc = responseObj? responseObj.transportRequestDescription : 'n/a';
+                const trId =   responseObj? responseObj.transportRequestId : '000';
+                const trNode = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeName : '';
+                //const trNodeId = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeId : '';
                 if (!fileId) {
                     logger.warn(`no file id found from export request: ${JSON.stringify(req.body,null,2)}`);
                 } else {
@@ -95,6 +100,12 @@ const tmsProxyConfig = {
                     } else {
                         logger.info(`extracting mtar ${mtarFile} to ${destPath}`);
                         extractMtar(mtarFile, destPath);
+                        const branch = repoMan.findBranch(trNode);
+                        logger.info(`pushing mtar content into branch ${branch}`);
+                        repoMan.pull(branch);
+                        repoMan.copyFiles(destPath, branch);
+                        repoMan.commit(branch,`${trId}-${trDesc}`);
+                        repoMan.push(branch);
                     }
                 }
             }

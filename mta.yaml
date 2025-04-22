@@ -29,7 +29,8 @@ modules:
       LOG_LEVEL: "debug" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
       PRETTY_RESPONSE: "true" # [true|false]
       REDACT_AUTH_HEADER: "true" # [true|false]
-      TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
+      # TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
+      # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
       builder: npm-ci
       ignore: [".git/","node_modules/","mta_archives/","upload/","work/","test/","tmp/","default-*.json",".env"]                  

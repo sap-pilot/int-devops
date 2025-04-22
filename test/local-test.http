@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:4004
+@baseUrl = http://localhost:4004/tms
 //@baseUrl = https://int-devops-cf-aws-use-sandbox-dcore.cfapps.us10.hana.ondemand.com
 //@baseUrl = https://sapux.org/tms
 // define tmsUrl, tmsOauthUrl,  tmsClientId and tmsClientSecret in .vscode/settings.json -> rest-client.environmentVariables

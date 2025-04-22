@@ -12,7 +12,7 @@ build-parameters:
         # - npm ci # run npm ci after checking out repo or npm install after updating package.json, instead of during build
 
 modules:
-  - name: int-devops-proxy
+  - name: int-devops-srv
     type: nodejs
     path: ./
     parameters:
@@ -28,10 +28,11 @@ modules:
     properties:
       LOG_LEVEL: "debug" # log level for proxy module, possible values: [trace|debug|info|warn|error|silent]
       PRETTY_RESPONSE: "true" # [true|false]
+      REDACT_AUTH_HEADER: "true" # [true|false]
       TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
     build-parameters:
       builder: npm-ci
-      ignore: ["node_modules/","mta_archives/","upload/","test/","tmp/","default-*.json",".env"]                  
+      ignore: [".git/","node_modules/","mta_archives/","upload/","work/","test/","tmp/","default-*.json",".env"]                  
 
 # resources:
   # bind to existing-service so we can switch between lite (free for non-prod) to standard (charagable for pre/prod) service plan

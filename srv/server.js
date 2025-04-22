@@ -8,11 +8,12 @@ const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middl
 
 // logging and branding module
 const { logger } = require("./common/logger");
-let buildInfo = { "version": "N/A", "built": "N/A" };
+let buildInfo = { "version": "N/A", "build": "N/A" };
 try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`build-info.json not found`) }
 
 // env variables
 const prettyResponse = process.env.PRETTY_RESPONSE != "false";
+const redactAuthHeader = !process.env.REDACT_AUTH_HEADER || process.env.REDACT_AUTH_HEADER != "false" ;
 const tmsUrl = process.env.TMS_URL ? process.env.TMS_URL : 'https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com'
 //const tmsUrl = 'https://int-devops.free.beeceptor.com';
 const port = process.env.PORT || 4004;
@@ -29,7 +30,17 @@ const tmsProxyConfig = {
             req.startTime = Date.now();
             const exchange = `[request] ${req.method} ${req.path}`;
             logger.info(exchange); // GET / -> http://www.example.com [200]
-            logger.debug(`[req-headers]: ${JSON.stringify(req.headers, null, 2)}`);
+            if (redactAuthHeader) {
+                const redactedHeaders = {};
+                if (req.headers) {
+                    for (const [key, value] of Object.entries(req.headers)) {
+                        redactedHeaders[key] = key.toLowerCase() == 'authorization'? '[redacted]' : value;
+                    };
+                }
+                logger.debug(`[req-headers]: ${JSON.stringify(redactedHeaders, null, 2)}`);
+            } else {
+                logger.debug(`[req-headers]: ${JSON.stringify(req.headers, null, 2)}`);
+            }
             if (req.file) {
                 const formData = new FormData();
                 //append other form fields to FormData
@@ -71,7 +82,7 @@ const tmsProxyConfig = {
             // try renaming uploaded file 
             if (req.file && obj && obj.fileId) {
                 try {
-                    const newFileName = `${uploadPath}/${obj.fileId}-${obj.fileName}`;
+                    const newFileName = `${uploadPath}/${obj.fileId}`;
                     logger.info(`renaming ${req.file.path} to ${newFileName}`);
                     fs.renameSync(req.file.path, newFileName);
                 } catch (e) {
@@ -90,12 +101,16 @@ app.get('/health', (req, res) => {
     res.send('ok');
 });
 
-app.get('/build-info', (req, res) => {
-    res.send(JSON.stringify(buildInfo));
+app.get('/version', (req, res) => {
+    const info = {"version":buildInfo,"process":process.versions};
+    res.setHeader("Content-Type","application/json");
+    res.send(JSON.stringify(info,null,2));
 });
 
 const proxy = createProxyMiddleware(tmsProxyConfig);
-app.use('/', upload.single('file'), proxy);
+app.use('/tms', upload.single('file'), proxy);
+
+app.use(express.static('./app/webapp'));
 
 app.listen(port, () => {
     logger.info(`server ${buildInfo.version} (build: ${buildInfo.build}) listening at http://localhost:${port}`);

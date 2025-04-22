@@ -47,6 +47,7 @@ const tmsProxyConfig = {
             } else if (req.body && typeof req.body == 'object') {
                 // repost JSON request body
                 const str = JSON.stringify(req.body,null,2);
+                logger.debug(`[req-body]: ${str}`);
                 proxyReq.setHeader('Content-Type', `application/json`);
                 proxyReq.setHeader('Content-Length', str.length);
                 proxyReq.write(str);

@@ -55,7 +55,8 @@ class RepoMan {
             return;
         }
         const destFolder = `${this._rootFolder}/${branch}`;
-        const cmd = `cp -rf ${srcFolder}/* ${destFolder}`;
+        //const cmd = `cp -rf ${srcFolder}/* ${destFolder}`;
+        const cmd = `rsync -art ${srcFolder}/* ${destFolder} --exclude /META-INF`;
         logger.info(cmd)
         try {
             const result = execSync(`${cmd}`);

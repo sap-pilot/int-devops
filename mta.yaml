@@ -33,7 +33,7 @@ modules:
       # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
       builder: npm-ci
-      ignore: [".git/","node_modules/","mta_archives/","upload/","work/","test/","tmp/","default-*.json",".env"]                  
+      ignore: [".git/","node_modules/","mta_archives/","upload/","work/","test/","tmp/","doc/","*.md","default-*.json",".env"]                  
 
 # resources:
   # bind to existing-service so we can switch between lite (free for non-prod) to standard (charagable for pre/prod) service plan

@@ -5,6 +5,9 @@ node_modules/
 target/
 resources/
 mta_archives/
+tmp/
+upload/
+work/
 
 default-env.json
 Makefile*.mta

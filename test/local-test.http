@@ -1,0 +1,68 @@
+@baseUrl = http://localhost:4004/tms
+//@baseUrl = https://int-devops-cf-aws-use-sandbox-dcore.cfapps.us10.hana.ondemand.com
+//@baseUrl = https://sapux.org/tms
+// define tmsUrl, tmsOauthUrl,  tmsClientId and tmsClientSecret in .vscode/settings.json -> rest-client.environmentVariables
+//@baseUrl = {{tmsUrl}
+
+### Get OAuth Token
+# @name tmsLogin
+POST {{tmsOauthUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{tmsClientId}}&client_secret={{tmsClientSecret}}
+
+###
+# @name tmsGetNodes
+GET {{baseUrl}}/v2/nodes
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+
+###
+# @name tmsGetTransportRequests
+GET {{baseUrl}}/v2/nodes/192836/transportRequests?status=in
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+
+###
+# @name tmsFileUpload
+POST {{baseUrl}}/v2/files/upload
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="namedUser"
+
+int-devops@sap-test.de
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="cpi-iflow.mtar"
+Content-Type: application/zip
+
+< ../upload/cpi-iflow.mtar
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+# @name tmsFileDelete
+DELETE {{baseUrl}}/v2/files/{{tmsFileUpload.response.body.fileId}}
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+
+###
+# @name tmsCreateTransport
+POST {{baseUrl}}/v2/nodes/export
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "nodeName": "DCORE_INT_PREPROD2",
+    "contentType": "MTA",
+    "storageType": "FILE", 
+    "description": "cpi-iflow.mtar",
+    "namedUser": "int-devops@sap-test.de",
+    "entries": [
+        {
+            "uri": {{tmsFileUpload.response.body.fileId}}
+        }
+    ]
+}

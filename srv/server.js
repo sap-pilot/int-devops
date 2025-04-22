@@ -7,7 +7,7 @@ const FormData = require('form-data');
 const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middleware');
 
 // logging and branding module
-const { logger } = require("./common/logger");
+const { logger } = require("./helper/logger");
 let buildInfo = { "version": "N/A", "build": "N/A" };
 try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`build-info.json not found`) }
 

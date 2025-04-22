@@ -87,9 +87,9 @@ const tmsProxyConfig = {
             const exportUrlPattern = /^\/v2\/nodes\/export$/;
             if ( proxyRes.req.path.match(exportUrlPattern) ) {
                 const fileId = req.body && req.body.entries && req.body.entries.length > 0? req.body.entries[0].uri : null;
+                const trNode = req.body? req.body.nodeName : '';
                 const trDesc = responseObj? responseObj.transportRequestDescription : 'n/a';
                 const trId =   responseObj? responseObj.transportRequestId : '000';
-                const trNode = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeName : '';
                 //const trNodeId = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeId : '';
                 if (!fileId) {
                     logger.warn(`no file id found from export request: ${JSON.stringify(req.body,null,2)}`);

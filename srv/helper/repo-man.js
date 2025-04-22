@@ -28,12 +28,18 @@ class RepoMan {
             logger.error(`REPO_URL not specified, will skip all repo operation`);
             return;
         }
-        const devFolder = `${this._rootFolder}/dev`;
-        if (!fs.existsSync(`${devFolder}`)) {
-            this._git(`clone -b dev ${this._repoUrl} dev`, this._rootFolder);
-            // config user name and email
-            this._git(`config user.name "int-devops"`, devFolder);
-            this._git(`config user.email "int-devops@sap-test.de"`, devFolder);
+        if (!this._branches) {
+            logger.error(`REPO_BRANCHES not specified, will skip all repo operation`);
+            return;
+        }
+        for (const branch of this._branches) {
+            let folder = `${this._rootFolder}/${branch}`;
+            if (!fs.existsSync(`${folder}`)) {
+                this._git(`clone -b ${branch} ${this._repoUrl} ${branch}`, this._rootFolder);
+                // config user name and email
+                this._git(`config user.name "int-devops"`, folder);
+                this._git(`config user.email "int-devops@sap-test.de"`, folder);
+            }
         }
         const durationMs = Date.now() - startTime;
         logger.info(`completed initialization of RepoMan, takes time: ${durationMs}ms`);

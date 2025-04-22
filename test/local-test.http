@@ -48,7 +48,7 @@ Authorization: Bearer {{tmsLogin.response.body.access_token}}
 Accept: application/json
 
 ###
-# @name tmsCreateTransport
+# @name tmsNodeExport
 POST {{baseUrl}}/v2/nodes/export
 Authorization: Bearer {{tmsLogin.response.body.access_token}}
 Accept: application/json

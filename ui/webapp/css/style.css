@@ -1,0 +1,100 @@
+/* Enter your custom styles here */
+
+/*************************************************************************
+*
+* Copyright 2021 and onwards, Just-BI B.V. (Rijswijk, the Netherlands; KVK: 27256964)
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
+
+/* 
+
+  Use 
+  
+  <m:TabContainer class="noCloseButtons">
+  
+  to hide the close button on all tabs 
+
+*/
+div.sapMTabContainer.noCloseButtons > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsContainer > .sapMTSTabs > .sapMTabStripItem {
+  padding-right: 8px;
+}
+
+div.sapMTabContainer.noCloseButtons > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsContainer > .sapMTSTabs > .sapMTabStripItem > .sapMTSItemCloseBtnCnt {
+  display: none;  
+}
+
+/* 
+  Use
+  
+  <m:customData>
+    <core:CustomData writeToDom="true" key="noCloseButton" value="true"/>
+  </m:customData>
+    
+  inside a TabContainerItem to hide the close button on that tab
+*/
+div.sapMTabContainer > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsContainer > .sapMTSTabs > .sapMTabStripItem[data-noclosebutton='true'] > .sapMTSItemCloseBtnCnt {
+  display: none;  
+}
+
+/* 
+  To still show the close button on individual TabContainerItems 
+  for a TabContainer that has class="noCloseButtons"
+  
+  Use
+  
+  <m:customData>
+    <core:CustomData writeToDom="true" key="noCloseButton" value="false"/>
+  </m:customData>
+    
+  inside the TabContainerItem.
+*/
+div.sapMTabContainer > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsContainer > .sapMTSTabs > .sapMTabStripItem[data-noclosebutton='false'] > .sapMTSItemCloseBtnCnt {
+  display: none;  
+}
+
+
+.sapMLnk.sapMLnkSubtle {
+  text-decoration: none; 
+  opacity: 0.5;
+}
+
+.sapMLnk.sapMLnkSubtle:hover {
+  text-decoration: underline !important; 
+}
+
+.linkMenuButton {
+  margin-left: 2px;
+}
+
+.linkMenuHeaderLabel {
+  margin-left: 8px;
+}
+
+.prodColumn button:not(.sapMSBArrow) {
+   /* background-color: rgba(0, 0, 0, 0.1); 
+   background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+);  */
+  /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 13.1l-8-8 2.1-2.2 5.9 5.9 5.9-5.9 2.1 2.2z'/%3E%3C/svg%3E"); */
+  /* background-image: url('data:image/svg+xml,<%3Fxml version="1.0"%3F><svg fill="%23FAB005" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="20px" height="20px"><path d="M23,27l-8-7l-8,7V5c0-1.105,0.895-2,2-2h12c1.105,0,2,0.895,2,2V27z"/></svg>');
+  background-repeat: no-repeat;
+  padding-left: 14px; */
+  /* height: 50px;
+  width: 50px; */
+}

@@ -1,0 +1,9 @@
+<mvc:View controllerName="org.sapux.int.controller.MainView"
+    xmlns:mvc="sap.ui.core.mvc" xmlns:l="sap.ui.layout" displayBlock="true"
+    xmlns="sap.m">
+    <Page id="overview" showHeader="false" class="bpHomepage">
+        <content>
+			
+		</content>
+    </Page>
+</mvc:View>

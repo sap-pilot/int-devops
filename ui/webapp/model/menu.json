@@ -1,0 +1,32 @@
+{
+	"selectedKey": "home",
+	"navigation": [
+		{
+			"title": "Overview",
+			"icon": "sap-icon://home",
+			"key": "Overview",
+			"items": [
+				{
+					"title": "System Landscape",
+					"key": "Landscape",
+					"url": "#",
+					"target": "_self"
+				}
+			]
+		}
+	],
+	"fixedNavigation": [
+		{
+			"title": "BTP What's New",
+			"icon": "sap-icon://create",
+			"url": "https://help.sap.com/whats-new/cf0cb2cb149647329b5d02aa96303f56?locale=en-US",
+			"target": "_blank"
+		},
+		{
+			"title": "Report SAP Incident",
+			"icon": "sap-icon://incident",
+			"url": "https://me.sap.com/createIssue/0/overview",
+			"target": "_blank"
+		}
+	]
+}

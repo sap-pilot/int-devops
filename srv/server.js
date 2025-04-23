@@ -33,7 +33,7 @@ const tmsProxy = createProxyMiddleware(tmsProxyConfig);
 // at /tms path: handle file upload -> handle json body (export) -> then do tms-proxy
 app.use('/tms', upload.single('file'), express.json(), tmsProxy);
 
-app.use(express.static('./app/webapp'));
+app.use(express.static('./ui/webapp'));
 
 app.listen(port, () => {
     logger.info(`server ${buildInfo.version} (build: ${buildInfo.build}) listening at http://localhost:${port}`);

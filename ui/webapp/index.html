@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SAP Integration DevOps</title>
+	<link rel="icon" type="image/png" href="./favicon.png" />
+	<link id="custom-css" rel="stylesheet" type="text/css" href="css/style.css" />
+	<style>
+		html,
+		body,
+		body>div,
+		#container,
+		#container-uiarea {
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.lds-ellipsis {
+			/* change color here */
+			color: #1c4c5b
+		}
+
+		.lds-ellipsis,
+		.lds-ellipsis div {
+			box-sizing: border-box;
+		}
+
+		.lds-ellipsis {
+			display: inline-block;
+			position: relative;
+			width: 80px;
+			height: 80px;
+		}
+
+		.lds-ellipsis div {
+			position: absolute;
+			top: 33.33333px;
+			width: 13.33333px;
+			height: 13.33333px;
+			border-radius: 50%;
+			background: currentColor;
+			animation-timing-function: cubic-bezier(0, 1, 1, 0);
+		}
+
+		.lds-ellipsis div:nth-child(1) {
+			left: 8px;
+			animation: lds-ellipsis1 0.6s infinite;
+		}
+
+		.lds-ellipsis div:nth-child(2) {
+			left: 8px;
+			animation: lds-ellipsis2 0.6s infinite;
+		}
+
+		.lds-ellipsis div:nth-child(3) {
+			left: 32px;
+			animation: lds-ellipsis2 0.6s infinite;
+		}
+
+		.lds-ellipsis div:nth-child(4) {
+			left: 56px;
+			animation: lds-ellipsis3 0.6s infinite;
+		}
+
+		@keyframes lds-ellipsis1 {
+			0% {
+				transform: scale(0);
+			}
+
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		@keyframes lds-ellipsis3 {
+			0% {
+				transform: scale(1);
+			}
+
+			100% {
+				transform: scale(0);
+			}
+		}
+
+		@keyframes lds-ellipsis2 {
+			0% {
+				transform: translate(0, 0);
+			}
+
+			100% {
+				transform: translate(24px, 0);
+			}
+		}
+
+		#splash-screen {
+			position: fixed;
+			width: 100%;
+			height: 100vh;
+			top: 30%;
+			left: 0;
+			z-index: 9998;
+			display: block;
+			overflow-y: hidden;
+			overflow-x: hidden;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			font-family: Sans, Arial;
+		}
+	</style>
+	<script
+		id="sap-ui-bootstrap"
+		src="https://sapui5.hana.ondemand.com/1.120/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_horizon"
+		data-sap-ui-resourceroots='{
+            "org.sapux.int": "./"
+        }'
+		data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+		data-sap-ui-compatVersion="edge"
+		data-sap-ui-async="true"
+		data-sap-ui-frameOptions="trusted"></script>
+</head>
+
+<body class="sapUiBody sapUiSizeCompact" id="content">
+	<!-- Loading splash screen -->
+	<div id="splash-screen">
+		<!-- static header text -->
+		<h3>loading....</h3>
+		<!--
+            loader animation
+            CC0 licensed code used with permission from
+            https://loading.io/css/
+        -->
+		<div class="lds-ellipsis">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+		<!-- end of loader animation -->
+		<!-- static footer text  -->
+		<h5>This may take a few moments... Any issue/feedback? Please <a
+				href='https://github.com/sap-pilot/int-devops/issues'>contact us here</a></h5>
+	</div>
+	<div
+		id="ui5-container"
+		data-sap-ui-component
+		data-name="org.sapux.int"
+		data-id="container"
+		data-settings='{"id" : "org.sapux.int"}'
+		data-handle-validation="true"
+		style="display:none">
+	</div>
+</body>
+
+</html>

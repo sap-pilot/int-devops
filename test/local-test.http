@@ -55,10 +55,10 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "nodeName": "DCORE_INT_PREPROD2",
+    "nodeName": "INT_MAINT",
     "contentType": "MTA",
     "storageType": "FILE", 
-    "description": "cpi-iflow.mtar",
+    "description": "Test Transport",
     "namedUser": "int-devops@sap-test.de",
     "entries": [
         {

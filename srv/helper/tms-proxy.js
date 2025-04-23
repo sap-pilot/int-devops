@@ -4,6 +4,7 @@ const { responseInterceptor } = require('http-proxy-middleware');
 const { logger } = require("./logger");
 const { config } = require('../config');
 const { extractMtar } = require('./mtar-extractor');
+const { repoMan } = require('./repo-man');
 
 /* http-proxy middleware */
 const tmsProxyConfig = {
@@ -46,6 +47,7 @@ const tmsProxyConfig = {
             } else if (req.body && typeof req.body == 'object') {
                 // repost JSON request body
                 const str = JSON.stringify(req.body,null,2);
+                logger.debug(`[req-body]: ${str}`);
                 proxyReq.setHeader('Content-Type', `application/json`);
                 proxyReq.setHeader('Content-Length', str.length);
                 proxyReq.write(str);
@@ -85,16 +87,28 @@ const tmsProxyConfig = {
             const exportUrlPattern = /^\/v2\/nodes\/export$/;
             if ( proxyRes.req.path.match(exportUrlPattern) ) {
                 const fileId = req.body && req.body.entries && req.body.entries.length > 0? req.body.entries[0].uri : null;
+                const trNode = req.body? req.body.nodeName : '';
+                const trDesc = responseObj? responseObj.transportRequestDescription : 'n/a';
+                const trId =   responseObj? responseObj.transportRequestId : '000';
+                //const trNodeId = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeId : '';
                 if (!fileId) {
                     logger.warn(`no file id found from export request: ${JSON.stringify(req.body,null,2)}`);
                 } else {
                     const mtarFile = `${config.uploadPath}/${fileId}`;
                     const destPath = `${config.tmpPath}/${fileId}`;
                     if (!fs.existsSync(mtarFile)) {
-                        logger.warn(`abort mtar extraction, no mtarFile exists at ${mtarFile}`);
+                        logger.warn(`abort mtar extraction and repo update - no mtarFile exists at ${mtarFile}`);
                     } else {
-                        logger.info(`extracting mtar ${mtarFile} to ${destPath}`);
-                        extractMtar(mtarFile, destPath);
+                        const branch = repoMan.findBranch(trNode);
+                        logger.info(`extracting mtar ${mtarFile} to ${destPath} and pushing to ${branch}`);
+                        extractMtar(mtarFile, destPath)
+                            .then(repoMan.pull(branch))
+                            .then(repoMan.copyFiles(destPath, branch))
+                            .then(repoMan.commit(branch,`${trId}-${trDesc}`))
+                            .then(repoMan.push(branch))
+                            .catch(error => {
+                                logger.error(`error while extracting/pushing ${mtarFile} to ${branch}: ${error}`)
+                            });
                     }
                 }
             }

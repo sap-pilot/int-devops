@@ -57,8 +57,7 @@ class RepoMan {
     }
     copyFiles(srcFolder, branch) {
         if (!this._initialized) {
-            logger.warn(`repo not initialized, abort copying files`);
-            return;
+            throw new Error(`repo not initialized, abort copying files`);
         }
         const destFolder = `${this._rootFolder}/${branch}`;
         //const cmd = `cp -rf ${srcFolder}/* ${destFolder}`;
@@ -68,7 +67,7 @@ class RepoMan {
             const result = execSync(`${cmd}`);
             logger.debug(`completed '${cmd}:\n${result}`);
         } catch (error) {
-            logger.error(`error with '${cmd}':\n${error}`);
+            throw new Error(`error with '${cmd}': ${error}`, {cause: error});
         }
     }
     pull(branch) {
@@ -76,6 +75,7 @@ class RepoMan {
             throw new Error(`repo not initialized, abort pull`);
         }
         this._git(`reset --hard`,`${this._rootFolder}/${branch}`)
+        this._git(`clean -fd`,`${this._rootFolder}/${branch}`)
         this._git(`pull`,`${this._rootFolder}/${branch}`)
     }
     commit(branch, message) {

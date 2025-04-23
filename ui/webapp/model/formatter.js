@@ -10,9 +10,9 @@ sap.ui.define([], function () {
 		statusIcon: function (sStatusText) {
 			// var resourceBundle = this.getView().getModel("i18n").getResourceBundle();
 			switch (sStatusText) {
-				case "OK":
+				case "ok":
 					return "sap-icon://sys-enter-2";
-				case "ERROR":
+				case "error":
 					return "sap-icon://error";
 				default:
 					return null;
@@ -21,9 +21,9 @@ sap.ui.define([], function () {
         statusState: function (sStatusText) {
 			// var resourceBundle = this.getView().getModel("i18n").getResourceBundle();
 			switch (sStatusText) {
-				case "OK":
+				case "ok":
 					return "Success";
-				case "ERROR":
+				case "error":
 					return "Error";
 				default:
 					return null;
@@ -32,15 +32,15 @@ sap.ui.define([], function () {
         statusHighlight: function (sStatusText) {
 			// var resourceBundle = this.getView().getModel("i18n").getResourceBundle();
 			switch (sStatusText) {
-				case "OK":
+				case "ok":
 					return "Success";
-				case "INFO":
+				case "info":
 					return "Information";
-				case "WARNING":
+				case "warning":
 					return "Warning";
-				case "ERROR":
+				case "error":
 					return "Error";
-				case "FATAL":
+				case "fatal":
 					return "Error";
 				default:
 					return "None";

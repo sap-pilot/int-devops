@@ -73,21 +73,28 @@
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
 									id="TreeTableBasic"
-									rows="{path:'resourceTree>/content/resources', parameters: {arrayNames:['categories']}}"
+									rows="{path:'resourceTree>/', parameters: {arrayNames:['children']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
 									enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
-										<Title id="title" text=""/>
+										<SearchField id="treeFilter" width="50%" liveChange="onTreeFilterLiveChange"/>
 										<ToolbarSpacer/>
+										<Button text="Transport" type="Emphasized"/>
 										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
 										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
 										<Button icon="sap-icon://expand-group" press="onExpandSelection"/>
 										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/>
 									</OverflowToolbar>
 								</table:extension>
+								<table:rowSettingsTemplate>
+                                    <table:RowSettings highlight="{
+                                        path: 'resourceTree>status',
+                                        formatter: '.formatter.statusHighlight'
+                                    }" highlightText="{resourceTree>status}"/>
+                                </table:rowSettingsTemplate>
 								<table:columns>
 									<table:Column width="13rem">
 										<Label text="Content Resources"/>

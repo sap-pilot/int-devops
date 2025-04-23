@@ -37,8 +37,8 @@ class RepoMan {
             if (!fs.existsSync(`${folder}`)) {
                 this._git(`clone -b ${branch} ${this._repoUrl} ${branch}`, this._rootFolder);
                 // config user name and email
-                this._git(`config user.name "int-devops"`, folder);
-                this._git(`config user.email "int-devops@sap-test.de"`, folder);
+                // this._git(`config user.name "int-devops"`, folder);
+                // this._git(`config user.email "int-devops@sap-test.de"`, folder);
             }
         }
         const durationMs = Date.now() - startTime;
@@ -78,13 +78,22 @@ class RepoMan {
         this._git(`clean -fd`,`${this._rootFolder}/${branch}`)
         this._git(`pull`,`${this._rootFolder}/${branch}`)
     }
-    commit(branch, message) {
+    commit(branch, message, user) {
         if (!this._initialized) {
             throw new Error(`repo not initialized, abort commit`);
             return;
         }
-        this._git(`add -A`,`${this._rootFolder}/${branch}`)
-        this._git(`commit -m "${message}"`,`${this._rootFolder}/${branch}`)
+        let dir = `${this._rootFolder}/${branch}`;
+        if (user) {
+            this._git(`config user.name "${user.name}"`, dir);
+            this._git(`config user.email "${user.email}"`, dir);
+        } else {
+            // revert to default user
+            this._git(`config user.name "int-devops"`, dir);
+            this._git(`config user.email "int-devops@sap-test.de"`, dir);
+        }
+        this._git(`add -A`,dir)
+        this._git(`commit -m "${message}"`,dir)
     }
     push(branch) {
         if (!this._initialized) {

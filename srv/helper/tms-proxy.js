@@ -88,8 +88,14 @@ const tmsProxyConfig = {
             if ( proxyRes.req.path.match(exportUrlPattern) ) {
                 const fileId = req.body && req.body.entries && req.body.entries.length > 0? req.body.entries[0].uri : null;
                 const trNode = req.body? req.body.nodeName : '';
+                const namedUser = req.body? req.body.namedUser : null;
+                const userInfo = namedUser? {
+                    "name":namedUser.split("@")[0],
+                    "email":namedUser
+                }:null;
                 const trDesc = responseObj? responseObj.transportRequestDescription : 'n/a';
                 const trId =   responseObj? responseObj.transportRequestId : '000';
+               
                 //const trNodeId = responseObj && responseObj.queueEntries && responseObj.queueEntries.length > 0? responseObj.queueEntries[0].nodeId : '';
                 if (!fileId) {
                     logger.warn(`no file id found from export request: ${JSON.stringify(req.body,null,2)}`);
@@ -104,7 +110,7 @@ const tmsProxyConfig = {
                         extractMtar(mtarFile, destPath)
                             .then(repoMan.pull(branch))
                             .then(repoMan.copyFiles(destPath, branch))
-                            .then(repoMan.commit(branch,`${trId}-${trDesc}`))
+                            .then(repoMan.commit(branch,`${trId}-${trDesc}`,userInfo))
                             .then(repoMan.push(branch))
                             .catch(error => {
                                 logger.error(`error while extracting/pushing ${mtarFile} to ${branch}: ${error}`)

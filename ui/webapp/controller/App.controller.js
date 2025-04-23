@@ -42,7 +42,7 @@ sap.ui.define(
 				this.loadUserInfo();
 
 				// load build info
-				const buildInfo = new JSONModel("/version");
+				const buildInfo = new JSONModel("./version");
 				this.getView().setModel(buildInfo, "buildInfo");
 
 				// setup session dialog and expiring timeout (attach to fetch event)
@@ -61,7 +61,7 @@ sap.ui.define(
 
 			loadUserInfo: function() {
 				// read sub-accounts
-				const url = "/model/user.json",
+				const url = "./model/user.json",
 				 requestOptions = {
 						method: "GET",
 						redirect: "follow"

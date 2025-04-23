@@ -97,16 +97,18 @@ const tmsProxyConfig = {
                     const mtarFile = `${config.uploadPath}/${fileId}`;
                     const destPath = `${config.tmpPath}/${fileId}`;
                     if (!fs.existsSync(mtarFile)) {
-                        logger.warn(`abort mtar extraction, no mtarFile exists at ${mtarFile}`);
+                        logger.warn(`abort mtar extraction and repo update - no mtarFile exists at ${mtarFile}`);
                     } else {
-                        logger.info(`extracting mtar ${mtarFile} to ${destPath}`);
-                        extractMtar(mtarFile, destPath);
                         const branch = repoMan.findBranch(trNode);
-                        logger.info(`pushing mtar content into branch ${branch}`);
-                        repoMan.pull(branch);
-                        repoMan.copyFiles(destPath, branch);
-                        repoMan.commit(branch,`${trId}-${trDesc}`);
-                        repoMan.push(branch);
+                        logger.info(`extracting mtar ${mtarFile} to ${destPath} and pushing to ${branch}`);
+                        extractMtar(mtarFile, destPath)
+                            .then(repoMan.pull(branch))
+                            .then(repoMan.copyFiles(destPath, branch))
+                            .then(repoMan.commit(branch,`${trId}-${trDesc}`))
+                            .then(repoMan.push(branch))
+                            .catch(error => {
+                                logger.error(`error while extracting/pushing ${mtarFile} to ${branch}: ${error}`)
+                            });
                     }
                 }
             }

@@ -62,7 +62,7 @@ class RepoMan {
         }
         const destFolder = `${this._rootFolder}/${branch}`;
         //const cmd = `cp -rf ${srcFolder}/* ${destFolder}`;
-        const cmd = `rsync -art ${srcFolder}/* ${destFolder} --exclude /META-INF`;
+        const cmd = `rsync -art ${srcFolder}/* ${destFolder} --exclude /META-INF --exclude ExportInformation.info`;
         logger.info(cmd)
         try {
             const result = execSync(`${cmd}`);
@@ -73,15 +73,14 @@ class RepoMan {
     }
     pull(branch) {
         if (!this._initialized) {
-            logger.warn(`repo not initialized, abort pull`);
-            return;
+            throw new Error(`repo not initialized, abort pull`);
         }
         this._git(`reset --hard`,`${this._rootFolder}/${branch}`)
         this._git(`pull`,`${this._rootFolder}/${branch}`)
     }
     commit(branch, message) {
         if (!this._initialized) {
-            logger.warn(`repo not initialized, abort commit`);
+            throw new Error(`repo not initialized, abort commit`);
             return;
         }
         this._git(`add -A`,`${this._rootFolder}/${branch}`)
@@ -89,7 +88,7 @@ class RepoMan {
     }
     push(branch) {
         if (!this._initialized) {
-            logger.warn(`repo not initialized, abort push`);
+            throw new Error(`repo not initialized, abort push`);
             return;
         }
         //this._git(`push --force`,`${this._rootFolder}/${branch}`)
@@ -110,7 +109,7 @@ class RepoMan {
             const durationMs = Date.now() - startTime;
             logger.debug(`completed 'git ${redactedCmd}' (duration: ${durationMs}ms):\n${result}`);
         } catch (error) {
-            logger.error(`error with 'git ${redactedCmd}':\n${error}`);
+            throw new Error(`error with 'git ${redactedCmd}': ${error}`,{cause: error});
         }
     }
 }

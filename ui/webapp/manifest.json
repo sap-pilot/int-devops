@@ -55,13 +55,12 @@
 				"sap.m": {},
 				"sap.ui.core": {},
 				"sap.f": {},
-				"sap.suite.ui.generic.template": {},
+				"sap.suite.ui.commons": {},
+				"sap.tnt": {},
 				"sap.ui.comp": {},
 				"sap.ui.generic.app": {},
 				"sap.ui.table": {},
-				"sap.ushell": {},
-				"sap.ui.layout": {},
-				"sap.ui.unified": {}
+				"sap.ui.layout": {}
 			}
 		},
 		"contentDensities": {

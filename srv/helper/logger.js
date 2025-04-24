@@ -1,5 +1,4 @@
 const { createLogger, format, transports }= require("winston");
-const redact = require('redact-secrets')('[REDACTED]');
 
 const logRedact = process.env.LOG_REDACT != "false";
 const environment = process.env.NODE_ENV;

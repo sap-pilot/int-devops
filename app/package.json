@@ -17,6 +17,6 @@
     },
     "scripts": {
         "local": "XS_APP_LOG_LEVEL=error node server.js -w local",
-        "start": "node server.js"
+        "start": "node --trace-deprecation server.js"
     }
 }

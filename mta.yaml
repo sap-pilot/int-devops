@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: int-devops
-version: 0.0.1
+version: 0.0.5
 description: "SAP Integration Suite DevOps Utilities"
 parameters:
   enable-parallel-deployments: true

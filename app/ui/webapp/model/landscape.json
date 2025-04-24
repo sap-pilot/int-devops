@@ -1,0 +1,307 @@
+{
+	"nodes": [
+		{
+			"key": 0,
+			"icon": "sap-icon://begin",
+			"title": "0.INT_DEV",
+			"group": 1,
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		},
+		{
+			"key": 1,
+			"icon": "sap-icon://begin",
+			"title": "1.INT_DEV_2",
+			"group": 1,
+			"status": "Warning",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "FI",
+					"value": "2.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "2.0.0"
+				},
+				{
+					"label": "UTIL",
+					"value": "2.0.0"
+				}
+			]
+		},
+		{
+			"key": 2,
+			"title": "2.INT_STAGING_2",
+			"group": 2,
+			"status": "Warning",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "FI",
+					"value": "2.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "2.0.0"
+				},
+				{
+					"label": "UTIL",
+					"value": "2.0.0"
+				}
+			]
+		},
+		{
+			"key": 3,
+			"title": "3.INT_SAGING",
+			"group": 2,
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		},
+		{
+			"key": 4,
+			"title": "4.INT_PREPROD_4",
+			"group": 3,
+			"status": "Warning",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "FI",
+					"value": "2.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "2.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "2.0.0"
+				},
+				{
+					"label": "UTIL",
+					"value": "2.0.0"
+				}
+			]
+		},
+		{
+			"key": 5,
+			"title": "5.INT_PREPROD_2",
+			"group": 3,
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		},
+		{
+			"key": 6,
+			"title": "6.INT_PREPROD",
+			"group": 4,
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		},
+		{
+			"key": 7,
+			"title": "7.INT_PROD",
+			"group": 5,
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		}
+	],
+	"lines": [
+		{
+			"from": 0,
+			"to": 1,
+            "status": "Success"
+		},
+		{
+			"from": 0,
+			"to": 3,
+            "status": "Success"
+		},
+		{
+			"from": 0,
+			"to": 2,
+			"status": "Success"
+		},
+		{
+			"from": 0,
+			"to": 4,
+			"status": "Success"
+		},
+		{
+			"from": 3,
+			"to": 5,
+			"status": "Success"
+		},
+		{
+			"from": 6,
+			"to": 7,
+            "status": "Success"
+		},
+		{
+			"from": 0,
+			"to": 6,
+			"status": "Success"
+		},
+		{
+			"from": 5,
+			"to": 6,
+			"status": "Success"
+		},
+		{
+			"from": 4,
+			"to": 6,
+			"status": "Success"
+		}
+	],
+	"groups": [
+		{
+			"key": 1,
+			"title": "Development",
+			"headerCheckboxState": "Checked",
+			"status": "Success"
+		},
+		{
+			"key": 2,
+			"title": "Staging",
+			"headerCheckboxState": "Unchecked",
+			"status": "Warning"
+		},
+		{
+			"key": 3,
+			"title": "Preprod(X)",
+			"status": "Warning",
+			"collapsed": false
+		},
+		{
+			"key": 4,
+			"title": "Preprod",
+			"status": "Success"
+		},
+		{
+			"key": 5,
+			"title": "Production",
+			"status": "Success"
+		}
+	]
+}

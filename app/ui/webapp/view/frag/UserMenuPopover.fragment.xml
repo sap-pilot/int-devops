@@ -1,0 +1,28 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:f="sap.f"
+	xmlns:l="sap.ui.layout">
+	<Popover
+		id="userMenu"
+		title="{userInfo>/attr/givenName} {userInfo>/attr/familyName}"
+		showHeader="true"
+		placement="Bottom"
+		afterClose="onUserAvatarPopoverClose">
+		<subHeader>
+			<FlexBox width="100%" 
+				alignItems="Start"
+				justifyContent="Center">
+				<Text text="{userInfo>/attr/email}" class="sapUiSmallMarginBottom sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+			</FlexBox>
+		</subHeader>
+		<List>
+            <items>
+                <!-- <StandardListItem icon="sap-icon://action-settings" title="Settings" type="Active" press="onUserMenuListItemPress" /> -->
+                <StandardListItem icon="sap-icon://sys-help" title="Report Issue" type="Active" press="onUserMenuListItemPress" />
+                <StandardListItem icon="sap-icon://hint" title="About" type="Active" press="onUserMenuListItemPress" />
+                <StandardListItem icon="sap-icon://log" title="Sign Out" type="Active" press="onUserMenuListItemPress" />
+            </items>
+        </List>
+	</Popover>
+</core:FragmentDefinition>

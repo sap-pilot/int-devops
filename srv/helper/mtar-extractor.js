@@ -1,15 +1,20 @@
-const { execSync } = require('child_process');
-const { logger } = require("./logger");
+const { config } = require("../config");
+const { command } = require('./command');
+const fs = require("fs");
 
 // extract specified mtarFile to destDir, returns Promise
-const extractMtar = (mtarFile, destDir) => {
+const extractMtar = function(mtarFile, destDir) {
     return new Promise((resolve,reject) => {
+        const cmd = `${config.rootPath}/srv/helper/mtar-extractor.sh`;
+        const args = `${mtarFile} ${destDir}`;
         try {
-            const result = execSync(`./srv/helper/mtar-extractor.sh ${mtarFile} ${destDir}`);
-            logger.debug(`extracted ${mtarFile}: ${result}`);
+            if (!fs.existsSync(config.tmpPath)){
+                fs.mkdirSync(config.tmpPath);
+            }
+            const result = command(cmd, args, config.tmpPath);
             resolve(result);
         } catch (error) {
-            reject(new Error(`error during extracting ${mtarFile}: ${error}`, { cause: error }));
+            reject(new Error(`'${cmd} ${args}': ${error}`, {cause: error}));
         }
     });
 }

@@ -1,0 +1,120 @@
+{
+	"_version": "1.49.0",
+	"sap.app": {
+		"id": "org.sapux.int",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:basic",
+			"version": "1.11.0",
+			"toolsId": "3a849e6f-143f-4991-ac96-a3e637ae3dc9"
+		},
+		"dataSources": {},
+		"crossNavigation": {
+			"inbounds": {
+				"BtpPilot-overview": {
+					"semanticObject": "BtpPilot",
+					"action": "overview",
+					"title": "{{flpTitle}}",
+					"subTitle": "{{flpSubtitle}}",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": false,
+		"dependencies": {
+			"minUI5Version": "1.120.8",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.f": {},
+				"sap.suite.ui.commons": {},
+				"sap.tnt": {},
+				"sap.ui.comp": {},
+				"sap.ui.generic.app": {},
+				"sap.ui.table": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "org.sapux.int.i18n.i18n"
+				}
+			}
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"async": true,
+				"viewPath": "org.sapux.int.view",
+				"controlAggregation": "pages",
+				"controlId": "pageContainer",
+				"clearControlAggregation": false,
+				"path": "org.sapux.int.view"
+			},
+			"routes": [
+				{
+					"name": "Overview",
+					"pattern": ":?query:",
+					"target": "Main"
+				}
+			],
+			"targets": {
+				"Main": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "MainView",
+					"viewName": "MainView"
+				}
+			}
+		},
+		"rootView": {
+			"viewName": "org.sapux.int.view.App",
+			"type": "XML",
+			"async": true,
+			"id": "app"
+		}
+	}
+}

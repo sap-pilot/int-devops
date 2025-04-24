@@ -1,0 +1,31 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Dialog
+		title="{i18n>SessionDialogTitle}"
+		contentWidth="20rem"
+		verticalScrolling="false">
+		<buttons>
+			<Button
+				visible="{sessionExpiring>/bIsExpiring}"
+				text="{i18n>ContinueWorking}"
+				press="onContinueWorking"
+				type="Emphasized" />
+			<Button
+				visible="{= !${sessionExpiring>/bIsExpiring} }"
+				text="{i18n>SignIn}"
+				press="onSignIn"
+				type="Emphasized" />
+			<!-- <Button
+				visible="{= !${/bIsExpiring} }"
+				text="{i18n>Close}"
+				press="onDialogClose"/> -->
+		</buttons>
+		<IllustratedMessage
+			title="{= ${sessionExpiring>/bIsExpiring} ? ${i18n>TitleExpiring} : ${i18n>TitleExpired} }"
+			description="{= ${sessionExpiring>/bIsExpiring} ?
+				${i18n>DescriptionExpiringBegin} + ${sessionExpiring>/iSecondsLeft} + ${i18n>DescriptionExpiringEnd} :
+				${i18n>DescriptionExpired} }"
+			illustrationType="{= ${sessionExpiring>/bIsExpiring} ? 'tnt-SessionExpiring' : 'tnt-SessionExpired' }" />
+	</Dialog>
+</core:FragmentDefinition>

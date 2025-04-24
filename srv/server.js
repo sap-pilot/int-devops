@@ -9,8 +9,7 @@ const { config } = require('./config');
 
 // upload handling
 const multer = require('multer')
-const uploadPath = config.uploadPath;
-const upload = multer({ dest: uploadPath });
+const upload = multer({ dest: config.uploadPath });
 
 let buildInfo = { "version": "N/A", "build": "N/A" };
 try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
@@ -33,7 +32,7 @@ const tmsProxy = createProxyMiddleware(tmsProxyConfig);
 // at /tms path: handle file upload -> handle json body (export) -> then do tms-proxy
 app.use('/tms', upload.single('file'), express.json(), tmsProxy);
 
-app.use(express.static('./app/webapp'));
+app.use(express.static('./app/ui/webapp'));
 
 app.listen(port, () => {
     logger.info(`server ${buildInfo.version} (build: ${buildInfo.build}) listening at http://localhost:${port}`);

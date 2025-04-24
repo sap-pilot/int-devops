@@ -34,7 +34,7 @@
 		{
 			"source": "^/ui(.*)$",
 			"target": "$1",
-			"localDir": "ui/webapp",
+			"localDir": "ui/dist",
 			"authenticationType": "xsuaa",
 			"cacheControl": "max-age=0, must-revalidate"
 		}

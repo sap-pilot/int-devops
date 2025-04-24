@@ -5,20 +5,11 @@
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
   "type": "commonjs",
-  "keywords": [
-    "SAP",
-    "Integration",
-    "DevOps",
-    "TMS"
-  ],
   "homepage": "https://github.com/sap-pilot/int-devops#readme",
-  "bugs": {
-    "url": "https://github.com/sap-pilot/int-devops/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sap-pilot/int-devops.git"
-  },
+  "workspaces": [
+    "app",
+    "app/ui"
+  ],
   "engines": {
     "node": ">=22"
   },
@@ -30,7 +21,7 @@
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1"
   },
-  "dependencies": {
-    
+  "devDependencies": {
+    "@ui5/cli": "^4"
   }
 }

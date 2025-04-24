@@ -12,6 +12,17 @@ build-parameters:
         # - npm ci # run npm ci after checking out repo or npm install after updating package.json, instead of during build
 
 modules:
+  - name: int-devops-ui
+    type: html5
+    path: app/ui
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+      supported-platforms: []    
+
   - name: int-devops-app
     type: approuter.nodejs
     path: app
@@ -37,7 +48,7 @@ modules:
       # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
       builder: npm-ci
-      ignore: ["node_modules/","default-*.json","*.env"]                  
+      ignore: ["node_modules/","default-*.json","*.env"]              
 
 resources:
   - name: int-devops-xsuaa

@@ -1,8 +1,8 @@
 const { config } = require('../config');
 const { logger } = require('./logger');
+const { command } = require('./command');
 const fs = require("fs");
-const path = require("path");
-const { execSync } = require('child_process');
+
 
 class RepoMan {
     constructor() {
@@ -11,14 +11,12 @@ class RepoMan {
         }
         RepoMan.instance = this;
         this._initialized = false;
-        let repoStr = JSON.stringify(config.repo,null,2);
-        const redactedStr = this._redactUrl(repoStr);
         const startTime =  Date.now();
-        logger.info(`initializing RepoMan with config: ${redactedStr}`);
+        logger.info(`initializing RepoMan at: ${config.repo.url}`);
         this._repoUrl = config.repo.url;
         this._branches = config.repo.branches;
         this._nodeMapping = config.repo.nodeMapping;
-        this._rootFolder = path.join(__dirname, '../../', config.workPath);
+        this._rootFolder = config.workPath;
         logger.info(`repo rootFolder: '${this._rootFolder}'`);
         if (!fs.existsSync(this._rootFolder)){
             logger.info(`creating repo rootFolder '${this._rootFolder}'`);
@@ -61,14 +59,9 @@ class RepoMan {
         }
         const destFolder = `${this._rootFolder}/${branch}`;
         //const cmd = `cp -rf ${srcFolder}/* ${destFolder}`;
-        const cmd = `rsync -art ${srcFolder}/* ${destFolder} --exclude /META-INF --exclude ExportInformation.info`;
-        logger.info(cmd)
-        try {
-            const result = execSync(`${cmd}`);
-            logger.debug(`completed '${cmd}:\n${result}`);
-        } catch (error) {
-            throw new Error(`error with '${cmd}': ${error}`, {cause: error});
-        }
+        const cmd = 'rsync';
+        const args = `-art ${srcFolder}/* ${destFolder} --exclude /META-INF --exclude ExportInformation.info`;
+        command(cmd, args, config.tmpPath);
     }
     pull(branch) {
         if (!this._initialized) {
@@ -103,23 +96,8 @@ class RepoMan {
         //this._git(`push --force`,`${this._rootFolder}/${branch}`)
         this._git(`push`,`${this._rootFolder}/${branch}`)
     }
-    _redactUrl(url) {
-        if (!config.redactAuthHeader)
-            return url;
-        const newUrl = url.replace(/\/\/(.*?)\@/, "//[redacted]@");
-        return newUrl;
-    }
     _git(gitCmd, targetDir) {
-        const startTime =  Date.now();
-        const redactedCmd = this._redactUrl(gitCmd);
-        logger.info(`git ${redactedCmd}`)
-        try {
-            const result = execSync(`git ${gitCmd}`, { cwd: targetDir });
-            const durationMs = Date.now() - startTime;
-            logger.debug(`completed 'git ${redactedCmd}' (duration: ${durationMs}ms):\n${result}`);
-        } catch (error) {
-            throw new Error(`error with 'git ${redactedCmd}': ${error}`,{cause: error});
-        }
+        command('git', gitCmd, targetDir);
     }
 }
 

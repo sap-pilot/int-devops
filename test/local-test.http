@@ -31,7 +31,7 @@ Accept: application/json
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="namedUser"
+Content-Disposition: form-data; name="int-devops@sap-test.de"
 
 int-devops@sap-test.de
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -55,7 +55,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "nodeName": "INT_MAINT",
+    "nodeName": "INT_DEV2",
     "contentType": "MTA",
     "storageType": "FILE", 
     "description": "Test Transport",

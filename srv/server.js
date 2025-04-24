@@ -9,8 +9,7 @@ const { config } = require('./config');
 
 // upload handling
 const multer = require('multer')
-const uploadPath = config.uploadPath;
-const upload = multer({ dest: uploadPath });
+const upload = multer({ dest: config.uploadPath });
 
 let buildInfo = { "version": "N/A", "build": "N/A" };
 try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }

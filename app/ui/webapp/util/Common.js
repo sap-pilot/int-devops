@@ -10,7 +10,7 @@ sap.ui.define([
 
 		SESSION_TIMEOUT_SEC: 119 * 60, // session timeout after 119 minutes (-1 minute comparing to app/xs-app.json->sessionTimeout)
 		SESSION_WARNING_SEC: 59, // show session expiring dialog 59 seconds before actual timeout
-		LINK_REPORT_ISSUE: "https://github.com/sap-pilot/btp-pilot/issues",
+		LINK_REPORT_ISSUE: "https://github.com/sap-pilot/int-devops/issues",
 
 		reportSuccess: function(oProgressModel, sMessage) {
 			if (!oProgressModel) {

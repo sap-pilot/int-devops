@@ -1,0 +1,22 @@
+{
+    "engines": {
+        "node": ">=22"
+    },
+    "dependencies": {
+        "@sap/approuter": "^20",
+        "express": "^5",
+        "form-data": "^4.0.2",
+        "http-proxy-middleware": "^3",
+        "multer": "^1.4.5-lts.2",
+        "winston": "^3"
+    },
+    "overrides": {
+        "http-proxy-middleware": {
+            "http-proxy": "github:nikeee/node-http-proxy#b42c38fc3486ee8ad4374cc2397458b6e4cd99ca"
+        }
+    },
+    "scripts": {
+        "local": "XS_APP_LOG_LEVEL=error node server.js -w local",
+        "start": "node server.js"
+    }
+}

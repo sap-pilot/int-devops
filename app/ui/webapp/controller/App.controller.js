@@ -42,7 +42,7 @@ sap.ui.define(
 				this.loadUserInfo();
 
 				// load build info
-				const buildInfo = new JSONModel("./version");
+				const buildInfo = new JSONModel("../public/version");
 				this.getView().setModel(buildInfo, "buildInfo");
 
 				// setup session dialog and expiring timeout (attach to fetch event)
@@ -61,7 +61,7 @@ sap.ui.define(
 
 			loadUserInfo: function() {
 				// read sub-accounts
-				const url = "./model/user.json",
+				const url = "../user-api/currentUser",
 				 requestOptions = {
 						method: "GET",
 						redirect: "follow"
@@ -75,10 +75,10 @@ sap.ui.define(
 								Common.reportError(result.error, sErrorMessage, null);
 								return;
 							}
-							if (result && result.value) {
-								this.handleUserInfo(result.value);
+							if (result) {
+								this.handleUserInfo(result);
 							} else {
-								console.error("unexpected data returned from " + url + ": " + result);
+								console.error("Unexpected data returned from " + url + ": " + result);
 							}
 						}.bind(this))
 						.catch(function(error) {
@@ -92,19 +92,17 @@ sap.ui.define(
 			handleUserInfo: function(oUserInfo) {
 				let sInitial = "";
 				if (oUserInfo) {
-					if (oUserInfo.attr) {
-						if (oUserInfo.attr.givenName) {
-							sInitial += oUserInfo.attr.givenName.slice(0, 1);
-						}
-						if (oUserInfo.attr.familyName) {
-							sInitial += oUserInfo.attr.familyName.slice(0, 1);
-						}
+					if (oUserInfo.firstname) {
+						sInitial += oUserInfo.firstname.slice(0, 1);
+					}
+					if (oUserInfo.lastname) {
+						sInitial += oUserInfo.lastname.slice(0, 1);
 					}
 				}
 				if (sInitial) {
 					sInitial = sInitial.toUpperCase();
 				} else {
-					sInitial = "U";
+					sInitial = "NA";
 				}
 				oUserInfo.initial = sInitial;
 				this.userInfo.setData(oUserInfo);

@@ -1,0 +1,70 @@
+{
+	"xsappname": "int-devops",
+	"tenant-mode": "dedicated",
+	"description": "SAP Integration DevOps Service",
+	"scopes": [
+		{
+			"name": "uaa.user",
+			"description": "UAA"
+		},
+		{
+			"name": "$XSAPPNAME.Viewer",
+			"description": "INT-DevOps service viewer"
+		},
+		{
+			"name": "$XSAPPNAME.Operator",
+			"description": "INT-DevOps service operator"
+		},
+		{
+			"name": "$XSAPPNAME.Admin",
+			"description": "INT-DevOps service administrator"
+		}
+	],
+	"role-templates": [
+		{
+			"name": "Token_Exchange",
+			"description": "UAA",
+			"scope-references": [
+				"uaa.user"
+			]
+		},
+		{
+			"name": "INT_DevOps_Viewer",
+			"description": "Integration DevOps Viewer (Readonly) Role Template",
+			"scope-references": [
+				"$XSAPPNAME.Viewer"
+			]
+		},
+		{
+			"name": "INT_DevOps_Operator",
+			"description": "Integration DevOps Operator Role Template",
+			"scope-references": [
+				"$XSAPPNAME.Admin"
+			]
+		},
+		{
+			"name": "INT_DevOps_Admin",
+			"description": "Integration DevOps Administrator Role Template",
+			"scope-references": [
+				"$XSAPPNAME.Admin"
+			]
+		}
+	],
+	"oauth2-configuration": {
+		"token-validity": 86400,
+		"redirect-uris": [
+			"https://*.cvx.one/**",
+			"https://*.cfapps.us10.hana.ondemand.com/**",
+			"https://*.cfapps.us20.hana.ondemand.com/**",
+			"https://*.cfapps.eu10.hana.ondemand.com/**"
+		],
+		"refresh-token-validity": 604800,
+		"system-attributes": [
+			"groups",
+			"rolecollections"
+		],
+		"allowedproviders": [
+			"sap.default"
+		]
+	}
+}

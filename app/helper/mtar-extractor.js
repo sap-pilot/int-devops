@@ -5,7 +5,7 @@ const fs = require("fs");
 // extract specified mtarFile to destDir, returns Promise
 const extractMtar = function(mtarFile, destDir) {
     return new Promise((resolve,reject) => {
-        const cmd = `${config.rootPath}/srv/helper/mtar-extractor.sh`;
+        const cmd = `${__dirname}/mtar-extractor.sh`;
         const args = `${mtarFile} ${destDir}`;
         try {
             if (!fs.existsSync(config.tmpPath)){

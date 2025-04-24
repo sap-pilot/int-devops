@@ -1,46 +1,27 @@
 {
   "name": "int-devops",
-  "version": "0.0.4",
-  "description": "SAP Integration Suite DevOps Utilities",
+  "version": "0.0.5",
+  "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
   "type": "commonjs",
-  "keywords": [
-    "SAP",
-    "Integration",
-    "DevOps",
-    "TMS"
-  ],
   "homepage": "https://github.com/sap-pilot/int-devops#readme",
-  "bugs": {
-    "url": "https://github.com/sap-pilot/int-devops/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sap-pilot/int-devops.git"
-  },
+  "workspaces": [
+    "app",
+    "app/ui"
+  ],
   "engines": {
     "node": ">=22"
   },
-  "main": "srv/server.js",
+  "main": "app/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node srv/server.js",
-    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > ./srv/build-info.json",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > app/build-info.json",
     "build": "mbt build --mtar=int-devops.mtar",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1"
   },
-  "dependencies": {
-    "express": "^5",
-    "form-data": "^4.0.2",
-    "http-proxy-middleware": "^3",
-    "multer": "^1.4.5-lts.2",
-    "winston": "^3"
-  },
-  "overrides": {
-    "http-proxy-middleware": {
-      "http-proxy": "github:nikeee/node-http-proxy#b42c38fc3486ee8ad4374cc2397458b6e4cd99ca"
-    }
+  "devDependencies": {
+    "@ui5/cli": "^4"
   }
 }

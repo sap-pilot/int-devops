@@ -28,6 +28,8 @@ const command = function(cmd, args, path){
     if (result.error) {
         throw new Error(result.error);
     } else if (result.status != 0) {
+        if (stdout && stdout.indexOf('nothing to commit, working tree clean' > -1))
+            return stdout; // nothing to worry not an exception
         throw new Error(`exit code [${result.status}] from '${cmd} ${args}''`)
     } else {
         return stdout;

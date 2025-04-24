@@ -14,9 +14,9 @@ const tmsProxyConfig = {
     on: {
         proxyReq: (proxyReq, req, res) => {
             req.startTime = Date.now();
-            const exchange = `[request] ${req.method} ${req.path}`;
+            const exchange = `[request] ${req.method} ${req.originalUrl}`;
             logger.info(exchange); // GET / -> http://www.example.com [200]
-            logger.debug(`[req-headers]: ${JSON.stringify(req.headers, null, 2)}`);
+            logger.debug(`[request-headers]: ${JSON.stringify(req.headers, null, 2)}`);
             const uploadUrlPattern = /^\/v2\/files\/upload$/;
             if (req.file) {
                 const formData = new FormData();
@@ -37,7 +37,7 @@ const tmsProxyConfig = {
             } else if (req.body && typeof req.body == 'object') {
                 // repost JSON request body
                 const str = JSON.stringify(req.body,null,2);
-                logger.debug(`[req-body]: ${str}`);
+                logger.debug(`[request-body]: ${str}`);
                 proxyReq.setHeader('Content-Type', `application/json`);
                 proxyReq.setHeader('Content-Length', str.length);
                 proxyReq.write(str);
@@ -47,9 +47,9 @@ const tmsProxyConfig = {
         proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
             // log original request and proxied request info
             const durationMs = Date.now() - req.startTime;
-            const exchange = `[response] ${req.method} ${req.path} -> ${proxyRes.req.protocol}//${proxyRes.req.host}${proxyRes.req.path} [${proxyRes.statusCode}] (${durationMs}ms)`;
+            const exchange = `[response] ${req.method} ${req.originalUrl} -> ${proxyRes.req.protocol}//${proxyRes.req.host}${proxyRes.req.path} [${proxyRes.statusCode}] (${durationMs}ms)`;
             logger.info(exchange); // GET / -> http://www.example.com [200]
-            logger.debug(`[res-headers]: ${JSON.stringify(res.getHeaders(), null, 2)}`);
+            logger.debug(`[response-headers]: ${JSON.stringify(res.getHeaders(), null, 2)}`);
             const response = responseBuffer.toString('utf8');
             let responseObj = null;
             try {
@@ -60,9 +60,9 @@ const tmsProxyConfig = {
             // pretty print response
             const nodesUrlPattern = /^\/v2\/nodes$/;
             if (config.logPretty && !proxyRes.req.path.match(nodesUrlPattern) && responseObj) {
-                logger.debug(`[res-body]: ${JSON.stringify(responseObj, null, 2)}`); // pretty print json object
+                logger.debug(`[response-body]: ${JSON.stringify(responseObj, null, 2)}`); // pretty print json object
             } else if (response) {
-                logger.debug(`[res-body]: ${response}`); // log raw response body
+                logger.debug(`[response-body]: ${response}`); // log raw response body
             }
             // try renaming uploaded file to fileId
             if (req.file && responseObj && responseObj.fileId) {

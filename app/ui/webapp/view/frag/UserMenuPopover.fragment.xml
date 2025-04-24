@@ -5,7 +5,7 @@
 	xmlns:l="sap.ui.layout">
 	<Popover
 		id="userMenu"
-		title="{userInfo>/attr/givenName} {userInfo>/attr/familyName}"
+		title="{userInfo>/firstname} {userInfo>/lastname}"
 		showHeader="true"
 		placement="Bottom"
 		afterClose="onUserAvatarPopoverClose">
@@ -13,7 +13,7 @@
 			<FlexBox width="100%" 
 				alignItems="Start"
 				justifyContent="Center">
-				<Text text="{userInfo>/attr/email}" class="sapUiSmallMarginBottom sapUiSmallMarginBegin sapUiSmallMarginEnd" />
+				<Text text="{userInfo>/email}" class="sapUiSmallMarginBottom sapUiSmallMarginBegin sapUiSmallMarginEnd" />
 			</FlexBox>
 		</subHeader>
 		<List>

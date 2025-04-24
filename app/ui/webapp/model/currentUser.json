@@ -1,0 +1,11 @@
+{
+    "firstname": "Local",
+    "lastname": "Test",
+    "email": "int-devops@sap-test.de",
+    "name": "int-devops@sap-test.de",
+    "scopes": [
+      "openid",
+      "uaa.user"
+    ],
+    "displayName": "Local Test (int-devops@sap-test.de)"
+  }

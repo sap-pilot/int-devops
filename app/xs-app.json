@@ -1,0 +1,42 @@
+{
+	"welcomeFile": "/public/index.html",
+	"authenticationMethod": "route",
+	"sessionTimeout": 120,
+	"logout": {
+		"logoutEndpoint": "/do/logout",
+		"logoutPage": "/public/logout.html"
+	},
+	"routes": [
+		{
+			"source": "^/user-api(.*)",
+			"target": "$1",
+			"service": "sap-approuter-userapi"
+		},
+		{
+			"source": "^/tms(.*)$",
+			"target": "$1",
+			"localDir": "public",
+			"authenticationType": "none",
+			"cacheControl": "max-age=0, must-revalidate"
+		},
+		{
+			"source": "^/favicon(.*)$",
+			"target": "favicon$1",
+			"localDir": "ui/webapp/",
+			"authenticationType": "none"
+		},
+		{
+			"source": "^/public(.*)$",
+			"target": "$1",
+			"localDir": "public",
+			"authenticationType": "none"
+		},
+		{
+			"source": "^/ui(.*)$",
+			"target": "$1",
+			"localDir": "ui/dist",
+			"authenticationType": "xsuaa",
+			"cacheControl": "max-age=0, must-revalidate"
+		}
+	]
+}

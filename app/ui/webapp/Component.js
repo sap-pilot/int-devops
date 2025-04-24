@@ -56,6 +56,11 @@ function(UIComponent, Device, IllustrationPool, JSONModel, models) {
 				document.title = "Integration DevOps";
 				this.compModel.setProperty("/currentRouteName", "");
 			}
+			const oPageViewEvent = {
+				page_title: document.title,
+				page_location: window.location.href + window.location.hash
+			};
+			gtag("event", "page_view", oPageViewEvent);
 		}
 	});
 }

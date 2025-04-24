@@ -1,4 +1,5 @@
-// Integration DevOps server (main)
+// Integration DevOps AppRouter (main)
+const approuter = require('@sap/approuter');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
@@ -15,25 +16,39 @@ let buildInfo = { "version": "N/A", "build": "N/A" };
 try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
 
 const port = process.env.PORT || 4004;
-const app = express();
 
-app.get('/health', (req, res) => {
-    res.send('ok');
+const app = approuter();
+
+app.beforeRequestHandler.use('/public/health', (req, res) => {
+    res.end('ok');
 });
 
-app.get('/version', (req, res) => {
+app.beforeRequestHandler.use('/public/version', (req, res) => {
     const info = {"version":buildInfo,"process":process.versions};
     res.setHeader("Content-Type","application/json");
-    res.send(JSON.stringify(info,null,2));
+    res.end(JSON.stringify(info,null,2));
 });
 
 // create tms proxy with file upload handling
 const tmsProxy = createProxyMiddleware(tmsProxyConfig);
 // at /tms path: handle file upload -> handle json body (export) -> then do tms-proxy
-app.use('/tms', upload.single('file'), express.json(), tmsProxy);
+const compose = (...middlewares) => (req, res, next) => {
+    const execute = (index) => {
+      if (index >= middlewares.length) {
+        return next();
+      }
+      middlewares[index](req, res, () => execute(index + 1));
+    };
+    execute(0);
+  };
+  
+const combinedMiddleware = compose(upload.single('file'), express.json(), tmsProxy);
 
-app.use(express.static('./app/ui/webapp'));
+app.beforeRequestHandler.use('/tms', combinedMiddleware);
 
-app.listen(port, () => {
-    logger.info(`server ${buildInfo.version} (build: ${buildInfo.build}) listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     logger.info(`server ${buildInfo.version} (build: ${buildInfo.build}) listening at http://localhost:${port}`);
+// });
+app.start({
+    port: port
+})

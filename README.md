@@ -1,3 +1,3 @@
-# SAP Integration Suite DevOps Utilities
+# SAP Integration Suite DevOps Service
 
-Utilities to manage SAP Cloud Integration and API Management transports
+DevOps service to manage SAP Cloud Integration and API Management transports

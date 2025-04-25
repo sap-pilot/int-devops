@@ -1,13 +1,12 @@
 {
   "name": "int-devops",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
   "type": "commonjs",
   "homepage": "https://github.com/sap-pilot/int-devops#readme",
   "workspaces": [
-    "app",
     "app/ui"
   ],
   "engines": {
@@ -15,11 +14,13 @@
   },
   "main": "app/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > app/build-info.json",
     "build": "mbt build --mtar=int-devops.mtar",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > app/build-info.json",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
-    "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1"
+    "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
+    "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ui": "npm run local --prefix app"
   },
   "devDependencies": {
     "@ui5/cli": "^4"

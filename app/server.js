@@ -52,3 +52,5 @@ app.beforeRequestHandler.use('/tms', combinedMiddleware);
 app.start({
     port: port
 })
+
+logger.info(`started approuter at http://localhost:${port}`);

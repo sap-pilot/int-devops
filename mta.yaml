@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: int-devops
-version: 0.0.5
+version: 0.0.6
 description: "SAP Integration Suite DevOps Utilities"
 parameters:
   enable-parallel-deployments: true
@@ -19,7 +19,7 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm ci
+        #- npm ci
         - npm run build
       supported-platforms: []    
 

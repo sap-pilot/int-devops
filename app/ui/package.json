@@ -1,6 +1,6 @@
 {
     "name": "int-devops-ui",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "description": "Integration DevOps Service UI",
     "keywords": [
         "ui5",

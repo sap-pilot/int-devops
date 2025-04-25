@@ -3,9 +3,9 @@
 		{
 			"key": 0,
 			"icon": "sap-icon://begin",
-			"title": "0.INT_DEV",
+			"title": "0.INT_DEV_2",
 			"group": 1,
-			"status": "Success",
+			"status": "Warning",
 			"attributes": [
 				{
 					"label": "AM",
@@ -32,9 +32,9 @@
 		{
 			"key": 1,
 			"icon": "sap-icon://begin",
-			"title": "1.INT_DEV_2",
+			"title": "1.INT_DEV",
 			"group": 1,
-			"status": "Warning",
+			"status": "Success",
 			"attributes": [
 				{
 					"label": "AM",
@@ -60,9 +60,9 @@
 		},
 		{
 			"key": 2,
-			"title": "2.INT_STAGING_2",
+			"title": "2.INT_STAGING",
 			"group": 2,
-			"status": "Warning",
+			"status": "Success",
 			"attributes": [
 				{
 					"label": "AM",
@@ -88,9 +88,9 @@
 		},
 		{
 			"key": 3,
-			"title": "3.INT_SAGING",
+			"title": "3.INT_SAGING_2",
 			"group": 2,
-			"status": "Success",
+			"status": "Warning",
 			"attributes": [
 				{
 					"label": "AM",
@@ -116,7 +116,7 @@
 		},
 		{
 			"key": 4,
-			"title": "4.INT_PREPROD_4",
+			"title": "4.INT_PREPROD_3",
 			"group": 3,
 			"status": "Warning",
 			"attributes": [
@@ -139,34 +139,6 @@
 				{
 					"label": "UTIL",
 					"value": "2.0.0"
-				}
-			]
-		},
-		{
-			"key": 5,
-			"title": "5.INT_PREPROD_2",
-			"group": 3,
-			"status": "Success",
-			"attributes": [
-				{
-					"label": "AM",
-					"value": "1.0.1"
-				},
-				{
-					"label": "FI",
-					"value": "1.0.0"
-				},
-				{
-					"label": "MM",
-					"value": "1.0.0"
-				},
-				{
-					"label": "ROUTER",
-					"value": "1.0.1"
-				},
-				{
-					"label": "UTIL",
-					"value": "1.0.1"
 				}
 			]
 		},
@@ -230,28 +202,8 @@
 	"lines": [
 		{
 			"from": 0,
-			"to": 1,
-            "status": "Success"
-		},
-		{
-			"from": 0,
 			"to": 3,
             "status": "Success"
-		},
-		{
-			"from": 0,
-			"to": 2,
-			"status": "Success"
-		},
-		{
-			"from": 0,
-			"to": 4,
-			"status": "Success"
-		},
-		{
-			"from": 3,
-			"to": 5,
-			"status": "Success"
 		},
 		{
 			"from": 6,
@@ -259,18 +211,23 @@
             "status": "Success"
 		},
 		{
-			"from": 0,
+			"from": 1,
+			"to": 2,
+			"status": "Success"
+		},
+		{
+			"from": 3,
+			"to": 4,
+			"status": "Success"
+		},
+		{
+			"from": 3,
 			"to": 6,
 			"status": "Success"
 		},
 		{
-			"from": 5,
-			"to": 6,
-			"status": "Success"
-		},
-		{
-			"from": 4,
-			"to": 6,
+			"from": 2,
+			"to": 7,
 			"status": "Success"
 		}
 	],

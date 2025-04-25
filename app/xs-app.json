@@ -1,5 +1,5 @@
 {
-	"welcomeFile": "/public/index.html",
+	"welcomeFile": "/ui/index.html",
 	"authenticationMethod": "route",
 	"sessionTimeout": 120,
 	"logout": {

@@ -98,3 +98,7 @@ div.sapMTabContainer > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsConta
   /* height: 50px;
   width: 50px; */
 }
+
+.sapMSwtLabel {
+  font-size: 9px !important;
+}

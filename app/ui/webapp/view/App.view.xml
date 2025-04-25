@@ -27,11 +27,18 @@
 						showBorder="true"
 						press="onUserAvatarPress"/>
 				</f:profile>
-				<f:searchManager>
+				<!--f:searchManager>
 					<f:SearchManager/>
-				</f:searchManager>
+				</f:searchManager-->
                 <f:additionalContent>
-                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="sap-icon://dark-mode" press="onToggleTheme" />
+					<Switch state="false" customTextOn="Live" customTextOff="Demo" enabled="false" 
+						tooltip="DEMO mode uses static/fake data (no authorization needed); LIVE mode reads actual system landscape &amp; artifacts data (viewer/operator role required)">
+						<layoutData>
+							<FlexItemData growFactor="1" />
+						</layoutData>
+					</Switch>
+                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="sap-icon://dark-mode" press="onToggleTheme" 
+						tooltip="Toggle between dark/light theme" />
                 </f:additionalContent>
 			</f:ShellBar>
 		</tnt:header>

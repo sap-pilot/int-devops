@@ -15,7 +15,7 @@
   "main": "app/server.js",
   "scripts": {
     "build": "mbt build --mtar=int-devops.mtar",
-    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > app/build-info.json",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > app/build-info.json",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
     "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1",

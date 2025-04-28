@@ -9,7 +9,7 @@
 		<tnt:header>
 			<f:ShellBar 
                 title="Integration DevOps"
-				secondTitle="v{buildInfo>/version/version} ({buildInfo>/version/build})"
+				secondTitle="v{buildInfo>/version/version}-{buildInfo>/version/commit} ({buildInfo>/version/build})"
                 homeIcon="./favicon.png"
 				showMenuButton="true"
 				showNotifications="false"

@@ -27,8 +27,8 @@ sap.ui.define([
 			oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
 
-			this.oResourceTreeModel = new JSONModel("model/resources.json");
-			//this.oResourceTreeModel = new JSONModel("/srv/cas/resources");
+			//this.oResourceTreeModel = new JSONModel("model/resources.json");
+			this.oResourceTreeModel = new JSONModel("/srv/cas/resources");
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
 		},
 

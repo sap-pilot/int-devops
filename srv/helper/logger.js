@@ -3,7 +3,19 @@ const { createLogger, format, transports }= require("winston");
 const logRedact = process.env.LOG_REDACT != "false";
 const environment = process.env.NODE_ENV;
 
+const errorStackFormat = format(info => {
+    if (info instanceof Error) {
+      return Object.assign({}, info, {
+        stack: info.stack,
+        message: info.message
+      })
+    }
+    return info
+  })
+
+  
 let alignColorsAndTime = format.combine(
+    format.errors({ stack: true }), // <-- use errors format,
     format.colorize({
         all: true
     }),
@@ -20,11 +32,14 @@ let alignColorsAndTime = format.combine(
                 str = str.replace(/\/\/(.*?)\@/, "//[redacted]@");
                 str = str.replace(/(Authorization\"\:) \"[^\"]+/i, "$1 \"[redacted]");
             }
-            if (environment === 'production') {
-                return `[${info.level}] ${str}`;
-            }  else {
-                return `${info.timestamp} [${info.level}] ${str}`
-            } 
+            // if (environment === 'production') {
+            //     return `[${info.level}] ${str}`;
+            // }  else {
+            //     return `${info.timestamp} [${info.level}] ${str}`
+            // } 
+            return info.stack
+                ? `${str}\n${info.stack}`
+                : str;
         }
     )
 );

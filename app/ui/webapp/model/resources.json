@@ -22,20 +22,20 @@
                     {"n": "CreateDocument", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                     {"n": "DeleteDocument", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
                 ]},
-                {"n":"Key Map Entry", "status": "warning", "c": [
+                {"n":"Key Map Entry", "s": "warning", "c": [
                     {"n": "AccountingDocument", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                     {"n": "Sender", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                     {"n": "Whitelist", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
-                    {"n": "CompanyCodes", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.0", "status": "warning"},
+                    {"n": "CompanyCodes", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.0", "s": "warning"},
                     {"n": "PlanningPlants", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
                 ]}
             ]},
-            {"n":"Cloud Integration", "status": "error", "c": [
+            {"n":"Cloud Integration", "s": "error", "c": [
                 {"n": "Asset Management", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                 {"n": "Finance", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                 {"n": "Material Management", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
                 {"n": "Router", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
-                {"n": "Utilities", "t": "Package", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.14", "status": "error"}
+                {"n": "Utilities", "t": "Package", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.14", "s": "error"}
             ]},
             {"n":"Destination Service", "c": [
                 {"n": "APIPORTAL-DC_S4HANA", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},

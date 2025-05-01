@@ -73,7 +73,7 @@
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
 									id="TreeTableBasic"
-									rows="{path:'resourceTree>/value/resources', parameters: {arrayNames:['c']}}"
+									rows="{path:'resourceTree>/value/c', parameters: {arrayNames:['c']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
 									enableSelectAll="false"
@@ -92,15 +92,21 @@
 								</table:extension>
 								<table:rowSettingsTemplate>
                                     <table:RowSettings highlight="{
-                                        path: 'resourceTree>status',
+                                        path: 'resourceTree>s',
                                         formatter: '.formatter.statusHighlight'
-                                    }" highlightText="{resourceTree>status}"/>
+                                    }" highlightText="{resourceTree>s}"/>
                                 </table:rowSettingsTemplate>
 								<table:columns>
-									<table:Column width="20rem">
+									<table:Column width="16rem">
 										<Label text="Content Resources"/>
 										<table:template>
 											<Text text="{resourceTree>n}" wrapping="false" />
+										</table:template>
+									</table:Column>
+                                    <table:Column width="5rem">
+										<Label text="ID"/>
+										<table:template>
+											<Text text="{resourceTree>i}" wrapping="false" />
 										</table:template>
 									</table:Column>
 									<table:Column width="7rem">

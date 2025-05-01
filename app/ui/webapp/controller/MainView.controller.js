@@ -61,14 +61,14 @@ sap.ui.define([
 			if (!sText) {
 				this.getView().getModel("resourceTree").setData(this.oOriginTree);
 			} else {
-				const oFilteredTree = this.filterTree(this.oOriginTree.value.resources, node => {
+				const oFilteredTree = this.filterTree(this.oOriginTree.value.c, node => {
 					for (const [key, value] of Object.entries(node) ) {
 						if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
 							return true;
 					}
 					return false;
 				});
-				this.getView().getModel("resourceTree").setData({"value":{"resources":oFilteredTree}});
+				this.getView().getModel("resourceTree").setData({"value":{"c":oFilteredTree}});
 				this.onExpandAll();
 			}			
 		},

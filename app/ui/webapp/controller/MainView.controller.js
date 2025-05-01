@@ -28,6 +28,7 @@ sap.ui.define([
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
 
 			this.oResourceTreeModel = new JSONModel("model/resources.json");
+			//this.oResourceTreeModel = new JSONModel("/srv/cas/resources");
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
 		},
 
@@ -52,7 +53,7 @@ sap.ui.define([
 			oToolbar.insertContent(oOrientation, 2);
 		},
 
-		onTreeFilterLiveChange: function() {
+		onTreeFilterChange: function() {
 			const oTreeFilter = this.byId("treeFilter");
 			const sText = oTreeFilter.getValue().toLowerCase();
 			if (!this.oOriginTree)
@@ -60,8 +61,14 @@ sap.ui.define([
 			if (!sText) {
 				this.getView().getModel("resourceTree").setData(this.oOriginTree);
 			} else {
-				const oFilteredTree = this.filterTree(this.oOriginTree,node => node.name && node.name.toLowerCase().indexOf(sText) > -1);
-				this.getView().getModel("resourceTree").setData(oFilteredTree);
+				const oFilteredTree = this.filterTree(this.oOriginTree.value.resources, node => {
+					for (const [key, value] of Object.entries(node) ) {
+						if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
+							return true;
+					}
+					return false;
+				});
+				this.getView().getModel("resourceTree").setData({"value":{"resources":oFilteredTree}});
 				this.onExpandAll();
 			}			
 		},
@@ -69,10 +76,10 @@ sap.ui.define([
 		filterTree: function(tree, condition) {
 			return tree
 			  .map(node => {
-				const children = node.children ? this.filterTree(node.children, condition) : [];
+				const c = node.c ? this.filterTree(node.c, condition) : [];
 				// If current node matches or has matching children
-				if (condition(node) || children.length) {
-				  return { ...node, children };
+				if (condition(node) || c.length) {
+				  return { ...node, c };
 				}
 				return null;
 			  })

@@ -24,5 +24,9 @@
   },
   "devDependencies": {
     "@ui5/cli": "^4"
+  },
+  "dependencies": {
+    "@sap/cds": "^8.9.2",
+    "winston": "^3.17.0"
   }
 }

@@ -60,7 +60,7 @@
 		},
 		{
 			"key": 2,
-			"title": "2.INT_STAGING",
+			"title": "2.INT_STG",
 			"group": 2,
 			"status": "Success",
 			"attributes": [
@@ -240,7 +240,7 @@
 		},
 		{
 			"key": 2,
-			"title": "Staging",
+			"title": "STG",
 			"headerCheckboxState": "Unchecked",
 			"status": "Warning"
 		},

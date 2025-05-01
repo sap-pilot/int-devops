@@ -68,21 +68,22 @@
                      </l:SplitPane>
                     <l:SplitPane id="monitorAlertsPane">   
                         <l:layoutData>
-                            <l:SplitterLayoutData size="520px" />
+                            <l:SplitterLayoutData size="720px" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
 									id="TreeTableBasic"
-									rows="{path:'resourceTree>/', parameters: {arrayNames:['children']}}"
+									rows="{path:'resourceTree>/value/resources', parameters: {arrayNames:['c']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
 									enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
-										<SearchField id="treeFilter" width="50%" liveChange="onTreeFilterLiveChange"/>
+										<SearchField id="treeFilter" width="45%" change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
-										<Button text="Transport" type="Emphasized"/>
+										<Button icon="sap-icon://synchronize" press="onRefeshResources" enabled="true"
+                                            text="Refresh" tooltip="Refresh content resources list from all connected Content Agent services" />
 										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
 										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
 										<Button icon="sap-icon://expand-group" press="onExpandSelection"/>
@@ -96,22 +97,34 @@
                                     }" highlightText="{resourceTree>status}"/>
                                 </table:rowSettingsTemplate>
 								<table:columns>
-									<table:Column width="13rem">
+									<table:Column width="20rem">
 										<Label text="Content Resources"/>
 										<table:template>
-											<Text text="{resourceTree>name}" wrapping="false" />
+											<Text text="{resourceTree>n}" wrapping="false" />
 										</table:template>
 									</table:Column>
-									<table:Column width="9rem">
+									<table:Column width="7rem">
 										<Label text="Sub-Type"/>
 										<table:template>
-											<Text text="{resourceTree>subType}" wrapping="false" />
+											<Text text="{resourceTree>t}" wrapping="false" />
 										</table:template>
 									</table:Column>
-									<table:Column width="11rem">
-										<Label text="Version"/>
+									<table:Column width="5rem">
+										<Label text="DEV"/>
 										<table:template>
-											<Text text="{resourceTree>version}" wrapping="false" />
+											<Text text="{resourceTree>v0}" wrapping="false" />
+										</table:template>
+									</table:Column>
+                                    <table:Column width="5rem">
+										<Label text="DEV_2"/>
+										<table:template>
+											<Text text="{resourceTree>v1}" wrapping="false" />
+										</table:template>
+									</table:Column>
+                                    <table:Column width="5rem">
+										<Label text="STG_2"/>
+										<table:template>
+											<Text text="{resourceTree>v2}" wrapping="false" />
 										</table:template>
 									</table:Column>
 								</table:columns>

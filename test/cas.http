@@ -1,0 +1,17 @@
+### Get OAuth Token
+# @name casLogin
+POST {{casTokenUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{casClientId}}&client_secret={{casClientSecret}}
+
+###
+# @name casGetContentResources
+GET {{casUrl}}/v1/contentResources?filters=(type eq 'API Management') or (type eq 'Cloud Integration')
+Authorization: Bearer {{casLogin.response.body.access_token}}
+Accept: application/json
+
+###
+# @name localCasGetResources
+GET http://localhost:4004/srv/cas/resources
+Authorization: Basic admin:admin

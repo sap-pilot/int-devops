@@ -31,7 +31,7 @@
 					<f:SearchManager/>
 				</f:searchManager-->
                 <f:additionalContent>
-					<Switch state="false" customTextOn="Live" customTextOff="Demo" enabled="false" 
+					<Switch state="false" customTextOn="Live" customTextOff="Demo" enabled="true" 
 						tooltip="DEMO mode uses static/fake data (no authorization needed); LIVE mode reads actual system landscape &amp; artifacts data (viewer/operator role required)">
 						<layoutData>
 							<FlexItemData growFactor="1" />

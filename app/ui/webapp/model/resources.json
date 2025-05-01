@@ -1,44 +1,49 @@
-[
-    {"name": "API Management", "children": [
-        {"name":"API Provider", "children": [
-            {"name": "S/4HANA", "subType": "API Provider", "version": "1.0.0"},
-            {"name": "MDG", "subType": "API Provider", "version": "1.0.0"},
-            {"name": "CPI", "subType": "API Provider", "version": "1.0.0"},
-            {"name": "BTP", "subType": "API Provider", "version": "1.0.0"},
-            {"name": "ABAPCLOUD", "subType": "API Provider", "version": "1.0.0"}
-        ]},
-        {"name":"Product", "children": [
-            {"name": "OpenText", "subType": "Product", "version": "1.0.0"},
-            {"name": "Prometheus", "subType": "Product", "version": "1.0.0"},
-            {"name": "Utilities", "subType": "Product", "version": "1.0.0"}
-        ]},
-        {"name":"Proxy", "children": [
-            {"name": "AcccountingDocuments", "subType": "Proxy", "version": "1.0.0"},
-            {"name": "BusinessPartner", "subType": "Proxy", "version": "1.0.0"},
-            {"name": "CostCenter", "subType": "Proxy", "version": "1.0.0"},
-            {"name": "CreateDocument", "subType": "Proxy", "version": "1.0.0"},
-            {"name": "DeleteDocument", "subType": "Proxy", "version": "1.0.0"}
-        ]},
-        {"name":"Key Map Entry", "status": "warning", "children": [
-            {"name": "AccountingDocument", "subType": "Key Map Entry", "version": "1.0.0"},
-            {"name": "Sender", "subType": "Key Map Entry", "version": "1.0.0"},
-            {"name": "Whitelist", "subType": "Key Map Entry", "version": "1.0.0"},
-            {"name": "CompanyCodes", "subType": "Key Map Entry", "version": "1.0.1", "status": "warning"},
-            {"name": "PlanningPlants", "subType": "Key Map Entry", "version": "1.0.0"}
-        ]}
-    ]},
-    {"name":"Cloud Integration", "status": "warning", "children": [
-        {"name": "Asset Management", "subType": "Package", "version": "1.0.0"},
-        {"name": "Finance", "subType": "Package", "version": "1.0.0"},
-        {"name": "Material Management", "subType": "Package", "version": "1.0.0"},
-        {"name": "Router", "subType": "Package", "version": "1.0.0"},
-        {"name": "Utilities", "subType": "Package", "version": "1.0.14", "status": "warning"}
-    ]},
-    {"name":"Destination Service", "children": [
-        {"name": "APIPORTAL-DC_S4HANA", "subType": "Destination", "version": "1.0.0"},
-        {"name": "APIPORTAL-DC_MDG", "subType": "Destination", "version": "1.0.0"},
-        {"name": "APIPORTAL-DC_BTP", "subType": "Destination", "version": "1.0.0"},
-        {"name": "APIPORTAL-DC_CPI", "subType": "Destination", "version": "1.0.0"},
-        {"name": "APIPORTAL-DC_ABAPCLOUD", "subType": "Destination", "version": "1.0.0"}
-    ]}
-]
+{
+    "value":{
+        "nodes": ["INT_DEV","INT_DEV_2","INT_STG_2"],
+        "resources": [
+            {"n": "API Management", "c": [
+                {"n":"API Provider", "c": [
+                    {"n": "S/4HANA", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "MDG", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "CPI", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "BTP", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "ABAPCLOUD", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
+                ]},
+                {"n":"Product", "c": [
+                    {"n": "OpenText", "t": "Product", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "Prometheus", "t": "Product", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "Utilities", "t": "Product", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
+                ]},
+                {"n":"Proxy", "c": [
+                    {"n": "AcccountingDocuments", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "BusinessPartner", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "CostCenter", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "CreateDocument", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "DeleteDocument", "t": "Proxy", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
+                ]},
+                {"n":"Key Map Entry", "status": "warning", "c": [
+                    {"n": "AccountingDocument", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "Sender", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "Whitelist", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                    {"n": "CompanyCodes", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.0", "status": "warning"},
+                    {"n": "PlanningPlants", "t": "Key Map Entry", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
+                ]}
+            ]},
+            {"n":"Cloud Integration", "status": "error", "c": [
+                {"n": "Asset Management", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "Finance", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "Material Management", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "Router", "t": "Package", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "Utilities", "t": "Package", "v0": "1.0.0", "v1": "1.0.1", "v2": "1.0.14", "status": "error"}
+            ]},
+            {"n":"Destination Service", "c": [
+                {"n": "APIPORTAL-DC_S4HANA", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "APIPORTAL-DC_MDG", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "APIPORTAL-DC_BTP", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "APIPORTAL-DC_CPI", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},
+                {"n": "APIPORTAL-DC_ABAPCLOUD", "t": "Destination", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"}
+            ]}
+        ]
+    }
+}

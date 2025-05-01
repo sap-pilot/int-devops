@@ -125,25 +125,34 @@ const _resursiveMerge = function(obj, merged, vProp) {
     }
 }
 
+function _countUnique(iterable) {
+    return new Set(iterable).size;
+}
+  
+
 const _calculateStatus = function(obj, maxIndex) {
-    let maxChildDiff = 0;
+    let maxUnique = 1;
     if (obj.c && obj.c.length > 0) {
         for (let child of obj.c) {
             const cd = _calculateStatus(child, maxIndex);
-            if (cd > maxChildDiff)
-                maxChildDiff = cd;
+            if (cd > maxUnique)
+                maxUnique = cd;
         }
     }
-    let diffCount = 0;
-    for ( let i = 1; i < maxIndex; i++ ) {
-        const p = `v${i-1}`;
-        const c = `v${i}`;
-        if (obj[p] != obj[c]) 
-            diffCount++;
+    let u = 0;
+    let arr = [];
+    for ( let i = 0; i < maxIndex; i++ ) {
+        const v = `v${i}`;
+        if (!obj.hasOwnProperty(v))
+            obj[v] = '-';
+        arr.push(obj[v]);
     }
-    if (maxChildDiff > 1 || diffCount > 1)
-        obj.s = 'error';
-    else if (maxChildDiff > 0 || diffCount > 0)
+    u = _countUnique(arr);
+    if (u == 1 && maxUnique == 1)
+        obj.s = 'ok';
+    else if (u > 2 || maxUnique > 2)
+        obj.s = 'error'
+    else
         obj.s = 'warning';
-    return diffCount == 0? maxChildDiff : diffCount;
+    return u == 1? maxUnique : u;
 }

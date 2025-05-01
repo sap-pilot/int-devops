@@ -18,6 +18,7 @@
                             id="graph"
                             height="100%"
                             width="100%"
+                            orientation="TopBottom"
                             nodes="{/nodes}"
                             lines="{/lines}"
                             groups="{/groups}">
@@ -33,6 +34,7 @@
                                         attributes="{path:'attributes', templateShareable:true}"
                                         showActionLinksButton="false"
                                         status="{status}"
+                                        headerCheckBoxState="{checkboxState}"
                                         shape="Box">
                                     <g:attributes>
                                         <g:ElementAttribute
@@ -68,7 +70,7 @@
                      </l:SplitPane>
                     <l:SplitPane id="monitorAlertsPane">   
                         <l:layoutData>
-                            <l:SplitterLayoutData size="720px" />
+                            <l:SplitterLayoutData size="810px" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
@@ -100,7 +102,8 @@
 									<table:Column width="16rem">
 										<Label text="Content Resources"/>
 										<table:template>
-											<Text text="{resourceTree>n}" wrapping="false" />
+                                            <Link text="{resourceTree>n}" wrapping="false" 
+                                                href="{resourceTree>/value/repoUrl}{resourceTree>p}" target="_blank"/>
 										</table:template>
 									</table:Column>
                                     <table:Column width="5rem">

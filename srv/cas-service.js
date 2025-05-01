@@ -1,6 +1,7 @@
 const cds = require("@sap/cds");
 const fs = require("fs");
 const { logger } = require("./helper/logger");
+const { config } = require("./helper/config");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
@@ -20,6 +21,7 @@ const getResources = function(req) {
         // merge objs array into single contentResources
         const merged = {
             "i":"contentResources",
+            "repoUrl": config.repoUrl,
             "table": {},
             "c": []
         };
@@ -62,14 +64,20 @@ const _reorgResources = function(data) {
     if (!data || !data.contentResources) {
         throw new Error("Unexpected response, no 'contentResources' found");
     }
-    const cpi = { "i":"cpi", "n": "Cloud Integration", "t":"", "v": "", "c": [] };
-    const apim = { "i":"apim", "n": "API Management", "t":"", "v": "", "c": [], "subTypes": {} };
+    const cpi = { "i":"CPI", "n": "Cloud Integration", "t":"", "v": "", "c": [] };
+    const apim = { "i":"APIM", "n": "API Management", "t":"", "v": "", "c": [], "subTypes": {} };
     for ( const entry of data.contentResources ) {
         if (entry.type == "Cloud Integration") {
-            const package = { "i":entry.id, "n": entry.name, "t": entry.subType, "v": entry.version, "c": [] };
+            const package = { "i":entry.id, "n": entry.name, "t": entry.subType, "v": entry.version, "c": []};
+            if (config.repoUrl) {
+                package.p = `/${entry.id}&version=GBdev`;
+             };
             if ( entry.components ) {
                 for ( const comp of entry.components ) {
-                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "v": comp.version };
+                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "v": comp.version}
+                    if (config.repoUrl) {
+                        iflow.p = `/${package.i}/${comp.id}_content/&version=GBdev`;
+                    }
                     package.c.push(iflow);
                 }
             }
@@ -113,6 +121,8 @@ const _resursiveMerge = function(obj, merged, vProp) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {
             mergedEntry = {"i":entry.i, "n":entry.n,"t":entry.t,"table":{}};
+            if (entry.p)
+                mergedEntry.p = entry.p;
             merged.table[entry.i] = mergedEntry;
             merged.c.push(mergedEntry);
         } 

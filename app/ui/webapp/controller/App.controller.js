@@ -61,7 +61,8 @@ sap.ui.define(
 
 			loadUserInfo: function() {
 				// read sub-accounts
-				const url = "../user-api/currentUser",
+				const url = document.location.href.indexOf("localhost")>-1 
+					? "./model/currentUser.json": "../user-api/currentUser" ,
 				 requestOptions = {
 						method: "GET",
 						redirect: "follow"

@@ -3,9 +3,10 @@
 		{
 			"key": 0,
 			"icon": "sap-icon://begin",
-			"title": "0.INT_DEV_2",
+			"title": "0.DEV2",
 			"group": 1,
 			"status": "Warning",
+			"checkboxState": "Unchecked",
 			"attributes": [
 				{
 					"label": "AM",
@@ -32,8 +33,9 @@
 		{
 			"key": 1,
 			"icon": "sap-icon://begin",
-			"title": "1.INT_DEV",
+			"title": "1.DEV",
 			"group": 1,
+			"checkboxState": "Unchecked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -60,8 +62,9 @@
 		},
 		{
 			"key": 2,
-			"title": "2.INT_STG",
+			"title": "2.STG",
 			"group": 2,
+			"checkboxState": "Checked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -88,8 +91,9 @@
 		},
 		{
 			"key": 3,
-			"title": "3.INT_SAGING_2",
+			"title": "3.STG2",
 			"group": 2,
+			"checkboxState": "Checked",
 			"status": "Warning",
 			"attributes": [
 				{
@@ -116,8 +120,9 @@
 		},
 		{
 			"key": 4,
-			"title": "4.INT_PREPROD_3",
+			"title": "4.PRE3",
 			"group": 3,
+			"checkboxState": "Checked",
 			"status": "Warning",
 			"attributes": [
 				{
@@ -143,9 +148,39 @@
 			]
 		},
 		{
+			"key": 8,
+			"title": "8.PRE2",
+			"group": 3,
+			"checkboxState": "Checked",
+			"status": "Success",
+			"attributes": [
+				{
+					"label": "AM",
+					"value": "1.0.1"
+				},
+				{
+					"label": "FI",
+					"value": "1.0.0"
+				},
+				{
+					"label": "MM",
+					"value": "1.0.0"
+				},
+				{
+					"label": "ROUTER",
+					"value": "1.0.1"
+				},
+				{
+					"label": "UTIL",
+					"value": "1.0.1"
+				}
+			]
+		},
+		{
 			"key": 6,
-			"title": "6.INT_PREPROD",
+			"title": "6.PRE",
 			"group": 4,
+			"checkboxState": "Checked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -172,8 +207,9 @@
 		},
 		{
 			"key": 7,
-			"title": "7.INT_PROD",
+			"title": "7.PROD",
 			"group": 5,
+			"checkboxState": "Unchecked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -218,6 +254,11 @@
 		{
 			"from": 3,
 			"to": 4,
+			"status": "Success"
+		},
+		{
+			"from": 3,
+			"to": 8,
 			"status": "Success"
 		},
 		{

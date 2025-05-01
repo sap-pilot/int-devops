@@ -27,10 +27,11 @@ const getResources = function(req) {
         };
         for (const [idx, obj] of objs.entries()) {
             const v = `v${idx}`;
-            _resursiveMerge(obj, merged, v);
+            _recursiveMerge(obj, merged, v);
         }
         _calculateStatus(merged, objs.length);
         _recursiveDelete(merged,["table"]);
+        _recursiveSort(merged);
         return merged;
     } catch (err) {
         logger.error(`Error reading the file: ${err}`,err);
@@ -116,7 +117,7 @@ const _recursiveDelete = function(obj, keysToDelete) {
     return obj;
 }
 
-const _resursiveMerge = function(obj, merged, vProp) {
+const _recursiveMerge = function(obj, merged, vProp) {
     for (const entry of obj.c) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {
@@ -130,7 +131,16 @@ const _resursiveMerge = function(obj, merged, vProp) {
         if (entry.c && entry.c.length > 0) {
             if(!mergedEntry.c) 
                 mergedEntry.c = [];
-            _resursiveMerge(entry, mergedEntry, vProp);
+            _recursiveMerge(entry, mergedEntry, vProp);
+        }
+    }
+}
+
+function _recursiveSort(obj) {
+    if (obj.c && obj.c.length > 0) {
+        obj.c = obj.c.sort((a,b)=>a.n === b.n?0:(a.n > b.n?1:-1));
+        for (const child of obj.c) {
+            _recursiveSort(child);
         }
     }
 }

@@ -116,21 +116,27 @@
 										</table:template>
 									</table:Column>
 									<table:Column width="5rem">
-										<Label text="DEV"/>
+										<Label text="STG"/>
 										<table:template>
 											<Text text="{resourceTree>v0}" wrapping="false" />
 										</table:template>
 									</table:Column>
                                     <table:Column width="5rem">
-										<Label text="DEV_2"/>
+										<Label text="PRE2"/>
 										<table:template>
 											<Text text="{resourceTree>v1}" wrapping="false" />
 										</table:template>
 									</table:Column>
                                     <table:Column width="5rem">
-										<Label text="STG_2"/>
+										<Label text="PRE3"/>
 										<table:template>
 											<Text text="{resourceTree>v2}" wrapping="false" />
+										</table:template>
+									</table:Column>
+                                    <table:Column width="5rem">
+										<Label text="PRE"/>
+										<table:template>
+											<Text text="{resourceTree>v3}" wrapping="false" />
 										</table:template>
 									</table:Column>
 								</table:columns>

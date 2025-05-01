@@ -1,6 +1,6 @@
 ### Get OAuth Token
 # @name casLogin
-POST {{casTokenUrl}}
+POST {{tokenUrl}}
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id={{casClientId}}&client_secret={{casClientSecret}}

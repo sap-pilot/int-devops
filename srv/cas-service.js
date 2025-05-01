@@ -8,7 +8,7 @@ module.exports = cds.service.impl(srv => {
 
 const getResources = function(req) {
     try {
-        const files = ['./srv/tmp-res-0.json','./srv/tmp-res-1.json','./srv/tmp-res-2.json'];
+        const files = ['./srv/tmp-res-stg.json','./srv/tmp-res-pre2.json','./srv/tmp-res-pre3.json','./srv/tmp-res-pre.json'];
         const objs = [];
         // parse data into objs array
         for (const [idx, file] of files.entries()) {

@@ -1,12 +1,12 @@
 @baseUrl = http://localhost:4004/tms
 //@baseUrl = https://int-devops-cf-aws-use-sandbox-dcore.cfapps.us10.hana.ondemand.com
 //@baseUrl = https://sapux.org/tms
-// define tmsUrl, tmsOauthUrl,  tmsClientId and tmsClientSecret in .vscode/settings.json -> rest-client.environmentVariables
+// define tmsUrl, tokenUrl,  tmsClientId and tmsClientSecret in .vscode/settings.json -> rest-client.environmentVariables
 //@baseUrl = {{tmsUrl}
 
 ### Get OAuth Token
 # @name tmsLogin
-POST {{tmsOauthUrl}}
+POST {{tokenUrl}}
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id={{tmsClientId}}&client_secret={{tmsClientSecret}}

@@ -12,8 +12,8 @@ const { config } = require('./config');
 const multer = require('multer')
 const upload = multer({ dest: config.uploadPath });
 
-let buildInfo = { "version": "N/A", "build": "N/A" };
-try { buildInfo = require("./build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
+let buildInfo = { "version": "N/A", "build": "N/A", "commit": "N/A"};
+try { buildInfo = require("./dist/build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
 
 const port = process.env.PORT || 4004;
 
@@ -24,9 +24,9 @@ app.beforeRequestHandler.use('/public/health', (req, res) => {
 });
 
 app.beforeRequestHandler.use('/public/version', (req, res) => {
-    const info = {"version":buildInfo,"process":process.versions};
+    buildInfo.process = process.versions;
     res.setHeader("Content-Type","application/json");
-    res.end(JSON.stringify(info,null,2));
+    res.end(JSON.stringify(buildInfo,null,2));
 });
 
 // create tms proxy with file upload handling
@@ -52,3 +52,5 @@ app.beforeRequestHandler.use('/tms', combinedMiddleware);
 app.start({
     port: port
 })
+
+logger.info(`started approuter at http://localhost:${port}`);

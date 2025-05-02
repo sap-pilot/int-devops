@@ -5,15 +5,15 @@
 	xmlns:f="sap.f"
   	xmlns:core="sap.ui.core"
 	xmlns:tnt="sap.tnt" >
-	<tnt:ToolPage id="toolPage">
+	<tnt:ToolPage id="toolPage" sideExpanded="{viewState>/sideExpanded}">
 		<tnt:header>
 			<f:ShellBar 
                 title="Integration DevOps"
-				secondTitle="v{buildInfo>/version/version} ({buildInfo>/version/build})"
+				secondTitle="v{buildInfo>/version}-{buildInfo>/commit} ({buildInfo>/date})"
                 homeIcon="./favicon.png"
 				showMenuButton="true"
 				showNotifications="false"
-				menuButtonPressed="onMenuButtonPress"
+				menuButtonPressed="toggleSideExpanded"
                 homeIconPressed="onHomeIconPress">
 				<f:menu>
 					<Menu>
@@ -27,11 +27,18 @@
 						showBorder="true"
 						press="onUserAvatarPress"/>
 				</f:profile>
-				<f:searchManager>
+				<!--f:searchManager>
 					<f:SearchManager/>
-				</f:searchManager>
+				</f:searchManager-->
                 <f:additionalContent>
-                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="sap-icon://dark-mode" press="onToggleTheme" />
+					<Switch state="{viewState>/liveMode}" customTextOn="Live" customTextOff="Demo" enabled="true" 
+						tooltip="DEMO mode uses static/fake data (no authorization needed); LIVE mode reads actual system landscape &amp; artifacts data (viewer/operator role required)">
+						<layoutData>
+							<FlexItemData growFactor="1" />
+						</layoutData>
+					</Switch>
+                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="{=%{viewState>/theme}==='sap_horizon_dark'?'sap-icon://dark-mode':'sap-icon://light-mode'}" press="toggleTheme()" 
+						tooltip="Toggle between dark/light theme" />
                 </f:additionalContent>
 			</f:ShellBar>
 		</tnt:header>

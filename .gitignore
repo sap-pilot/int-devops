@@ -13,3 +13,4 @@ default-env.json
 Makefile*.mta
 *_mta_build_tmp/
 build-info.json
+tmp-*

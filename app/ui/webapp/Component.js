@@ -7,9 +7,10 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/m/IllustrationPool",
 	"sap/ui/model/json/JSONModel",
+	"sap/ui/util/Storage",
 	"org/sapux/int/model/models"
 ],
-function(UIComponent, Device, IllustrationPool, JSONModel, models) {
+function(UIComponent, Device, IllustrationPool, JSONModel, Storage, models) {
 	"use strict";
 
 	return UIComponent.extend("org.sapux.int.Component", {
@@ -44,6 +45,31 @@ function(UIComponent, Device, IllustrationPool, JSONModel, models) {
 
 			// register tnt illustration set
 			IllustrationPool.registerIllustrationSet(oTntSet, false);
+
+			// init local storage and restore UI state
+			this.oStorage = new Storage(Storage.Type.local, "int-devops");
+			const oViewState = {
+				"theme":"sap_horizon",
+				"sideExpanded":false,
+				"liveMode":false, // demoMode on
+				"resourceTreeWidth": "810px",
+				"landscapeOrientation": "TopBottom"
+			};
+			this.oViewStateModel = new JSONModel(oViewState);
+			const fnViewStateChangeListener = function(event) {
+				let oNewViewState = this.oViewStateModel.getData();
+				// console.log(`save new viewState: ${JSON.stringify(oNewViewState,null,2)}`);
+				this.oStorage.put("viewState",oNewViewState);
+			}.bind(this);
+			// restore previous stateJSONModel can only attachChange against each property
+			const oPreviousViewState = this.oStorage.get('viewState') || {};
+			for (const sKey in oViewState) {
+				// check properties one by one in case of property gets added or delete
+				if (oPreviousViewState.hasOwnProperty(sKey)) oViewState[sKey] = oPreviousViewState[sKey];
+				// JSONModel can only attachChange against each property
+				this.oViewStateModel.bindProperty(`/${sKey}`).attachChange(fnViewStateChangeListener);
+			}
+			this.setModel(this.oViewStateModel, "viewState");
 		},
 
 		handleRouteMatched: function(event) {

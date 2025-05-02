@@ -17,7 +17,6 @@ sap.ui.define([
 
         onInit: function () {
 
-			
 			var oGraph,
 				oModel = new JSONModel("model/landscape.json");
 
@@ -27,7 +26,15 @@ sap.ui.define([
 			oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
 
-			this.oResourceTreeModel = new JSONModel("model/resources.json");
+			// load resource tree depending on liveMode
+			this.oResourceTreeModel = new JSONModel();
+			const viewStateModel = this.getOwnerComponent().getModel("viewState");
+			const fnLoadResourceTree = function() {
+				const sResourcePath = viewStateModel.getProperty("/liveMode")?"/srv/cas/resources":"model/resources.json";
+				this.oResourceTreeModel.loadData(sResourcePath);
+			}.bind(this);
+			fnLoadResourceTree();
+			viewStateModel.bindProperty("/liveMode").attachChange(fnLoadResourceTree);
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
 		},
 
@@ -35,16 +42,15 @@ sap.ui.define([
 			var oGraph = this.byId("graph"),
 				oToolbar = this.byId("graph-toolbar"),
 				oOrientation = new Select();
-
 			[
-				{key: "LeftRight", text: "Left to right"},
-				{key: "RightLeft", text: "Right to left"},
 				{key: "TopBottom", text: "Top to bottom"},
-				{key: "BottomTop", text: "Bottom to top"}
+				{key: "BottomTop", text: "Bottom to top"},
+				{key: "LeftRight", text: "Left to right"},
+				{key: "RightLeft", text: "Right to left"}				
 			].forEach(function (o) {
 				oOrientation.addItem(new Item(o));
 			});
-			oOrientation.setSelectedKey("LeftRight");
+			oOrientation.setSelectedKey(this.getOwnerComponent().getModel("viewState").getProperty("/landscapeOrientation"));
 			oOrientation.attachChange(function (oEvent) {
 				var sKey = oEvent.getParameter("selectedItem").getKey();
 				oGraph.setOrientation(sKey);
@@ -52,7 +58,7 @@ sap.ui.define([
 			oToolbar.insertContent(oOrientation, 2);
 		},
 
-		onTreeFilterLiveChange: function() {
+		onTreeFilterChange: function() {
 			const oTreeFilter = this.byId("treeFilter");
 			const sText = oTreeFilter.getValue().toLowerCase();
 			if (!this.oOriginTree)
@@ -60,8 +66,14 @@ sap.ui.define([
 			if (!sText) {
 				this.getView().getModel("resourceTree").setData(this.oOriginTree);
 			} else {
-				const oFilteredTree = this.filterTree(this.oOriginTree,node => node.name && node.name.toLowerCase().indexOf(sText) > -1);
-				this.getView().getModel("resourceTree").setData(oFilteredTree);
+				const oFilteredTree = this.filterTree(this.oOriginTree.value.c, node => {
+					for (const [key, value] of Object.entries(node) ) {
+						if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
+							return true;
+					}
+					return false;
+				});
+				this.getView().getModel("resourceTree").setData({"value":{"c":oFilteredTree}});
 				this.onExpandAll();
 			}			
 		},
@@ -69,10 +81,10 @@ sap.ui.define([
 		filterTree: function(tree, condition) {
 			return tree
 			  .map(node => {
-				const children = node.children ? this.filterTree(node.children, condition) : [];
+				const c = node.c ? this.filterTree(node.c, condition) : [];
 				// If current node matches or has matching children
-				if (condition(node) || children.length) {
-				  return { ...node, children };
+				if (condition(node) || c.length) {
+				  return { ...node, c };
 				}
 				return null;
 			  })

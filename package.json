@@ -1,13 +1,12 @@
 {
   "name": "int-devops",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
   "type": "commonjs",
   "homepage": "https://github.com/sap-pilot/int-devops#readme",
   "workspaces": [
-    "app",
     "app/ui"
   ],
   "engines": {
@@ -15,13 +14,27 @@
   },
   "main": "app/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"build\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\"}\" > app/build-info.json",
+    "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "build": "mbt build --mtar=int-devops.mtar",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"date\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > app/ui/webapp/build-info.json",
+    "clean": "rimraf gen resources mta_archives",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
-    "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1"
+    "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
+    "start": "cds-serve",
+    "start:debug": "npx -n=\"--inspect\" cds-serve",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ui": "npm run local --prefix app"
   },
   "devDependencies": {
+    "@sap/cds-dk": "^8.9.3",
     "@ui5/cli": "^4"
+  },
+  "dependencies": {
+    "@sap/cds": "^8.9.2",
+    "@sap/xsenv": "^5.5.0",
+    "@sap/xssec": "^4.6.0",
+    "passport": "^0.7.0",
+    "rimraf": "^6",
+    "winston": "^3.17.0"
   }
 }

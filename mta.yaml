@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: int-devops
-version: 0.0.5
+version: 0.0.6
 description: "SAP Integration Suite DevOps Utilities"
 parameters:
   enable-parallel-deployments: true
@@ -10,7 +10,8 @@ build-parameters:
       commands:
         - npm run build-info # update build timestamp
         # - npm ci # run npm ci after checking out repo or npm install after updating package.json, instead of during build
-
+        - npx -p @sap/cds-dk cds build --production
+      
 modules:
   - name: int-devops-ui
     type: html5
@@ -19,7 +20,6 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        - npm ci
         - npm run build
       supported-platforms: []    
 
@@ -28,6 +28,13 @@ modules:
     path: app
     requires:
       - name: int-devops-xsuaa
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api
+          url: ~{srv-url}
+          timeout: 600000
+          forwardAuthToken: true
     parameters:
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
@@ -47,8 +54,27 @@ modules:
       # TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
       # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
-      builder: npm-ci
-      ignore: ["node_modules/","default-*.json","*.env"]              
+      builder: custom
+      commands: []
+      ignore: ["node_modules/","default-*.json","*.env"]      
+
+  - name: int-devops-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: int-devops-xsuaa
+      - name: int-devops-destination
+    parameters:
+      memory: 256M
+      disk-quota: 1024M
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    build-parameters:
+      builder: custom
+      commands: []
+      ignore: ["node_modules/","default-*.json","*.env"]      
 
 resources:
   - name: int-devops-xsuaa
@@ -59,3 +85,11 @@ resources:
       path: ./xs-security.json
       service: xsuaa
       service-plan: application
+
+  - name: int-devops-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+      service: destination
+      service-plan: lite

@@ -3,9 +3,10 @@
 		{
 			"key": 0,
 			"icon": "sap-icon://begin",
-			"title": "0.INT_DEV",
+			"title": "0.DEV2",
 			"group": 1,
-			"status": "Success",
+			"status": "Warning",
+			"checkboxState": "Unchecked",
 			"attributes": [
 				{
 					"label": "AM",
@@ -32,9 +33,10 @@
 		{
 			"key": 1,
 			"icon": "sap-icon://begin",
-			"title": "1.INT_DEV_2",
+			"title": "1.DEV",
 			"group": 1,
-			"status": "Warning",
+			"checkboxState": "Unchecked",
+			"status": "Success",
 			"attributes": [
 				{
 					"label": "AM",
@@ -60,9 +62,10 @@
 		},
 		{
 			"key": 2,
-			"title": "2.INT_STAGING_2",
+			"title": "2.STG",
 			"group": 2,
-			"status": "Warning",
+			"checkboxState": "Checked",
+			"status": "Success",
 			"attributes": [
 				{
 					"label": "AM",
@@ -88,9 +91,10 @@
 		},
 		{
 			"key": 3,
-			"title": "3.INT_SAGING",
+			"title": "3.STG2",
 			"group": 2,
-			"status": "Success",
+			"checkboxState": "Checked",
+			"status": "Warning",
 			"attributes": [
 				{
 					"label": "AM",
@@ -116,8 +120,9 @@
 		},
 		{
 			"key": 4,
-			"title": "4.INT_PREPROD_4",
+			"title": "4.PRE3",
 			"group": 3,
+			"checkboxState": "Checked",
 			"status": "Warning",
 			"attributes": [
 				{
@@ -143,9 +148,10 @@
 			]
 		},
 		{
-			"key": 5,
-			"title": "5.INT_PREPROD_2",
+			"key": 8,
+			"title": "8.PRE2",
 			"group": 3,
+			"checkboxState": "Checked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -172,8 +178,9 @@
 		},
 		{
 			"key": 6,
-			"title": "6.INT_PREPROD",
+			"title": "6.PRE",
 			"group": 4,
+			"checkboxState": "Checked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -200,8 +207,9 @@
 		},
 		{
 			"key": 7,
-			"title": "7.INT_PROD",
+			"title": "7.PROD",
 			"group": 5,
+			"checkboxState": "Unchecked",
 			"status": "Success",
 			"attributes": [
 				{
@@ -230,28 +238,8 @@
 	"lines": [
 		{
 			"from": 0,
-			"to": 1,
-            "status": "Success"
-		},
-		{
-			"from": 0,
 			"to": 3,
             "status": "Success"
-		},
-		{
-			"from": 0,
-			"to": 2,
-			"status": "Success"
-		},
-		{
-			"from": 0,
-			"to": 4,
-			"status": "Success"
-		},
-		{
-			"from": 3,
-			"to": 5,
-			"status": "Success"
 		},
 		{
 			"from": 6,
@@ -259,18 +247,28 @@
             "status": "Success"
 		},
 		{
-			"from": 0,
+			"from": 1,
+			"to": 2,
+			"status": "Success"
+		},
+		{
+			"from": 3,
+			"to": 4,
+			"status": "Success"
+		},
+		{
+			"from": 3,
+			"to": 8,
+			"status": "Success"
+		},
+		{
+			"from": 3,
 			"to": 6,
 			"status": "Success"
 		},
 		{
-			"from": 5,
-			"to": 6,
-			"status": "Success"
-		},
-		{
-			"from": 4,
-			"to": 6,
+			"from": 2,
+			"to": 7,
 			"status": "Success"
 		}
 	],
@@ -283,7 +281,7 @@
 		},
 		{
 			"key": 2,
-			"title": "Staging",
+			"title": "STG",
 			"headerCheckboxState": "Unchecked",
 			"status": "Warning"
 		},

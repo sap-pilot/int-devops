@@ -1,4 +1,6 @@
 {
+    "name": "int-devops-app",
+    "version": "0.0.6",
     "engines": {
         "node": ">=22"
     },

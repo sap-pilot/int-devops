@@ -9,10 +9,9 @@ build-parameters:
     - builder: custom
       commands:
         - npm run build-info # update build timestamp
-        - npm ci
-        - npx -p @sap/cds-dk cds build --production
         # - npm ci # run npm ci after checking out repo or npm install after updating package.json, instead of during build
-
+        - npx -p @sap/cds-dk cds build --production
+      
 modules:
   - name: int-devops-ui
     type: html5
@@ -21,7 +20,6 @@ modules:
       build-result: dist
       builder: custom
       commands:
-        #- npm ci
         - npm run build
       supported-platforms: []    
 
@@ -56,7 +54,8 @@ modules:
       # TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
       # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
-      builder: npm-ci
+      builder: custom
+      commands: []
       ignore: ["node_modules/","default-*.json","*.env"]      
 
   - name: int-devops-srv
@@ -73,6 +72,8 @@ modules:
         properties:
           srv-url: ${default-url}
     build-parameters:
+      builder: custom
+      commands: []
       ignore: ["node_modules/","default-*.json","*.env"]      
 
 resources:

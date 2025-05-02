@@ -17,6 +17,7 @@
     "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "build": "mbt build --mtar=int-devops.mtar",
     "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"date\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > app/ui/webapp/build-info.json",
+    "clean": "rimraf gen resources mta_archives",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
     "start": "cds-serve",
@@ -33,6 +34,7 @@
     "@sap/xsenv": "^5.5.0",
     "@sap/xssec": "^4.6.0",
     "passport": "^0.7.0",
+    "rimraf": "^6",
     "winston": "^3.17.0"
   }
 }

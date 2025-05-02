@@ -18,7 +18,7 @@
                             id="graph"
                             height="100%"
                             width="100%"
-                            orientation="TopBottom"
+                            orientation="{viewState>/landscapeOrientation}"
                             nodes="{/nodes}"
                             lines="{/lines}"
                             groups="{/groups}">
@@ -70,7 +70,7 @@
                      </l:SplitPane>
                     <l:SplitPane id="monitorAlertsPane">   
                         <l:layoutData>
-                            <l:SplitterLayoutData size="810px" />
+                            <l:SplitterLayoutData size="{viewState>/resourceTreeWidth}" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable

@@ -4,10 +4,9 @@ sap.ui.define(
 		"sap/ui/core/mvc/Controller",
 		"sap/ui/model/json/JSONModel",
 		"sap/ui/core/Theming",
-		"sap/ui/util/Storage",
 		"sap/ui/core/Fragment"
 	],
-	function(Common, BaseController, JSONModel, Theming, Storage, Fragment) {
+	function(Common, BaseController, JSONModel, Theming, Fragment) {
 		"use strict";
 
 		return BaseController.extend("org.sapux.int.controller.App", {
@@ -19,10 +18,6 @@ sap.ui.define(
 				this.oMenuModel = new JSONModel();
 				this.oMenuModel.loadData(sap.ui.require.toUrl("org/sapux/int/model/menu.json"), null, false);
 				this.getView().setModel(this.oMenuModel);
-
-				// init local storage and restore UI state
-				this.oStorage = new Storage(Storage.Type.local, "int-devops");
-				this.restoreUIState();
 
 				// initialize avatar popover
 				this.oView = this.getView();
@@ -42,21 +37,19 @@ sap.ui.define(
 				this.loadUserInfo();
 
 				// load build info
-				const buildInfo = new JSONModel("../public/version");
+				const buildInfo = new JSONModel("./build-info.json");
 				this.getView().setModel(buildInfo, "buildInfo");
 
 				// setup session dialog and expiring timeout (attach to fetch event)
 				this.setupSessionExpiringTimer();
+
+				this.restoreUIState();
 			},
 
 			// restore UI state from local storage
 			restoreUIState: function() {
-				const sTheme = this.oStorage.get("theme");
-				if (sTheme) {
-					this.setTheme(sTheme);
-				}
-				const bSideExpanded = this.oStorage.get("sideExpanded");
-				this.setSideExpanded(bSideExpanded);
+				const sTheme = this.getOwnerComponent().getModel("viewState").getProperty("/theme");
+				this.toggleTheme(sTheme);
 			},
 
 			loadUserInfo: function() {
@@ -109,33 +102,17 @@ sap.ui.define(
 				this.userInfo.setData(oUserInfo);
 			},
 
-			onMenuButtonPress: function() {
+			toggleSideExpanded: function() {
 				const oToolPage = this.byId("toolPage");
-
-				// oToolPage.setSideExpanded(!oToolPage.getSideExpanded());
-				this.setSideExpanded(!oToolPage.getSideExpanded());
+				this.getOwnerComponent().getModel("viewState").setProperty("/sideExpanded",!oToolPage.getSideExpanded());
 			},
 
-			setSideExpanded: function(bExpanded) {
-				const oToolPage = this.byId("toolPage");
-				oToolPage.setSideExpanded(bExpanded);
-				this.oStorage.put("sideExpanded", bExpanded);
-			},
-
-			onToggleTheme: function() {
-				// console.log('## switching theme, current: ' + Theming.getTheme());
-				this.setTheme(Theming.getTheme() == "sap_horizon" || Theming.getTheme() == "sap_horizon_light" ? "dark" : "light");
-			},
-
-			setTheme: function(sTheme) {
-				if (!sTheme || sTheme == "light") {
-					Theming.setTheme("sap_horizon_light");
-					this.byId("themeToggleBtn").setIcon("sap-icon://light-mode");
-				} else {
-					Theming.setTheme("sap_horizon_dark");
-					this.byId("themeToggleBtn").setIcon("sap-icon://dark-mode");
+			toggleTheme: function(sNewTheme) {
+				if (!sNewTheme) {
+					sNewTheme = Theming.getTheme() != "sap_horizon_dark"? "sap_horizon_dark" : "sap_horizon_light";
 				}
-				this.oStorage.put("theme", sTheme);
+				Theming.setTheme(sNewTheme);
+				this.getOwnerComponent().getModel("viewState").setProperty("/theme",sNewTheme);
 			},
 
 			onHomeIconPress: function() {

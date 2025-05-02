@@ -1,7 +1,8 @@
 {
     "value":{
         "nodes": ["INT_DEV","INT_DEV_2","INT_STG_2"],
-        "resources": [
+        "repoUrl": "https://github.com/sap-pilot/int-devops/tree/dev/work",
+        "c": [
             {"n": "API Management", "c": [
                 {"n":"API Provider", "c": [
                     {"n": "S/4HANA", "t": "API Provider", "v0": "1.0.0", "v1": "1.0.0", "v2": "1.0.0"},

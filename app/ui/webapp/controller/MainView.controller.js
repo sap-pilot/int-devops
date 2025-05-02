@@ -17,7 +17,6 @@ sap.ui.define([
 
         onInit: function () {
 
-			
 			var oGraph,
 				oModel = new JSONModel("model/landscape.json");
 
@@ -27,8 +26,15 @@ sap.ui.define([
 			oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
 
-			//this.oResourceTreeModel = new JSONModel("model/resources.json");
-			this.oResourceTreeModel = new JSONModel("/srv/cas/resources");
+			// load resource tree depending on liveMode
+			this.oResourceTreeModel = new JSONModel();
+			const viewStateModel = this.getOwnerComponent().getModel("viewState");
+			const fnLoadResourceTree = function() {
+				const sResourcePath = viewStateModel.getProperty("/liveMode")?"/srv/cas/resources":"model/resources.json";
+				this.oResourceTreeModel.loadData(sResourcePath);
+			}.bind(this);
+			fnLoadResourceTree();
+			viewStateModel.bindProperty("/liveMode").attachChange(fnLoadResourceTree);
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
 		},
 
@@ -36,16 +42,15 @@ sap.ui.define([
 			var oGraph = this.byId("graph"),
 				oToolbar = this.byId("graph-toolbar"),
 				oOrientation = new Select();
-
 			[
-				{key: "LeftRight", text: "Left to right"},
-				{key: "RightLeft", text: "Right to left"},
 				{key: "TopBottom", text: "Top to bottom"},
-				{key: "BottomTop", text: "Bottom to top"}
+				{key: "BottomTop", text: "Bottom to top"},
+				{key: "LeftRight", text: "Left to right"},
+				{key: "RightLeft", text: "Right to left"}				
 			].forEach(function (o) {
 				oOrientation.addItem(new Item(o));
 			});
-			oOrientation.setSelectedKey("LeftRight");
+			oOrientation.setSelectedKey(this.getOwnerComponent().getModel("viewState").getProperty("/landscapeOrientation"));
 			oOrientation.attachChange(function (oEvent) {
 				var sKey = oEvent.getParameter("selectedItem").getKey();
 				oGraph.setOrientation(sKey);

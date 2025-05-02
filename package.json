@@ -1,6 +1,6 @@
 {
   "name": "int-devops",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",

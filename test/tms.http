@@ -15,6 +15,12 @@ Authorization: Bearer {{tmsLogin.response.body.access_token}}
 Accept: application/json
 
 ###
+# @name tmsGetRoutes
+GET {{tmsUrl}}/v2/routes
+Authorization: Bearer {{tmsLogin.response.body.access_token}}
+Accept: application/json
+
+###
 # @name tmsGetTransportRequests
 GET {{tmsUrl}}/v2/nodes/192836/transportRequests?status=in
 Authorization: Bearer {{tmsLogin.response.body.access_token}}

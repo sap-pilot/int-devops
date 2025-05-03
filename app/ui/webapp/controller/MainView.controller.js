@@ -45,16 +45,20 @@ sap.ui.define([
 				}	
 				// add new columns
 				const oContentResources = this.oResourceTreeModel.getProperty("/value");
+				const selectedIndicesSet = new Set();
 				const aNodes = oContentResources.nodes;
 				for (const node of aNodes) {
 					let column = new Column({
-						label: new Label({text: node.name}),
+						label: new Label({text: node.alias}),
 						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
 						width: "5em",
-						visible: true
+						visible: !node.r.error
 					});
 					this.oTreeTable.addColumn(column);
+					selectedIndicesSet.add(node.idx);
 				}
+				// update comparision status
+				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet);
 				this.updateLandscapeModel(oContentResources);
 				this.setBusy(false);
 			}.bind(this);
@@ -86,15 +90,17 @@ sap.ui.define([
 				lines: structuredClone(oContentResources.lines)
 			};
 			for (const node of obj.nodes) {
-				node.attrs = [];
+				node.attrs = [{key:"alias",value:node.alias}];
 				for (const [key, value] of Object.entries(node.r)) {
 					const attr = {key: key, value: value};
 					node.attrs.push(attr);
 				}
 				//node.checkboxState = "Checked"; // dont show checkbox yet
-				if (node.r.error)
+				if (node.r.error) {
 					node.status = "Error";
-				else {
+				} else if (node.r.warning) { 
+					node.status = "Warning";
+				} else {
 					node.selected = true;
 					node.pSelected = true;
 				}
@@ -190,15 +196,15 @@ sap.ui.define([
 					selectedIndexSet.add(node.idx);
 			}
 			const oResourceTree = this.oResourceTreeModel.getData();
-			this._updateTreeNodeStatus(oResourceTree.value,selectedIndexSet);
+			this._updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet);
 			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
 		},
 
-		_updateTreeNodeStatus: function(obj, selectedIndexSet) {
+		_updateVerisonCompareStatus: function(entry, selectedIndexSet) {
 			let maxUnique = 1;
-			if (obj.c && obj.c.length > 0) {
-				for (let child of obj.c) {
-					const cd = this._updateTreeNodeStatus(child, selectedIndexSet);
+			if (entry.c && entry.c.length > 0) {
+				for (let child of entry.c) {
+					const cd = this._updateVerisonCompareStatus(child, selectedIndexSet);
 					if (cd > maxUnique)
 						maxUnique = cd;
 				}
@@ -207,16 +213,16 @@ sap.ui.define([
 			let arr = [];
 			for ( let idx of selectedIndexSet) {
 				const v = `v${idx}`;
-				arr.push(obj[v]);
+				arr.push(entry[v]);
 			}
 			u = this._countUnique(arr);
 			//debugger;
 			if (u <= 1 && maxUnique <= 1)
-				obj.s = 'ok';
+				entry.s = 'ok';
 			else if (u > 2 || maxUnique > 2)
-				obj.s = 'error'
+				entry.s = 'error'
 			else
-				obj.s = 'warning';
+			entry.s = 'warning';
 			return u == 1? maxUnique : u;
 		},
 

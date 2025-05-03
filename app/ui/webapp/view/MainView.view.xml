@@ -30,7 +30,7 @@
                             <g:nodes>
                                 <g:Node
                                         key="{landscape>idx}"
-                                        title="{landscape>name}"
+                                        title="{landscape>tmsNode}"
                                         group="{landscape>group}"
                                         icon="{landscape>icon}"
                                         attributes="{path:'landscape>attrs', templateShareable:true}"

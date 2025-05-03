@@ -58,7 +58,7 @@ const getRemoteResources = async function(req) {
         let nodes = filteredDestinations.map(dest => ({
             idx: dest.originalProperties.NODE_ORDER,
             group: dest.originalProperties.NODE_GROUP,
-            name: dest.originalProperties.NODE_NAME ||  dest.originalProperties.TMS_NODE,
+            alias: dest.originalProperties.NODE_ALIAS || dest.originalProperties.TMS_NODE.split("_").at(-1),
             tmsNode: dest.originalProperties.TMS_NODE,
             dest: dest.name,
             r: {},
@@ -268,36 +268,4 @@ function _recursiveSort(obj) {
             _recursiveSort(child);
         }
     }
-}
-
-function _countUnique(iterable) {
-    return new Set(iterable).size;
-}
-  
-
-const _calculateStatus = function(obj, maxIndex) {
-    let maxUnique = 1;
-    if (obj.c && obj.c.length > 0) {
-        for (let child of obj.c) {
-            const cd = _calculateStatus(child, maxIndex);
-            if (cd > maxUnique)
-                maxUnique = cd;
-        }
-    }
-    let u = 0;
-    let arr = [];
-    for ( let i = 0; i < maxIndex; i++ ) {
-        const v = `v${i}`;
-        if (!obj.hasOwnProperty(v))
-            obj[v] = '-';
-        arr.push(obj[v]);
-    }
-    u = _countUnique(arr);
-    if (u == 1 && maxUnique == 1)
-        obj.s = 'ok';
-    else if (u > 2 || maxUnique > 2)
-        obj.s = 'error'
-    else
-        obj.s = 'warning';
-    return u == 1? maxUnique : u;
 }

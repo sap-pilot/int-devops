@@ -1,6 +1,6 @@
 {
   "name": "int-devops",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
@@ -20,6 +20,7 @@
     "clean": "rimraf gen resources mta_archives",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
+    "gen-env": "export CF_APP_NAME=int-devops-srv && curl https://raw.githubusercontent.com/sap-pilot/btp-util/main/cf/gen-default-env.js | node",
     "start": "cds-serve",
     "start:debug": "npx -n=\"--inspect\" cds-serve",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -30,6 +31,8 @@
     "@ui5/cli": "^4"
   },
   "dependencies": {
+    "@sap-cloud-sdk/connectivity": "^4.0.2",
+    "@sap-cloud-sdk/http-client": "^4.0.2",
     "@sap/cds": "^8.9.2",
     "@sap/xsenv": "^5.5.0",
     "@sap/xssec": "^4.6.0",

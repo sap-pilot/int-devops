@@ -24,7 +24,7 @@
 		},
 		{
 			"title": "Report SAP Incident",
-			"icon": "sap-icon://incident",
+			"icon": "sap-icon://quality-issue",
 			"url": "https://me.sap.com/createIssue/0/overview",
 			"target": "_blank"
 		}

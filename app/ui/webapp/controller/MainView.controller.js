@@ -1,14 +1,14 @@
 sap.ui.define([
 	"org/sapux/int/controller/BaseController",
     "sap/ui/model/json/JSONModel",
-	"sap/m/Popover",
-	"sap/m/ListBase",
-	"sap/m/StandardListItem",
 	"sap/m/Select",
 	"sap/ui/core/Item",
 	"sap/suite/ui/commons/networkgraph/layout/SwimLaneChainLayout",
+	"sap/ui/table/Column",
+	"sap/m/Label",
+	"sap/m/Text",
 	"org/sapux/int/model/formatter"
-], function (BaseController,JSONModel, Popover, ListBase, StandardListItem, Select, Item, SwimLaneChainLayout, formatter) {
+], function (BaseController,JSONModel, Select, Item, SwimLaneChainLayout, Column, Label, Text, formatter) {
 	"use strict";
 
 	return BaseController.extend("org.sapux.int.controller.Monitor", {
@@ -17,25 +17,95 @@ sap.ui.define([
 
         onInit: function () {
 
-			var oGraph,
-				oModel = new JSONModel("model/landscape.json");
+			this.oViewStateModel = new JSONModel({
+				busy: true
+			});
+			this.getView().setModel(this.oViewStateModel,"viewState");
 
-			this.getView().setModel(oModel);
-			this.setUpOrientationSelect();
-
-			oGraph = this.byId("graph");
+			this._selectedNodes = new Set(); // Store selected node keys
+			let oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
+			this.setUpOrientationSelect();
 
 			// load resource tree depending on liveMode
 			this.oResourceTreeModel = new JSONModel();
-			const viewStateModel = this.getOwnerComponent().getModel("viewState");
-			const fnLoadResourceTree = function() {
-				const sResourcePath = viewStateModel.getProperty("/liveMode")?"/srv/cas/resources":"model/resources.json";
-				this.oResourceTreeModel.loadData(sResourcePath);
-			}.bind(this);
-			fnLoadResourceTree();
-			viewStateModel.bindProperty("/liveMode").attachChange(fnLoadResourceTree);
+			this.oTreeTable = this.byId("resourceTreeTable");
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
+
+			// initial landscape model (need to format contentResources response)
+			this.oLandscapeModel = new JSONModel();
+			this.getView().setModel(this.oLandscapeModel,"landscape");
+
+			// list to nodes change event so to update columns
+			const fnContentResourcesLoaded = function() {
+				const aColumns = this.oTreeTable.getColumns();
+				// remove existing columns
+				for (let i = aColumns.length-1; i>2; i--) {
+					this.oTreeTable.removeColumn(i);
+				}	
+				// add new columns
+				const oContentResources = this.oResourceTreeModel.getProperty("/value");
+				const selectedIndicesSet = new Set();
+				const aNodes = oContentResources.nodes;
+				for (const node of aNodes) {
+					let column = new Column({
+						label: new Label({text: node.alias}),
+						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
+						width: "5em",
+						visible: !node.r.error
+					});
+					this.oTreeTable.addColumn(column);
+					selectedIndicesSet.add(node.idx);
+				}
+				// update comparision status
+				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet);
+				this.updateLandscapeModel(oContentResources);
+				this.setBusy(false);
+			}.bind(this);
+			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
+
+			// list to appState>/liveMode change event
+			const appStateModel = this.getOwnerComponent().getModel("appState");
+			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadContentResources(false)}.bind(this));
+
+			// now load resource tree, delay a bit otherwise busy indicator wont work on initial load
+			setTimeout(function(){this.loadContentResources(false)}.bind(this),200);
+		},
+
+		setBusy(bBusy) {
+			this.oViewStateModel.setProperty("/busy",bBusy);
+		},
+
+		loadContentResources(forceRefresh) {
+			this.setBusy(true);
+			const appStateModel = this.getOwnerComponent().getModel("appState");
+			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
+			this.oResourceTreeModel.loadData(sResourcePath);
+		},
+
+		updateLandscapeModel(oContentResources) {
+			const obj = {
+				nodes: structuredClone(oContentResources.nodes),
+				groups: structuredClone(oContentResources.groups),
+				lines: structuredClone(oContentResources.lines)
+			};
+			for (const node of obj.nodes) {
+				node.attrs = [{key:"alias",value:node.alias}];
+				for (const [key, value] of Object.entries(node.r)) {
+					const attr = {key: key, value: value};
+					node.attrs.push(attr);
+				}
+				//node.checkboxState = "Checked"; // dont show checkbox yet
+				if (node.r.error) {
+					node.status = "Error";
+				} else if (node.r.warning) { 
+					node.status = "Warning";
+				} else {
+					node.selected = true;
+					node.pSelected = true;
+				}
+			}
+			this.oLandscapeModel.setData(obj);
 		},
 
 		setUpOrientationSelect: function () {
@@ -43,14 +113,15 @@ sap.ui.define([
 				oToolbar = this.byId("graph-toolbar"),
 				oOrientation = new Select();
 			[
+				{key: "LeftRight", text: "Left to right"},
 				{key: "TopBottom", text: "Top to bottom"},
 				{key: "BottomTop", text: "Bottom to top"},
-				{key: "LeftRight", text: "Left to right"},
-				{key: "RightLeft", text: "Right to left"}				
+				{key: "RightLeft", text: "Right to left"}	
+							
 			].forEach(function (o) {
 				oOrientation.addItem(new Item(o));
 			});
-			oOrientation.setSelectedKey(this.getOwnerComponent().getModel("viewState").getProperty("/landscapeOrientation"));
+			oOrientation.setSelectedKey(this.getOwnerComponent().getModel("appState").getProperty("/landscapeOrientation"));
 			oOrientation.attachChange(function (oEvent) {
 				var sKey = oEvent.getParameter("selectedItem").getKey();
 				oGraph.setOrientation(sKey);
@@ -92,23 +163,79 @@ sap.ui.define([
 		},
 
 		onCollapseAll: function() {
-			const oTreeTable = this.byId("TreeTableBasic");
-			oTreeTable.collapseAll();
-		},
-
-		onCollapseSelection: function() {
-			const oTreeTable = this.byId("TreeTableBasic");
-			oTreeTable.collapse(oTreeTable.getSelectedIndices());
+			this.oTreeTable.collapseAll();
 		},
 
 		onExpandAll: function() {
-			const oTreeTable = this.byId("TreeTableBasic");
-			oTreeTable.expandToLevel(3);
+			this.oTreeTable.expandToLevel(3);
+		},
+
+		onCollapseSelection: function() {
+			this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
 		},
 
 		onExpandSelection: function() {
-			const oTreeTable = this.byId("TreeTableBasic");
-			oTreeTable.expand(oTreeTable.getSelectedIndices());
+			this.oTreeTable.expand(this.oTreeTable.getSelectedIndices());
+		},
+
+		onNodePress: function (oEvent) {
+			const oNode = oEvent.getSource();
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const node = nodes[oNode.getKey()];
+			node.pSelected = !node.pSelected; // flip true selected state
+		},
+
+		onGraphSelectionChange: function(oEvent) {
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const columns = this.oTreeTable.getColumns();
+			const selectedIndexSet = new Set();
+			for (const node of nodes) {
+				node.selected = node.pSelected;
+				columns[node.idx+3].setVisible(node.selected);
+				if (node.selected)
+					selectedIndexSet.add(node.idx);
+			}
+			const oResourceTree = this.oResourceTreeModel.getData();
+			this._updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet);
+			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
+		},
+
+		_updateVerisonCompareStatus: function(entry, selectedIndexSet) {
+			let maxUnique = 1;
+			if (entry.c && entry.c.length > 0) {
+				for (let child of entry.c) {
+					const cd = this._updateVerisonCompareStatus(child, selectedIndexSet);
+					if (cd > maxUnique)
+						maxUnique = cd;
+				}
+			}
+			let u = 0;
+			let arr = [];
+			for ( let idx of selectedIndexSet) {
+				const v = `v${idx}`;
+				arr.push(entry[v]);
+			}
+			u = this._countUnique(arr);
+			//debugger;
+			if (u <= 1 && maxUnique <= 1)
+				entry.s = 'ok';
+			else if (u > 2 || maxUnique > 2)
+				entry.s = 'error'
+			else
+			entry.s = 'warning';
+			return u == 1? maxUnique : u;
+		},
+
+		_countUnique: function(iterable) {
+			return new Set(iterable).size;
+		},
+
+		onTreeSelectionChange: function(oEvent) {
+			const oParams = oEvent.getParameters();
+			console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}`);
+			// const oSource = this.oResourceTreeModel.getProperty(oParams.rowContext.toString());
+			const aSelection = this.oTreeTable.getSelectedIndices() || [];
+			this.byId("exportBtn").setText(`Export (${aSelection.length})`)
 		}
 	});
 

@@ -3,13 +3,19 @@
 	"sap.app": {
 		"id": "org.sapux.int",
 		"type": "application",
-		"i18n": "i18n/i18n.properties",
-		"applicationVersion": {
-			"version": "0.0.1"
-		},
 		"title": "{{appTitle}}",
 		"description": "{{appDescription}}",
 		"resources": "resources.json",
+		"applicationVersion": {
+			"version": "0.0.7"
+		},
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				"en"
+			],
+			"fallbackLocale": "en"
+		},
 		"sourceTemplate": {
 			"id": "@sap/generator-fiori:basic",
 			"version": "1.11.0",
@@ -19,7 +25,7 @@
 		"crossNavigation": {
 			"inbounds": {
 				"BtpPilot-overview": {
-					"semanticObject": "BtpPilot",
+					"semanticObject": "IntDevOps",
 					"action": "overview",
 					"title": "{{flpTitle}}",
 					"subTitle": "{{flpSubtitle}}",
@@ -71,7 +77,11 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "org.sapux.int.i18n.i18n"
+					"bundleName": "org.sapux.int.i18n.i18n",
+					"supportedLocales": [
+						"en"
+					],
+					"fallbackLocale": "en"
 				}
 			}
 		},

@@ -38,8 +38,8 @@ let alignColorsAndTime = format.combine(
             //     return `${info.timestamp} [${info.level}] ${str}`
             // } 
             return info.stack
-                ? `${str}\n${info.stack}`
-                : str;
+                ? `[${info.level}] ${str}\n${info.stack}`
+                : `[${info.level}] ${str}`;
         }
     )
 );

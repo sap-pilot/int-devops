@@ -13,42 +13,46 @@
 		<content>
             <l:ResponsiveSplitter defaultPane="contePane" height="100%">
                 <l:PaneContainer>
-                    <l:SplitPane id="monitorGraphPane">
-                        <g:Graph  enableWheelZoom="false"
+                    <l:SplitPane id="landscapePane">
+                        <g:Graph enableWheelZoom="false"
                             id="graph"
                             height="100%"
                             width="100%"
-                            orientation="{viewState>/landscapeOrientation}"
-                            nodes="{/nodes}"
-                            lines="{/lines}"
-                            groups="{/groups}">
+                            busy="{viewState>/busy}"
+                            selectionChange="onGraphSelectionChange"
+                            orientation="{appState>/landscapeOrientation}"
+                            nodes="{landscape>/nodes}"
+                            lines="{landscape>/lines}"
+                            groups="{landscape>/groups}">
                             <g:statuses>
                                 <g:Status key="CustomStatus" backgroundColor="darkblue" />
                             </g:statuses>
                             <g:nodes>
                                 <g:Node
-                                        key="{key}"
-                                        title="{title}"
-                                        group="{group}"
-                                        icon="{icon}"
-                                        attributes="{path:'attributes', templateShareable:true}"
+                                        key="{landscape>idx}"
+                                        title="{landscape>tmsNode}"
+                                        group="{landscape>group}"
+                                        icon="{landscape>icon}"
+                                        attributes="{path:'landscape>attrs', templateShareable:true}"
                                         showActionLinksButton="false"
-                                        status="{status}"
-                                        headerCheckBoxState="{checkboxState}"
+                                        status="{landscape>status}"
+                                        headerCheckBoxState="{landscape>checkboxState}"
+                                        selected="{landscape>selected}"
+                                        press="onNodePress"
                                         shape="Box">
                                     <g:attributes>
                                         <g:ElementAttribute
-                                                label="{label}"
-                                                value="{value}"/>
+                                                label="{landscape>key}"
+                                                value="{landscape>value}"/>
                                     </g:attributes>
                                 </g:Node>
                             </g:nodes>
                             <g:lines>
                                 <g:Line
-                                        from="{from}"
-                                        to="{to}"
-                                        attributes="{path:'attributes', templateShareable:true}"
-                                        status="{status}">
+                                        from="{landscape>from}"
+                                        to="{landscape>to}"
+                                        attributes="{path:'landscape>attributes', templateShareable:true}"
+                                        status="{landscape>status}">
                                     <g:attributes>
                                         <g:ElementAttribute
                                                 label="{label}"
@@ -58,38 +62,51 @@
                             </g:lines>
                             <g:groups>
                                 <g:Group
-                                    headerCheckBoxState="{headerCheckboxState}"
-                                    status="{status}"
-                                    icon="sap-icon://measure"
-                                    collapsed="{collapsed}"
-                                    key="{key}"
-                                    title="{title}">
+                                    headerCheckBoxState="{landscape>headerCheckboxState}"
+                                    status="{landscape>status}"
+                                    collapsed="{landscape>collapsed}"
+                                    key="{landscape>idx}"
+                                    title="{landscape>name}">
                                 </g:Group>
                             </g:groups>
                         </g:Graph>
                      </l:SplitPane>
-                    <l:SplitPane id="monitorAlertsPane">   
+                    <l:SplitPane id="resourceTreePane">   
                         <l:layoutData>
-                            <l:SplitterLayoutData size="{viewState>/resourceTreeWidth}" />
+                            <l:SplitterLayoutData size="{appState>/resourceTreeWidth}" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
-									id="TreeTableBasic"
+									id="resourceTreeTable"
+                                    busy="{viewState>/busy}"
+                                    busyIndicatorDelay="0"
 									rows="{path:'resourceTree>/value/c', parameters: {arrayNames:['c']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
+                                    rowSelectionChange="onTreeSelectionChange"
 									enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
-										<SearchField id="treeFilter" width="45%" change="onTreeFilterChange"/>
+										<SearchField id="treeFilter" width="18rem" 
+                                            enabled="{=!${viewState>/busy}}"
+                                            change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
-										<Button icon="sap-icon://synchronize" press="onRefeshResources" enabled="true"
-                                            text="Refresh" tooltip="Refresh content resources list from all connected Content Agent services" />
 										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
 										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
-										<Button icon="sap-icon://expand-group" press="onExpandSelection"/>
-										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/>
+										<!-- <Button icon="sap-icon://expand-group" press="onExpandSelection"/>
+										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/> -->
+                                        <Button id="refreshBtn" 
+                                            press="loadContentResources(true)"
+                                            enabled="{=!${viewState>/busy}}"
+                                            text="{=${viewState>/busy}?'Loading...':'Refresh'}" 
+                                            icon="sap-icon://synchronize" 
+                                            tooltip="Force refresh content resources list from all connected Content Agent services" />
+                                        <Button id="exportBtn" 
+                                            enabled="false"
+                                            text="Export (0)" 
+                                            icon="sap-icon://shipping-status" 
+                                            tooltip="Export selected artifacts to TMS" />
 									</OverflowToolbar>
 								</table:extension>
 								<table:rowSettingsTemplate>
@@ -118,30 +135,12 @@
 											<Text text="{resourceTree>t}" wrapping="false" />
 										</table:template>
 									</table:Column>
-									<table:Column width="5rem">
+									<!-- <table:Column width="5rem">
 										<Label text="STG"/>
 										<table:template>
 											<Text text="{resourceTree>v0}" wrapping="false" />
 										</table:template>
-									</table:Column>
-                                    <table:Column width="5rem">
-										<Label text="PRE2"/>
-										<table:template>
-											<Text text="{resourceTree>v1}" wrapping="false" />
-										</table:template>
-									</table:Column>
-                                    <table:Column width="5rem">
-										<Label text="PRE3"/>
-										<table:template>
-											<Text text="{resourceTree>v2}" wrapping="false" />
-										</table:template>
-									</table:Column>
-                                    <table:Column width="5rem">
-										<Label text="PRE"/>
-										<table:template>
-											<Text text="{resourceTree>v3}" wrapping="false" />
-										</table:template>
-									</table:Column>
+									</table:Column> -->
 								</table:columns>
 							</table:TreeTable>
                         </Panel>

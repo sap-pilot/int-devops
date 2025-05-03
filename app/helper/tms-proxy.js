@@ -47,7 +47,7 @@ const tmsProxyConfig = {
         proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
             // log original request and proxied request info
             const durationMs = Date.now() - req.startTime;
-            const exchange = `[response] ${req.method} ${req.originalUrl} -> ${proxyRes.req.protocol}//${proxyRes.req.host}${proxyRes.req.path} [${proxyRes.statusCode}] (${durationMs}ms)`;
+            const exchange = `[response] ${req.method} ${req.originalUrl} -> ${proxyRes.req.protocol}//${proxyRes.req.host}${proxyRes.req.path} [${proxyRes.statusCode}] (${durationMs} ms)`;
             logger.info(exchange); // GET / -> http://www.example.com [200]
             logger.debug(`[response-headers]: ${JSON.stringify(res.getHeaders(), null, 2)}`);
             const response = responseBuffer.toString('utf8');

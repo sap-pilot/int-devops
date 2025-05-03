@@ -18,6 +18,7 @@
                             id="graph"
                             height="100%"
                             width="100%"
+                            selectionChange="onGraphSelectionChange"
                             orientation="{viewState>/landscapeOrientation}"
                             nodes="{/nodes}"
                             lines="{/lines}"

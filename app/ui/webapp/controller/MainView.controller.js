@@ -109,6 +109,10 @@ sap.ui.define([
 		onExpandSelection: function() {
 			const oTreeTable = this.byId("TreeTableBasic");
 			oTreeTable.expand(oTreeTable.getSelectedIndices());
+		},
+
+		onGraphSelectionChange: function(event) {
+			console.log("graph selection change: "+event);
 		}
 	});
 

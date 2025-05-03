@@ -166,12 +166,12 @@ sap.ui.define([
 			this.oTreeTable.collapseAll();
 		},
 
-		onCollapseSelection: function() {
-			this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
-		},
-
 		onExpandAll: function() {
 			this.oTreeTable.expandToLevel(3);
+		},
+
+		onCollapseSelection: function() {
+			this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
 		},
 
 		onExpandSelection: function() {
@@ -228,6 +228,14 @@ sap.ui.define([
 
 		_countUnique: function(iterable) {
 			return new Set(iterable).size;
+		},
+
+		onTreeSelectionChange: function(oEvent) {
+			const oParams = oEvent.getParameters();
+			console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}`);
+			// const oSource = this.oResourceTreeModel.getProperty(oParams.rowContext.toString());
+			const aSelection = this.oTreeTable.getSelectedIndices() || [];
+			this.byId("exportBtn").setText(`Export (${aSelection.length})`)
 		}
 	});
 

@@ -65,6 +65,7 @@ const getRemoteResources = async function(req) {
             obj: {}, // result object to be deleted after merge
         }));
         nodes = nodes.sort((a, b) => (a.idx == b.idx)? 0 : ((a.idx > b.idx)? 1 : -1));
+        // reset index and extract groups
         const groups = [];
         for (let i = 0; i < nodes.length; i++) {
             nodes[i].idx = i; // reset index for later tree column display
@@ -75,8 +76,8 @@ const getRemoteResources = async function(req) {
             }
             nodes[i].group = g.idx; // reset group name to index
         }
-        const startTime = Date.now();
         logger.info(`loading contentResources for nodes ${JSON.stringify(nodes,null,2)}`);
+        const startTime = Date.now();
         const promises = [];
         for (const node of nodes) {
             let p = executeHttpRequest({destinationName: node.dest}, { 

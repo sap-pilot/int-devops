@@ -83,24 +83,30 @@
 									rows="{path:'resourceTree>/value/c', parameters: {arrayNames:['c']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
+                                    rowSelectionChange="onTreeSelectionChange"
 									enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
-										<SearchField id="treeFilter" width="45%" 
+										<SearchField id="treeFilter" width="18rem" 
                                             enabled="{=!${viewState>/busy}}"
                                             change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
-										<Button id="refreshBtn" 
+										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
+										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
+										<!-- <Button icon="sap-icon://expand-group" press="onExpandSelection"/>
+										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/> -->
+                                        <Button id="refreshBtn" 
                                             press="loadContentResources(true)"
                                             enabled="{=!${viewState>/busy}}"
                                             text="{=${viewState>/busy}?'Loading...':'Refresh'}" 
                                             icon="sap-icon://synchronize" 
                                             tooltip="Force refresh content resources list from all connected Content Agent services" />
-										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
-										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
-										<Button icon="sap-icon://expand-group" press="onExpandSelection"/>
-										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/>
+                                        <Button id="exportBtn" 
+                                            enabled="false"
+                                            text="Export (0)" 
+                                            icon="sap-icon://shipping-status" 
+                                            tooltip="Export selected artifacts to TMS" />
 									</OverflowToolbar>
 								</table:extension>
 								<table:rowSettingsTemplate>

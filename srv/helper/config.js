@@ -1,6 +1,10 @@
 // config variables
 const config = {
     "repoUrl": process.env.REPO_URL,
-    "cachedContentResourcePath": "./srv/tmp-content-resources.json"
+    "tmsDestination": "TransportManagementService",
+    "casDestinationPrefix": "CAS_",
+    "cachedContentResourcePath": "./srv/tmp-content-resources.json",
+    "cachedTmsLandscapePath": "./srv/tmp-tms-landscape.json"
 }
+
 module.exports = { config };

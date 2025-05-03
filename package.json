@@ -39,5 +39,10 @@
     "passport": "^0.7.0",
     "rimraf": "^6",
     "winston": "^3.17.0"
+  },
+  "cds": {
+    "server": {
+      "shutdown_on_uncaught_errors": false
+    }
   }
 }

@@ -41,9 +41,9 @@ const getContentResources = async function(req) {
         // get list of destinations
         const allDestinations = await getAllDestinationsFromDestinationService();
         // filter conten-agent destiation with prerix 'CAS_' and additional property 'TMS_NODE'
-        const filteredDestinations = allDestinations.filter(dest => dest.name.startsWith("CAS_") && dest.originalProperties.TMS_NODE);
+        const filteredDestinations = allDestinations.filter(dest => dest.name.startsWith(config.casDestinationPrefix) && dest.originalProperties.TMS_NODE);
         if (!filteredDestinations || filteredDestinations.length == 0) 
-            throw new Error(`no Content Agent destination found with prefix 'CAS_' and 'TMS_NODE' property`);
+            throw new Error(`no Content Agent destination found with prefix '${config.casDestinationPrefix}' and 'TMS_NODE' property`);
         let nodes = filteredDestinations.map(dest => ({
             idx: dest.originalProperties.NODE_ORDER,
             group: dest.originalProperties.NODE_GROUP,

@@ -13,6 +13,11 @@
             {"idx":2,"name":"Preprod"},
             {"idx":3,"name":"Production"}
         ],
+        "lines": [
+            {"from":0,"to":1},
+            {"from":1,"to":2},
+            {"from":2,"to":3}
+        ],
         "c": [
             {"n": "API Management", "c": [
                 {"n":"API Provider", "c": [

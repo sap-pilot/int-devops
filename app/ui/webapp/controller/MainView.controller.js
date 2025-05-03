@@ -22,58 +22,84 @@ sap.ui.define([
 			});
 			this.getView().setModel(this.oViewStateModel,"viewState");
 
-			var oGraph,
-				oModel = new JSONModel("model/landscape.json");
-
-			this.getView().setModel(oModel);
-			this.setUpOrientationSelect();
-
-			oGraph = this.byId("graph");
+			this._selectedNodes = new Set(); // Store selected node keys
+			let oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
+			this.setUpOrientationSelect();
 
 			// load resource tree depending on liveMode
 			this.oResourceTreeModel = new JSONModel();
 			this.oTreeTable = this.byId("resourceTreeTable");
 			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
 
+			// initial landscape model (need to format contentResources response)
+			this.oLandscapeModel = new JSONModel();
+			this.getView().setModel(this.oLandscapeModel,"landscape");
+
 			// list to nodes change event so to update columns
-			const fnResourceTreeLoaded = function() {
+			const fnContentResourcesLoaded = function() {
 				const aColumns = this.oTreeTable.getColumns();
 				// remove existing columns
 				for (let i = aColumns.length-1; i>2; i--) {
 					this.oTreeTable.removeColumn(i);
 				}	
 				// add new columns
-				const aNodes = this.oResourceTreeModel.getProperty("/value/nodes");
+				const oContentResources = this.oResourceTreeModel.getProperty("/value");
+				const aNodes = oContentResources.nodes;
 				for (const node of aNodes) {
 					let column = new Column({
 						label: new Label({text: node.name}),
 						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
-						width: "5em"
+						width: "5em",
+						visible: true
 					});
 					this.oTreeTable.addColumn(column);
 				}
+				this.updateLandscapeModel(oContentResources);
 				this.setBusy(false);
 			}.bind(this);
-			this.oResourceTreeModel.attachRequestCompleted(fnResourceTreeLoaded);
+			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
 
 			// list to appState>/liveMode change event
 			const appStateModel = this.getOwnerComponent().getModel("appState");
-			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadResourceTree(false)}.bind(this));
+			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadContentResources(false)}.bind(this));
 
 			// now load resource tree, delay a bit otherwise busy indicator wont work on initial load
-			setTimeout(function(){this.loadResourceTree(false)}.bind(this),200);
+			setTimeout(function(){this.loadContentResources(false)}.bind(this),200);
 		},
 
 		setBusy(bBusy) {
 			this.oViewStateModel.setProperty("/busy",bBusy);
 		},
 
-		loadResourceTree(forceRefresh) {
+		loadContentResources(forceRefresh) {
 			this.setBusy(true);
 			const appStateModel = this.getOwnerComponent().getModel("appState");
 			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
 			this.oResourceTreeModel.loadData(sResourcePath);
+		},
+
+		updateLandscapeModel(oContentResources) {
+			const obj = {
+				nodes: structuredClone(oContentResources.nodes),
+				groups: structuredClone(oContentResources.groups),
+				lines: structuredClone(oContentResources.lines)
+			};
+			for (const node of obj.nodes) {
+				node.attrs = [];
+				for (const [key, value] of Object.entries(node.r)) {
+					const attr = {key: key, value: value};
+					node.attrs.push(attr);
+				}
+				//node.checkboxState = "Checked"; // dont show checkbox yet
+				if (node.r.error)
+					node.status = "Error";
+				else {
+					node.selected = true;
+					node.pSelected = true;
+				}
+			}
+			this.oLandscapeModel.setData(obj);
 		},
 
 		setUpOrientationSelect: function () {
@@ -81,10 +107,11 @@ sap.ui.define([
 				oToolbar = this.byId("graph-toolbar"),
 				oOrientation = new Select();
 			[
+				{key: "LeftRight", text: "Left to right"},
 				{key: "TopBottom", text: "Top to bottom"},
 				{key: "BottomTop", text: "Bottom to top"},
-				{key: "LeftRight", text: "Left to right"},
-				{key: "RightLeft", text: "Right to left"}				
+				{key: "RightLeft", text: "Right to left"}	
+							
 			].forEach(function (o) {
 				oOrientation.addItem(new Item(o));
 			});
@@ -145,8 +172,56 @@ sap.ui.define([
 			this.oTreeTable.expand(this.oTreeTable.getSelectedIndices());
 		},
 
-		onGraphSelectionChange: function(event) {
-			console.log("graph selection change: "+event);
+		onNodePress: function (oEvent) {
+			const oNode = oEvent.getSource();
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const node = nodes[oNode.getKey()];
+			node.pSelected = !node.pSelected; // flip true selected state
+		},
+
+		onGraphSelectionChange: function(oEvent) {
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const columns = this.oTreeTable.getColumns();
+			const selectedIndexSet = new Set();
+			for (const node of nodes) {
+				node.selected = node.pSelected;
+				columns[node.idx+3].setVisible(node.selected);
+				if (node.selected)
+					selectedIndexSet.add(node.idx);
+			}
+			const oResourceTree = this.oResourceTreeModel.getData();
+			this._updateTreeNodeStatus(oResourceTree.value,selectedIndexSet);
+			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
+		},
+
+		_updateTreeNodeStatus: function(obj, selectedIndexSet) {
+			let maxUnique = 1;
+			if (obj.c && obj.c.length > 0) {
+				for (let child of obj.c) {
+					const cd = this._updateTreeNodeStatus(child, selectedIndexSet);
+					if (cd > maxUnique)
+						maxUnique = cd;
+				}
+			}
+			let u = 0;
+			let arr = [];
+			for ( let idx of selectedIndexSet) {
+				const v = `v${idx}`;
+				arr.push(obj[v]);
+			}
+			u = this._countUnique(arr);
+			//debugger;
+			if (u <= 1 && maxUnique <= 1)
+				obj.s = 'ok';
+			else if (u > 2 || maxUnique > 2)
+				obj.s = 'error'
+			else
+				obj.s = 'warning';
+			return u == 1? maxUnique : u;
+		},
+
+		_countUnique: function(iterable) {
+			return new Set(iterable).size;
 		}
 	});
 

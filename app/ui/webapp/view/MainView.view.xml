@@ -13,7 +13,7 @@
 		<content>
             <l:ResponsiveSplitter defaultPane="contePane" height="100%">
                 <l:PaneContainer>
-                    <l:SplitPane id="monitorGraphPane">
+                    <l:SplitPane id="landscapePane">
                         <g:Graph enableWheelZoom="false"
                             id="graph"
                             height="100%"
@@ -21,36 +21,38 @@
                             busy="{viewState>/busy}"
                             selectionChange="onGraphSelectionChange"
                             orientation="{appState>/landscapeOrientation}"
-                            nodes="{/nodes}"
-                            lines="{/lines}"
-                            groups="{/groups}">
+                            nodes="{landscape>/nodes}"
+                            lines="{landscape>/lines}"
+                            groups="{landscape>/groups}">
                             <g:statuses>
                                 <g:Status key="CustomStatus" backgroundColor="darkblue" />
                             </g:statuses>
                             <g:nodes>
                                 <g:Node
-                                        key="{key}"
-                                        title="{title}"
-                                        group="{group}"
-                                        icon="{icon}"
-                                        attributes="{path:'attributes', templateShareable:true}"
+                                        key="{landscape>idx}"
+                                        title="{landscape>name}"
+                                        group="{landscape>group}"
+                                        icon="{landscape>icon}"
+                                        attributes="{path:'landscape>attrs', templateShareable:true}"
                                         showActionLinksButton="false"
-                                        status="{status}"
-                                        headerCheckBoxState="{checkboxState}"
+                                        status="{landscape>status}"
+                                        headerCheckBoxState="{landscape>checkboxState}"
+                                        selected="{landscape>selected}"
+                                        press="onNodePress"
                                         shape="Box">
                                     <g:attributes>
                                         <g:ElementAttribute
-                                                label="{label}"
-                                                value="{value}"/>
+                                                label="{landscape>key}"
+                                                value="{landscape>value}"/>
                                     </g:attributes>
                                 </g:Node>
                             </g:nodes>
                             <g:lines>
                                 <g:Line
-                                        from="{from}"
-                                        to="{to}"
-                                        attributes="{path:'attributes', templateShareable:true}"
-                                        status="{status}">
+                                        from="{landscape>from}"
+                                        to="{landscape>to}"
+                                        attributes="{path:'landscape>attributes', templateShareable:true}"
+                                        status="{landscape>status}">
                                     <g:attributes>
                                         <g:ElementAttribute
                                                 label="{label}"
@@ -60,17 +62,16 @@
                             </g:lines>
                             <g:groups>
                                 <g:Group
-                                    headerCheckBoxState="{headerCheckboxState}"
-                                    status="{status}"
-                                    icon="sap-icon://measure"
-                                    collapsed="{collapsed}"
-                                    key="{key}"
-                                    title="{title}">
+                                    headerCheckBoxState="{landscape>headerCheckboxState}"
+                                    status="{landscape>status}"
+                                    collapsed="{landscape>collapsed}"
+                                    key="{landscape>idx}"
+                                    title="{landscape>name}">
                                 </g:Group>
                             </g:groups>
                         </g:Graph>
                      </l:SplitPane>
-                    <l:SplitPane id="monitorAlertsPane">   
+                    <l:SplitPane id="resourceTreePane">   
                         <l:layoutData>
                             <l:SplitterLayoutData size="{appState>/resourceTreeWidth}" />
                         </l:layoutData>
@@ -91,7 +92,7 @@
                                             change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
 										<Button id="refreshBtn" 
-                                            press="loadResourceTree(true)"
+                                            press="loadContentResources(true)"
                                             enabled="{=!${viewState>/busy}}"
                                             text="{=${viewState>/busy}?'Loading...':'Refresh'}" 
                                             icon="sap-icon://synchronize" 

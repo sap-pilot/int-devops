@@ -53,7 +53,7 @@ function(UIComponent, Device, IllustrationPool, JSONModel, Storage, models) {
 				"sideExpanded":false,
 				"liveMode":false, // demoMode on
 				"resourceTreeWidth": "810px",
-				"landscapeOrientation": "TopBottom"
+				"landscapeOrientation": "LeftRight"
 			};
 			this.oAppStateModel = new JSONModel(oAppState);
 			const fnappStateChangeListener = function(event) {

@@ -71,9 +71,9 @@ const getRemoteResources = async function(req) {
             let g = groups.find((group) => group.name == nodes[i].group);
             if (!g) {
                 g = {idx: groups.length, name: nodes[i].group};
-                nodes[i].group = g.idx; // reset group name to index
                 groups.push(g);
             }
+            nodes[i].group = g.idx; // reset group name to index
         }
         const startTime = Date.now();
         logger.info(`loading contentResources for nodes ${JSON.stringify(nodes,null,2)}`);

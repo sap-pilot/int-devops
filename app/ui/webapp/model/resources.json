@@ -1,7 +1,18 @@
 {
     "value":{
-        "nodes": ["INT_DEV","INT_DEV_2","INT_STG_2"],
         "repoUrl": "https://github.com/sap-pilot/int-devops/tree/dev/work",
+        "nodes": [
+            {"idx":0,"group":0,"name":"DEV","tmdNode":"INT_DEV","dest":"CAS_DEV","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+            {"idx":1,"group":1,"name":"STG","tmdNode":"INT_STG","dest":"CAS_STG","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+            {"idx":2,"group":2,"name":"PRE","tmdNode":"INT_PRE","dest":"CAS_PRE","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+            {"idx":3,"group":3,"name":"PROD","tmdNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
+        ],
+        "groups": [
+            {"idx":0,"name":"Development"},
+            {"idx":1,"name":"Staging"},
+            {"idx":2,"name":"Preprod"},
+            {"idx":3,"name":"Production"}
+        ],
         "c": [
             {"n": "API Management", "c": [
                 {"n":"API Provider", "c": [

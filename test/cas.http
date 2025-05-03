@@ -17,3 +17,8 @@ Accept: application/json
 # @name localCasGetResources
 GET {{localBaseUrl}}/resources
 Authorization: Basic admin:admin
+
+###
+# @name localCasGetResourcesForceRefresh
+GET {{localBaseUrl}}/resources(forceRefresh=true)
+Authorization: Basic admin:admin

@@ -48,28 +48,28 @@ function(UIComponent, Device, IllustrationPool, JSONModel, Storage, models) {
 
 			// init local storage and restore UI state
 			this.oStorage = new Storage(Storage.Type.local, "int-devops");
-			const oViewState = {
+			const oAppState = {
 				"theme":"sap_horizon",
 				"sideExpanded":false,
 				"liveMode":false, // demoMode on
 				"resourceTreeWidth": "810px",
 				"landscapeOrientation": "TopBottom"
 			};
-			this.oViewStateModel = new JSONModel(oViewState);
-			const fnViewStateChangeListener = function(event) {
-				let oNewViewState = this.oViewStateModel.getData();
-				// console.log(`save new viewState: ${JSON.stringify(oNewViewState,null,2)}`);
-				this.oStorage.put("viewState",oNewViewState);
+			this.oAppStateModel = new JSONModel(oAppState);
+			const fnappStateChangeListener = function(event) {
+				let oNewAppState = this.oAppStateModel.getData();
+				// console.log(`save new appState: ${JSON.stringify(oNewAppState,null,2)}`);
+				this.oStorage.put("appState",oNewAppState);
 			}.bind(this);
 			// restore previous stateJSONModel can only attachChange against each property
-			const oPreviousViewState = this.oStorage.get('viewState') || {};
-			for (const sKey in oViewState) {
+			const oPreviousappState = this.oStorage.get('appState') || {};
+			for (const sKey in oAppState) {
 				// check properties one by one in case of property gets added or delete
-				if (oPreviousViewState.hasOwnProperty(sKey)) oViewState[sKey] = oPreviousViewState[sKey];
+				if (oPreviousappState.hasOwnProperty(sKey)) oAppState[sKey] = oPreviousappState[sKey];
 				// JSONModel can only attachChange against each property
-				this.oViewStateModel.bindProperty(`/${sKey}`).attachChange(fnViewStateChangeListener);
+				this.oAppStateModel.bindProperty(`/${sKey}`).attachChange(fnappStateChangeListener);
 			}
-			this.setModel(this.oViewStateModel, "viewState");
+			this.setModel(this.oAppStateModel, "appState");
 		},
 
 		handleRouteMatched: function(event) {

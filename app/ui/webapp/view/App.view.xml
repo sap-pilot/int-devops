@@ -5,7 +5,7 @@
 	xmlns:f="sap.f"
   	xmlns:core="sap.ui.core"
 	xmlns:tnt="sap.tnt" >
-	<tnt:ToolPage id="toolPage" sideExpanded="{viewState>/sideExpanded}">
+	<tnt:ToolPage id="toolPage" sideExpanded="{appState>/sideExpanded}">
 		<tnt:header>
 			<f:ShellBar 
                 title="Integration DevOps"
@@ -31,13 +31,13 @@
 					<f:SearchManager/>
 				</f:searchManager-->
                 <f:additionalContent>
-					<Switch state="{viewState>/liveMode}" customTextOn="Live" customTextOff="Demo" enabled="true" 
+					<Switch state="{appState>/liveMode}" customTextOn="Live" customTextOff="Demo" enabled="true" 
 						tooltip="DEMO mode uses static/fake data (no authorization needed); LIVE mode reads actual system landscape &amp; artifacts data (viewer/operator role required)">
 						<layoutData>
 							<FlexItemData growFactor="1" />
 						</layoutData>
 					</Switch>
-                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="{=%{viewState>/theme}==='sap_horizon_dark'?'sap-icon://dark-mode':'sap-icon://light-mode'}" press="toggleTheme()" 
+                    <OverflowToolbarButton id="themeToggleBtn" text="Change Theme" icon="{=%{appState>/theme}==='sap_horizon_dark'?'sap-icon://dark-mode':'sap-icon://light-mode'}" press="toggleTheme()" 
 						tooltip="Toggle between dark/light theme" />
                 </f:additionalContent>
 			</f:ShellBar>

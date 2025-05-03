@@ -48,7 +48,7 @@ sap.ui.define(
 
 			// restore UI state from local storage
 			restoreUIState: function() {
-				const sTheme = this.getOwnerComponent().getModel("viewState").getProperty("/theme");
+				const sTheme = this.getOwnerComponent().getModel("appState").getProperty("/theme");
 				this.toggleTheme(sTheme);
 			},
 
@@ -104,7 +104,7 @@ sap.ui.define(
 
 			toggleSideExpanded: function() {
 				const oToolPage = this.byId("toolPage");
-				this.getOwnerComponent().getModel("viewState").setProperty("/sideExpanded",!oToolPage.getSideExpanded());
+				this.getOwnerComponent().getModel("appState").setProperty("/sideExpanded",!oToolPage.getSideExpanded());
 			},
 
 			toggleTheme: function(sNewTheme) {
@@ -112,7 +112,7 @@ sap.ui.define(
 					sNewTheme = Theming.getTheme() != "sap_horizon_dark"? "sap_horizon_dark" : "sap_horizon_light";
 				}
 				Theming.setTheme(sNewTheme);
-				this.getOwnerComponent().getModel("viewState").setProperty("/theme",sNewTheme);
+				this.getOwnerComponent().getModel("appState").setProperty("/theme",sNewTheme);
 			},
 
 			onHomeIconPress: function() {

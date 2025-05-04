@@ -7,7 +7,7 @@
 		"description": "{{appDescription}}",
 		"resources": "resources.json",
 		"applicationVersion": {
-			"version": "0.0.7"
+			"version": "0.8.0"
 		},
 		"i18n": {
 			"bundleUrl": "i18n/i18n.properties",

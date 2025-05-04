@@ -1,5 +1,6 @@
 sap.ui.define([
 	"org/sapux/int/controller/BaseController",
+	"org/sapux/int/util/Common",
     "sap/ui/model/json/JSONModel",
 	"sap/m/Select",
 	"sap/ui/core/Item",
@@ -8,7 +9,7 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/Text",
 	"org/sapux/int/model/formatter"
-], function (BaseController,JSONModel, Select, Item, SwimLaneChainLayout, Column, Label, Text, formatter) {
+], function (BaseController, Common, JSONModel, Select, Item, SwimLaneChainLayout, Column, Label, Text, formatter) {
 	"use strict";
 
 	return BaseController.extend("org.sapux.int.controller.Monitor", {
@@ -47,7 +48,9 @@ sap.ui.define([
 				const oContentResources = this.oResourceTreeModel.getProperty("/value");
 				const selectedIndicesSet = new Set();
 				const aNodes = oContentResources.nodes;
-				for (const node of aNodes) {
+				const maxCasNodes = oContentResources.countCasNodes;
+				for (let i = 0; i < maxCasNodes; i++) {
+					const node = aNodes[i];;
 					let column = new Column({
 						label: new Label({text: node.alias}),
 						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
@@ -58,11 +61,15 @@ sap.ui.define([
 					selectedIndicesSet.add(node.idx);
 				}
 				// update comparision status
-				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet);
+				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
 				this.updateLandscapeModel(oContentResources);
 				this.setBusy(false);
 			}.bind(this);
 			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
+			this.oResourceTreeModel.attachRequestFailed(function(oEvent) {
+				const oParams = oEvent.getParameters();
+				Common.reportError(oParams,"Error loading content resources", null);
+			});
 
 			// list to appState>/liveMode change event
 			const appStateModel = this.getOwnerComponent().getModel("appState");
@@ -87,10 +94,13 @@ sap.ui.define([
 			const obj = {
 				nodes: structuredClone(oContentResources.nodes),
 				groups: structuredClone(oContentResources.groups),
-				lines: structuredClone(oContentResources.lines)
+				routes: structuredClone(oContentResources.routes)
 			};
 			for (const node of obj.nodes) {
-				node.attrs = [{key:"alias",value:node.alias}];
+				node.attrs = [];
+				if (node.alias) {
+					node.attrs.push({key:"alias",value:node.alias});
+				}
 				for (const [key, value] of Object.entries(node.r)) {
 					const attr = {key: key, value: value};
 					node.attrs.push(attr);
@@ -113,11 +123,10 @@ sap.ui.define([
 				oToolbar = this.byId("graph-toolbar"),
 				oOrientation = new Select();
 			[
-				{key: "LeftRight", text: "Left to right"},
 				{key: "TopBottom", text: "Top to bottom"},
 				{key: "BottomTop", text: "Bottom to top"},
+				{key: "LeftRight", text: "Left to right"},
 				{key: "RightLeft", text: "Right to left"}	
-							
 			].forEach(function (o) {
 				oOrientation.addItem(new Item(o));
 			});
@@ -186,6 +195,7 @@ sap.ui.define([
 		},
 
 		onGraphSelectionChange: function(oEvent) {
+			const maxCasNodes = this.oResourceTreeModel.getProperty("/value/countCasNodes");
 			const nodes = this.oLandscapeModel.getProperty("/nodes");
 			const columns = this.oTreeTable.getColumns();
 			const selectedIndexSet = new Set();
@@ -196,15 +206,15 @@ sap.ui.define([
 					selectedIndexSet.add(node.idx);
 			}
 			const oResourceTree = this.oResourceTreeModel.getData();
-			this._updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet);
+			this._updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet, maxCasNodes);
 			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
 		},
 
-		_updateVerisonCompareStatus: function(entry, selectedIndexSet) {
+		_updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
 			let maxUnique = 1;
 			if (entry.c && entry.c.length > 0) {
 				for (let child of entry.c) {
-					const cd = this._updateVerisonCompareStatus(child, selectedIndexSet);
+					const cd = this._updateVerisonCompareStatus(child, selectedIndexSet, maxCasNodes);
 					if (cd > maxUnique)
 						maxUnique = cd;
 				}
@@ -212,6 +222,8 @@ sap.ui.define([
 			let u = 0;
 			let arr = [];
 			for ( let idx of selectedIndexSet) {
+				if (idx >= maxCasNodes)
+					continue; // skip nodes without contentResourcees
 				const v = `v${idx}`;
 				arr.push(entry[v]);
 			}

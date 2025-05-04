@@ -1,0 +1,23 @@
+@localBaseUrl = http://localhost:4004/srv
+@localUser = admin
+@localPassword = admin
+
+###
+# @name localCasGetResources
+GET {{localBaseUrl}}/cas/resources
+Authorization: Basic {{localUser}}:{{localPassword}}
+
+###
+# @name localCasGetResourcesForceRefresh
+GET {{localBaseUrl}}/cas/resources(forceRefresh=true)
+Authorization: Basic {{localUser}}:{{localPassword}}
+
+###
+# @name locaTmsGetLandscape
+GET {{localBaseUrl}}/tms/landscape
+Authorization: Basic {{localUser}}:{{localPassword}}
+
+###
+# @name locaTmsGetLandscapeForceRefresh
+GET {{localBaseUrl}}/tms/landscape(forceRefresh=true)
+Authorization: Basic {{localUser}}:{{localPassword}}

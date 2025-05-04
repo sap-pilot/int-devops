@@ -22,7 +22,7 @@
                             selectionChange="onGraphSelectionChange"
                             orientation="{appState>/landscapeOrientation}"
                             nodes="{landscape>/nodes}"
-                            lines="{landscape>/lines}"
+                            lines="{landscape>/routes}"
                             groups="{landscape>/groups}">
                             <g:statuses>
                                 <g:Status key="CustomStatus" backgroundColor="darkblue" />

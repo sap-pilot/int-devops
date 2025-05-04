@@ -13,7 +13,7 @@ const multer = require('multer')
 const upload = multer({ dest: config.uploadPath });
 
 let buildInfo = { "version": "N/A", "build": "N/A", "commit": "N/A"};
-try { buildInfo = require("./dist/build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
+try { buildInfo = require("./ui/dist/build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
 
 const port = process.env.PORT || 4004;
 

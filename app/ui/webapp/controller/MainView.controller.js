@@ -63,6 +63,10 @@ sap.ui.define([
 				// update comparision status
 				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
 				this.updateLandscapeModel(oContentResources);
+				// add readable date to oContentResources
+				if (oContentResources.lastUpdated) {
+					this.oResourceTreeModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
+				}
 				this.setBusy(false);
 			}.bind(this);
 			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
@@ -120,8 +124,15 @@ sap.ui.define([
 
 		setUpOrientationSelect: function () {
 			var oGraph = this.byId("graph"),
-				oToolbar = this.byId("graph-toolbar"),
-				oOrientation = new Select();
+				oToolbar = this.byId("graph-toolbar");
+				
+			// disable some existing content
+			let aExistingContent = oToolbar.getContent();
+			aExistingContent[0].setVisible(false); // disable 1st spacer
+			aExistingContent[1].setVisible(false); // disable search field
+			aExistingContent[2].setVisible(false); // disable legend
+			// add new control
+			let oOrientation = new Select();
 			[
 				{key: "TopBottom", text: "Top to bottom"},
 				{key: "BottomTop", text: "Bottom to top"},
@@ -135,7 +146,18 @@ sap.ui.define([
 				var sKey = oEvent.getParameter("selectedItem").getKey();
 				oGraph.setOrientation(sKey);
 			});
-			oToolbar.insertContent(oOrientation, 2);
+			let oTitleLabel = new Label({text:"TMS Landscape",design:"Bold"});
+			oToolbar.insertContent(oTitleLabel, 0);
+			let oLabel = new Label({
+				text:"(updated as of {resourceTree>/value/lastUpdatedFormatted})", 
+				visible:"{=${resourceTree>/value/lastUpdatedFormatted} !== undefined && !${viewState>/busy}}"
+			});
+			oToolbar.insertContent(oLabel, 1);
+			let spacer = new sap.m.ToolbarSpacer();
+			oToolbar.insertContent(spacer, 2);
+			oToolbar.insertContent(oOrientation, 3);
+			
+
 		},
 
 		onTreeFilterChange: function() {
@@ -201,6 +223,8 @@ sap.ui.define([
 			const selectedIndexSet = new Set();
 			for (const node of nodes) {
 				node.selected = node.pSelected;
+				if (node.idx > maxCasNodes)
+					continue; // skip nodes without contentResourcees
 				columns[node.idx+3].setVisible(node.selected);
 				if (node.selected)
 					selectedIndexSet.add(node.idx);

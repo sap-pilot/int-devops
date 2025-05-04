@@ -16,3 +16,8 @@ Authorization: Basic {{localUser}}:{{localPassword}}
 # @name locaTmsGetLandscape
 GET {{localBaseUrl}}/tms/landscape
 Authorization: Basic {{localUser}}:{{localPassword}}
+
+###
+# @name locaTmsGetLandscapeForceRefresh
+GET {{localBaseUrl}}/tms/landscape(forceRefresh=true)
+Authorization: Basic {{localUser}}:{{localPassword}}

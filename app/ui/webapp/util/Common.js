@@ -29,7 +29,7 @@ sap.ui.define([
 		 * @param oProgressModel
 		 */
 		reportError: function(oError, sMainMessage, oProgressModel) {
-			console.error(oError);
+			console.error(sMainMessage, oError);
 			let sCode = "Error",
 				sMessage = null;
 			if (oError) {

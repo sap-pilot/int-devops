@@ -2,6 +2,7 @@ const { getAllDestinationsFromDestinationService } = require("@sap-cloud-sdk/con
 const { executeHttpRequest } = require("@sap-cloud-sdk/http-client");
 const { logger } = require("./logger");
 const { config } = require("./config");
+const { getTmsLandscapeAsync } = require("./tms");
 
 /**
  * get contentResources from remote content agent services via specified 'CAS_*' destinations
@@ -14,12 +15,13 @@ const { config } = require("./config");
  *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
- *           {"idx":0,"name":"Development"},
- *           {"idx":1,"name":"Staging"},
- *           {"idx":2,"name":"Preprod"},
- *           {"idx":3,"name":"Production"}
+ *           {"idx":0,"name":"Sandbox"},
+ *           {"idx":1,"name":"Development"},
+ *           {"idx":2,"name":"Staging"},
+ *           {"idx":3,"name":"Preprod"},
+ *           {"idx":4,"name":"Production"}
  *       ],
- *       "lines": [
+ *       "routes": [
  *           {"from":0,"to":1},
  *           {"from":1,"to":2},
  *           {"from":2,"to":3}
@@ -53,21 +55,19 @@ const getContentResources = async function(req) {
             r: {},
             obj: {}, // result object to be deleted after merge
         }));
-        nodes = nodes.sort((a, b) => (a.idx == b.idx)? 0 : ((a.idx > b.idx)? 1 : -1));
+        nodes.sort((a, b) => a.idx - b.idx);
         // reset index and extract groups
-        const groups = [];
+        const groups = structuredClone(config.groups);
         for (let i = 0; i < nodes.length; i++) {
             nodes[i].idx = i; // reset index for later tree column display
-            let g = groups.find((group) => group.name == nodes[i].group);
-            if (!g) {
-                g = {idx: groups.length, name: nodes[i].group};
-                groups.push(g);
-            }
-            nodes[i].group = g.idx; // reset group name to index
+            _assignOrCreateGroup(nodes[i],groups);
         }
         logger.info(`loading contentResources for nodes ${JSON.stringify(nodes,null,2)}`);
         const startTime = Date.now();
+        const startDate = new Date(startTime);
         const promises = [];
+        // also start loading tms landscape
+        const tmsPromise = getTmsLandscapeAsync(req, true);
         for (const node of nodes) {
             let p = executeHttpRequest({destinationName: node.dest}, { 
                 method: "GET", 
@@ -75,16 +75,17 @@ const getContentResources = async function(req) {
             })
             p.then(result => {
                 // check if response is valid
-                if (!result.data || !result.data.contentResources) {
-                    logger.warn(`no data.contentResources found from destination '${node.dest}', response: ${JSON.stringify(resp.data,null,2)}`);
-                    throw new Error(`no data.contentResource found from destination '${node.dest}'`);
+                if (!result?.data?.contentResources) {
+                    logger.warn(`no contentResources found from destination '${node.dest}', response: ${JSON.stringify(resp.data,null,2)}`);
+                    node.r.warning = "No contentResources found";
+                } else {
+                    node.obj = _reorgResources(result.data, node.r); // parse/reorg and count resources by subType
                 }
-                node.obj = _reorgResources(result.data, node.r); // parse/reorg and count resources by subType
             })
-            .catch(error => {
-                node.r.error = error.message;
-                logger.warn(`failed to load contentResource from destination ${node.dest}: ${error}`,error);
-            })
+            // .catch(error => {
+            //     node.r.error = error.message;
+            //     logger.warn(`failed to load contentResource from destination ${node.dest}: ${error}`,error);
+            // })
             .finally(() => {
                 const durationMs = Date.now() - startTime;
                 logger.debug(`completed loading contentResource from ${node.dest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.r,null,2)}`);
@@ -92,15 +93,23 @@ const getContentResources = async function(req) {
             promises.push(p);
         }
         // wait for all promises to complete
-        await Promise.all(promises);
+        const results = await Promise.allSettled(promises);
+        results.forEach((result, index) => {
+            if (result.status === "rejected") {
+                nodes[index].r.error = result.reason.message;
+                logger.warn(`Failed to load contentResource from destination ${nodes[index].dest}: ${result.reason}`);
+            }
+        });
         const durationMs = Date.now() - startTime;
         logger.debug(`completed loading contentResources from all nodes, takes time ${durationMs} ms`);
         // merge objs array into single contentResources
         const merged = {
             "repoUrl": config.repoUrl,
+            "lastUpdated": startDate.toISOString(),
             "table": {}, // to bev deleted after merge
             "nodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
             "groups": groups,
+            "routes": [],
             "c": []
         };
         for (const node of nodes) {
@@ -108,9 +117,16 @@ const getContentResources = async function(req) {
             _recursiveMerge(node.obj, merged, v);
             delete node.obj; // merged, delete this obj to avoid excessive result in response
         }
-        _calculateStatus(merged, nodes.length);
+
         _recursiveDelete(merged,["table"]);
         _recursiveSort(merged);
+        merged.countCasNodes = nodes.length; // only nodes with contentResources will be included the UI tree table
+
+        // done with contentResources, now added tms resource into merged result
+        const tmsLandscape = await tmsPromise;
+        _mergeTmsLandscapeData(merged, tmsLandscape);
+
+        // all done, return merged result
         return merged;
     } catch (error) {
         throw new Error(`Failed to read remote resources from content-agent service: ${error}`,{cause: error});
@@ -226,6 +242,117 @@ const _recursiveSort = function(obj) {
             _recursiveSort(child);
         }
     }
+}
+
+const _assignOrCreateGroup = function(node, groups) {
+    let nodeName = node.tmsNode || node.alias;
+    nodeName = nodeName.toLowerCase();
+    let groupName = '';
+    if (nodeName.includes("dev")) {
+        groupName = "Development";
+    } else if (nodeName.includes("stg") || nodeName.includes("staging")) {
+        groupName = "Staging";
+    } else if (nodeName.includes("pre") || nodeName.includes("qa") ) {
+        groupName = "Preprod";
+    } else if (nodeName.includes("sbx") || nodeName.includes("sandbox") ) {
+        groupName = "Sandbox";
+    } else if (nodeName.includes("prod")) {
+        groupName = "Production";
+    } else {
+        groupName = "Other";
+    }
+    let group = groups.find(g => g.name.toLowerCase() === groupName.toLowerCase());
+    if (!group) {
+        group = {
+            idx: groups.length,
+            name: groupName
+        };
+        groups.push(group);
+    }
+    node.group = group.idx;
+}
+
+const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
+    if (!tmsLandscape || !tmsLandscape.nodes || !tmsLandscape.routes) {
+        logger.warn(`tmsLandscape data is not valid: ${JSON.stringify(tmsLandscape,null,2)}`);
+        return;
+    }
+    const tmsNodeNameMap = {}, tmsNodeIdMap = {}, nodeTmsIdMap = {}, routeSet = new Set();
+    for (const tmsNode of tmsLandscape.nodes) {
+        tmsNodeNameMap[tmsNode.name] = tmsNode;
+        tmsNodeIdMap[tmsNode.id] = tmsNode;
+    }
+    // enrich content resources nodes with tms info
+    for (const node of merged.nodes) {
+        const tmsNode = tmsNodeNameMap[node.tmsNode];
+        if (!tmsNode) {
+            logger.warn(`tmsNode not found for ${node.tmsNode}, node: ${JSON.stringify(node,null,2)}`);
+            continue;
+        }
+        node.tmsNodeId = tmsNode.id;
+        nodeTmsIdMap[node.tmsNodeId] = node;
+    }
+    // add existing routes
+    for (const route of merged.routes) {
+        routeSet.add(`${route.from}-${route.to}`);
+    }
+    // now go through tms routes and add connected nodes
+    let foundAdditionTmsNode = true;
+    while (foundAdditionTmsNode) {
+        foundAdditionTmsNode = false;
+        for (const route of tmsLandscape.routes) {
+            let fromNode = nodeTmsIdMap[route.sourceNodeId];
+            let toNode = nodeTmsIdMap[route.targetNodeId];
+            if (!fromNode && !toNode) {
+                // neither node is connected to existing landscape, so we skip this route route
+                continue;
+            }
+            if (!(fromNode && toNode) ) {
+                foundAdditionTmsNode = true;
+                // one of the nodes is already connected, so we can add the other one
+                if (!fromNode) {
+                    const fromTmsNode = tmsNodeIdMap[route.sourceNodeId]
+                    fromNode = _convertTmsNode(fromTmsNode, merged.groups);
+                    fromNode.idx = merged.nodes.length;
+                    merged.nodes.push(fromNode);
+                    nodeTmsIdMap[fromNode.tmsNodeId] = fromNode;
+                    logger.debug(`added node from tms: ${JSON.stringify(fromNode,null,2)}`);
+                } else if (!toNode) {
+                    const toTmsNode = tmsNodeIdMap[route.targetNodeId]
+                    toNode = _convertTmsNode(toTmsNode, merged.groups);
+                    toNode.idx = merged.nodes.length;
+                    merged.nodes.push(toNode);
+                    nodeTmsIdMap[toNode.tmsNodeId] = toNode;
+                    logger.debug(`added node from tms: ${JSON.stringify(toNode,null,2)}`);
+                } else {
+                    logger.warn(`unexpected state, both nodes are connected: ${JSON.stringify(route,null,2)}`);
+                }
+            }
+            // now add route if not done already
+            const routeKey = `${fromNode.idx}-${toNode.idx}`;
+            if (!routeSet.has(routeKey)) {
+                routeSet.add(routeKey);
+                const route = {from: fromNode.idx, to: toNode.idx};
+                merged.routes.push(route);
+                logger.debug(`added route from tms: ${JSON.stringify(route,null,2)}`);
+            }
+        }
+    }
+}
+
+
+const _convertTmsNode = function(tmsNode, groups) {
+    let node = {
+        idx: -1,
+        group: -1, // TODO: assign a group for this one
+        tmsNode: tmsNode.name,
+        tmsNodeId: tmsNode.id,
+        r: {
+            warning: "CAS not connected"
+        }
+    };
+    _assignOrCreateGroup(node, groups);
+    return node;
 }
 
 module.exports = { getContentResources };

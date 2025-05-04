@@ -23,12 +23,13 @@ module.exports = cds.service.impl(srv => {
  *          {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
- *          {"idx":0,"name":"Development"},
- *          {"idx":1,"name":"Staging"},
- *          {"idx":2,"name":"Preprod"},
- *          {"idx":3,"name":"Production"}
+ *          {"idx":0,"name":"Sandbox"},
+ *          {"idx":1,"name":"Development"},
+ *          {"idx":2,"name":"Staging"},
+ *          {"idx":3,"name":"Preprod"},
+ *          {"idx":4,"name":"Production"}
  *       ],
- *       "lines": [
+ *       "routes": [
  *          {"from":0,"to":1},
  *          {"from":1,"to":2},
  *          {"from":2,"to":3}

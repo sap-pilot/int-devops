@@ -188,7 +188,9 @@ sap.ui.define([
 			} else {
 				const oFilteredTree = this.filterTree(this.oOriginTree, node => {
 					for (const [key, value] of Object.entries(node) ) {
-						if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
+						if ((key == 'i' || key == 'n') && value.toLowerCase().indexOf(sText) > -1)
+							return {exactMatch: true}; // this case will include the node and all its children
+						else if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
 							return true;
 					}
 					return false;
@@ -200,11 +202,14 @@ sap.ui.define([
 
 		filterTree: function (tree, condition) {
 			return tree.reduce((filtered, node) => {
-				if (condition(node)) {
-					filtered.push(node); // Include the node and it's children if it matches the condition
+				const matchResult = condition(node);
+				if (matchResult?.exactMatch) {
+					// matched id or name so include the node and all it's children
+					filtered.push(node);
 				} else {
+					// matched version, status etc, so only include itself and matching children
 					const children = node.c ? this.filterTree(node.c, condition) : [];
-					if (children.length) {
+					if (matchResult || children.length) {
 						filtered.push({ ...node, c: children });
 					}
 				}

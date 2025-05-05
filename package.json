@@ -19,7 +19,7 @@
     "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"date\\\": \\\"$(date +\"%Y-%m-%d %H:%M\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > app/ui/webapp/build-info.json",
     "clean": "rimraf gen resources mta_archives",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
-    "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
+    "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green --skip-testing-phase -f --retries 1",
     "gen-env": "export CF_APP_NAME=int-devops-srv && curl https://raw.githubusercontent.com/sap-pilot/btp-util/main/cf/gen-default-env.js | node",
     "logs-app": "cf logs int-devops-app | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",
     "logs-srv": "cf logs int-devops-srv | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",

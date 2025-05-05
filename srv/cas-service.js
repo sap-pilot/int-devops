@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const cds = require("@sap/cds");
-const { logger } = require("./helper/logger");
-const { config } = require("./helper/config");
-const { getContentResources } = require("./helper/cas");
+const { logger } = require("./lib/logger");
+const { config } = require("./lib/config");
+const { getContentResources } = require("./lib/cas");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);

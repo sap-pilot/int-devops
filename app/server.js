@@ -3,9 +3,9 @@ const approuter = require('@sap/approuter');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// custom helpers
-const { logger } = require('./helper/logger');
-const { tmsProxyConfig } = require('./helper/tms-proxy');
+// custom libraries
+const { logger } = require('./lib/logger');
+const { tmsProxyConfig } = require('./lib/tms-proxy');
 const { config } = require('./config');
 
 // upload handling

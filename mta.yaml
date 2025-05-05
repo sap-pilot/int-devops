@@ -38,7 +38,7 @@ modules:
     parameters:
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
-      readiness-health-check-http-endpoint: /health
+      readiness-health-check-http-endpoint: /public/health
       instances: 1 # TODO: minimal 2 in case one instance crash the other one can take over (multi-AZ)
       memory: 128M
       disk-quota: 1G

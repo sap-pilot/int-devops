@@ -1,6 +1,6 @@
 const path = require("path");
 const rootPath = path.join(__dirname, '..');
-const { logger } = require('./helper/logger');
+const { logger } = require('./lib/logger');
 
 // config variables
 const config = {

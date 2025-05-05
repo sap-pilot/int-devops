@@ -32,39 +32,24 @@ sap.ui.define([
 			console.error(sMainMessage, oError);
 			let sCode = "Error",
 				sMessage = null;
+			
 			if (oError) {
-				if (typeof oError === "string") {
-					sMessage = oError;
-				} else if (oError.reason) {
-					if (typeof oError.reason === "string") {
-						sMessage = oError.reason;
-					} else if (oError.reason.message) {
-						sMessage = oError.reason.message;
-					} else {
-						sMessage = JSON.stringify(oError.reason);
-					} // TODO: other case to check?
-				} else if (oError.error) {
-					if (typeof oError.error === "string") {
-						sMessage = oError.error;
-					} else if (oError.error.message) {
-						sMessage = oError.error.message;
-					} else {
-						sMessage = JSON.stringify(oError.error);
-					} // TODO: other case to check?
-				} else if (oError.message) {
-					if (typeof oError.message === "string") {
-						sMessage = oError.message;
-					} else {
-						sMessage = JSON.stringify(oError.message);
-					} // TODO: other case to check?
-					if (oError.code) {
-						sCode = oError.code;
+				let sResponseText = oError?.responseText;
+				if (sResponseText) {
+					if (sResponseText?.startsWith("{")) {
+						sMessage = JSON.parse(sResponseText).error?.message;
+					} 
+					if (!sMessage) {
+						sMessage = sResponseText;
 					}
 				} else {
-					sMessage = JSON.stringify(oError); // TODO: other case to check?
+					sMessage = oError.reason?.message || oError.reason || oError.error?.message || oError.error || oError.message;
+					if (!sMessage) {
+						sMessage = typeof oError === "string" ? oError : JSON.stringify(oError);
+					}
 				}
 			}
-			let sErrorDetail = "<p><a href=\"" + this.LINK_REPORT_ISSUE + "\" target=\"_blank\">Report issue</a>.";
+			let sErrorDetail = "<p><a href=\"" + this.LINK_REPORT_ISSUE + "\" target=\"_blank\">Report an issue</a>.";
 			if (sMessage) {
 				sErrorDetail = "<p>" + sMessage + "</p>" + sErrorDetail;
 			}

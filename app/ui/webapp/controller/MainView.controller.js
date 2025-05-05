@@ -38,7 +38,8 @@ sap.ui.define([
 			this.getView().setModel(this.oLandscapeModel,"landscape");
 
 			// list to nodes change event so to update columns
-			const fnContentResourcesLoaded = function() {
+			const fnContentResourcesLoaded = function(result) {
+				this.setBusy(false);
 				const aColumns = this.oTreeTable.getColumns();
 				// remove existing columns
 				for (let i = aColumns.length-1; i>2; i--) {
@@ -47,8 +48,8 @@ sap.ui.define([
 				// add new columns
 				const oContentResources = this.oResourceTreeModel.getProperty("/value");
 				const selectedIndicesSet = new Set();
-				const aNodes = oContentResources.nodes || [];
-				const maxCasNodes = oContentResources.countCasNodes || 0;
+				const aNodes = oContentResources?.nodes || [];
+				const maxCasNodes = oContentResources?.countCasNodes || 0;
 				for (let i = 0; i < maxCasNodes; i++) {
 					const node = aNodes[i];
 					const columnVisible = !node.r?.error && !node.r?.warning;
@@ -65,18 +66,18 @@ sap.ui.define([
 				}
 				// update comparision status
 				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
-				this.updateLandscapeModel(oContentResources);
+				this._updateLandscapeModel(oContentResources);
 				// add readable date to oContentResources
-				if (oContentResources.lastUpdated) {
+				if (oContentResources?.lastUpdated) {
 					this.oResourceTreeModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
-				}
-				this.setBusy(false);
+				} 
 			}.bind(this);
 			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
 			this.oResourceTreeModel.attachRequestFailed(function(oEvent) {
+				console.log("Content resources load failed");
 				const oParams = oEvent.getParameters();
 				Common.reportError(oParams,"Error loading content resources", null);
-			});
+			}.bind(this));
 
 			// list to appState>/liveMode change event
 			const appStateModel = this.getOwnerComponent().getModel("appState");
@@ -97,11 +98,11 @@ sap.ui.define([
 			this.oResourceTreeModel.loadData(sResourcePath);
 		},
 
-		updateLandscapeModel(oContentResources) {
+		_updateLandscapeModel(oContentResources) {
 			const obj = {
-				nodes: structuredClone(oContentResources.nodes),
-				groups: structuredClone(oContentResources.groups),
-				routes: structuredClone(oContentResources.routes)
+				nodes: structuredClone(oContentResources?.nodes) || [],
+				groups: structuredClone(oContentResources?.groups) || [],
+				routes: structuredClone(oContentResources?.routes) || []
 			};
 			for (const node of obj.nodes) {
 				node.attrs = [];
@@ -243,6 +244,8 @@ sap.ui.define([
 		},
 
 		_updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
+			if (!entry)
+				return 0;
 			let maxUnique = 1;
 			if (entry.c && entry.c.length > 0) {
 				for (let child of entry.c) {
@@ -253,7 +256,7 @@ sap.ui.define([
 			}
 			let u = 0;
 			let arr = [];
-			for ( let idx of selectedIndexSet) {
+			for (let idx of selectedIndexSet) {
 				if (idx >= maxCasNodes)
 					continue; // skip nodes without contentResourcees
 				const v = `v${idx}`;

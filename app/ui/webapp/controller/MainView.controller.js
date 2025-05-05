@@ -47,18 +47,21 @@ sap.ui.define([
 				// add new columns
 				const oContentResources = this.oResourceTreeModel.getProperty("/value");
 				const selectedIndicesSet = new Set();
-				const aNodes = oContentResources.nodes;
-				const maxCasNodes = oContentResources.countCasNodes;
+				const aNodes = oContentResources.nodes || [];
+				const maxCasNodes = oContentResources.countCasNodes || 0;
 				for (let i = 0; i < maxCasNodes; i++) {
-					const node = aNodes[i];;
+					const node = aNodes[i];
+					const columnVisible = !node.r?.error && !node.r?.warning;
 					let column = new Column({
 						label: new Label({text: node.alias}),
 						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
 						width: "5em",
-						visible: !node.r.error
+						visible: columnVisible
 					});
 					this.oTreeTable.addColumn(column);
-					selectedIndicesSet.add(node.idx);
+					if (columnVisible) {
+						selectedIndicesSet.add(node.idx);
+					}
 				}
 				// update comparision status
 				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
@@ -163,50 +166,53 @@ sap.ui.define([
 		onTreeFilterChange: function() {
 			const oTreeFilter = this.byId("treeFilter");
 			const sText = oTreeFilter.getValue().toLowerCase();
+			const oModel = this.getView().getModel("resourceTree");
 			if (!this.oOriginTree)
-				this.oOriginTree = this.getView().getModel("resourceTree").getData();
+				this.oOriginTree = oModel.getProperty("/value/c");
 			if (!sText) {
-				this.getView().getModel("resourceTree").setData(this.oOriginTree);
+				this.getView().getModel("resourceTree").setProperty("/value/c",this.oOriginTree);
 			} else {
-				const oFilteredTree = this.filterTree(this.oOriginTree.value.c, node => {
+				const oFilteredTree = this.filterTree(this.oOriginTree, node => {
 					for (const [key, value] of Object.entries(node) ) {
 						if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
 							return true;
 					}
 					return false;
 				});
-				this.getView().getModel("resourceTree").setData({"value":{"c":oFilteredTree}});
-				this.onExpandAll();
+				this.getView().getModel("resourceTree").setProperty("/value/c", oFilteredTree);
+				this.handleTreeAction("expandAll");
 			}			
 		},
 
-		filterTree: function(tree, condition) {
-			return tree
-			  .map(node => {
-				const c = node.c ? this.filterTree(node.c, condition) : [];
-				// If current node matches or has matching children
-				if (condition(node) || c.length) {
-				  return { ...node, c };
+		filterTree: function (tree, condition) {
+			return tree.reduce((filtered, node) => {
+				if (condition(node)) {
+					filtered.push(node); // Include the node and it's children if it matches the condition
+				} else {
+					const children = node.c ? this.filterTree(node.c, condition) : [];
+					if (children.length) {
+						filtered.push({ ...node, c: children });
+					}
 				}
-				return null;
-			  })
-			  .filter(Boolean); // Remove null entries
+				return filtered;
+			}, []);
 		},
 
-		onCollapseAll: function() {
-			this.oTreeTable.collapseAll();
-		},
-
-		onExpandAll: function() {
-			this.oTreeTable.expandToLevel(3);
-		},
-
-		onCollapseSelection: function() {
-			this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
-		},
-
-		onExpandSelection: function() {
-			this.oTreeTable.expand(this.oTreeTable.getSelectedIndices());
+		handleTreeAction: function (action) {
+			switch (action) {
+				case "collapseAll":
+					this.oTreeTable.collapseAll();
+					break;
+				case "expandAll":
+					this.oTreeTable.expandToLevel(3);
+					break;
+				case "collapseSelection":
+					this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
+					break;
+				case "expandSelection":
+					this.oTreeTable.expand(this.oTreeTable.getSelectedIndices());
+					break;
+			}
 		},
 
 		onNodePress: function (oEvent) {
@@ -223,8 +229,10 @@ sap.ui.define([
 			const selectedIndexSet = new Set();
 			for (const node of nodes) {
 				node.selected = node.pSelected;
-				if (node.idx > maxCasNodes)
+				if (node.idx >= maxCasNodes)
 					continue; // skip nodes without contentResourcees
+				if (node.r?.error || node.r?.warning) 
+					continue; // skip nodes with error or warning
 				columns[node.idx+3].setVisible(node.selected);
 				if (node.selected)
 					selectedIndexSet.add(node.idx);

@@ -92,10 +92,10 @@
                                             enabled="{=!${viewState>/busy}}"
                                             change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
-										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
-										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
-										<!-- <Button icon="sap-icon://expand-group" press="onExpandSelection"/>
-										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/> -->
+										<Button icon="sap-icon://expand-all" press="handleTreeAction('expandAll')"/>
+										<Button icon="sap-icon://collapse-all" press="handleTreeAction('collapseAll')"/>
+										<!-- <Button icon="sap-icon://expand-group" press="handleTreeAction('expandSelection')"/>
+										<Button icon="sap-icon://collapse-group" press="handleTreeAction('collapseSelection')"/> -->
                                         <Button id="refreshBtn" 
                                             press="loadContentResources(true)"
                                             enabled="{=!${viewState>/busy}}"

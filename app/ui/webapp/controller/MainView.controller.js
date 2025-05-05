@@ -54,7 +54,13 @@ sap.ui.define([
 					const node = aNodes[i];
 					const columnVisible = !node.r?.error && !node.r?.warning;
 					let column = new Column({
-						label: new Label({text: node.alias}),
+						label: node.casUrl?
+							new sap.m.Link({
+								text: node.alias, href:`${node.casUrl}`, 
+								tooltip: `Open Content-Agent for ${node.alias}`,
+								emphasized: true,
+								target:"_blank",  wrapping: false})
+							: new Text({text: node.alias, wrapping: false}),
 						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
 						width: "5em",
 						visible: columnVisible
@@ -150,7 +156,14 @@ sap.ui.define([
 				var sKey = oEvent.getParameter("selectedItem").getKey();
 				oGraph.setOrientation(sKey);
 			});
-			let oTitleLabel = new Label({text:"TMS Landscape",design:"Bold"});
+			let oTitleLabel = new sap.m.Link({
+				text:"TMS Landscape",
+				href:"{resourceTree>/value/tmsUrl}",
+				tooltip: "Open TMS",
+				target:"_blank",
+				emphasized: true,
+				enabled:"{=${resourceTree>/value/tmsUrl} !== undefined}"
+			});
 			oToolbar.insertContent(oTitleLabel, 0);
 			let oLabel = new Label({
 				text:"(updated as of {resourceTree>/value/lastUpdatedFormatted})", 

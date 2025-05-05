@@ -34,7 +34,8 @@
                                         group="{landscape>group}"
                                         icon="{landscape>icon}"
                                         attributes="{path:'landscape>attrs', templateShareable:true}"
-                                        showActionLinksButton="false"
+                                        showActionLinksButton="true"
+                                        showDetailButton="false"
                                         status="{landscape>status}"
                                         headerCheckBoxState="{landscape>checkboxState}"
                                         selected="{landscape>selected}"
@@ -45,6 +46,28 @@
                                                 label="{landscape>key}"
                                                 value="{landscape>value}"/>
                                     </g:attributes>
+                                    <!-- <g:actionButtons>
+                                        <g:ActionButton 
+                                            icon="sap-icon://shipping-status" 
+                                            title="TMS Node - Import Queue" 
+                                            enabled="{=${resourceTree>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}"
+                                            press="onPressTmsLink"/>
+                                        <g:ActionButton 
+                                            icon="sap-icon://account" 
+                                            title="Content Agent" 
+                                            enabled="{=${landscape>casUrl} !== undefined}" 
+                                            press="onPressCasLink"/>
+                                    </g:actionButtons> -->
+                                    <g:actionLinks>
+                                        <Link text="Content Agent for {landscape>tmsNode}" 
+                                                href="{landscape>casUrl}" 
+                                                enabled="{=${landscape>casUrl} !== undefined}" 
+                                                target="_blank" />
+                                        <Link text="TMS Import Queue of {landscape>tmsNode}" 
+                                                href="{resourceTree>/value/tmsUrl}#/nodeObject/{landscape>tmsNodeId}" 
+                                                enabled="{=${resourceTree>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}" 
+                                                target="_blank" />
+                                    </g:actionLinks>
                                 </g:Node>
                             </g:nodes>
                             <g:lines>

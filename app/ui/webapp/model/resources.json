@@ -1,6 +1,7 @@
 {
     "value":{
         "repoUrl": "https://github.com/sap-pilot/int-devops/tree/dev/work",
+        "lastUpdatedFormatted": "n/a - demo data",
         "countCasNodes": 4,
         "nodes": [
             {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},

@@ -8,11 +8,13 @@ const { getTmsLandscapeAsync } = require("./tms");
  * get contentResources from remote content agent services via specified 'CAS_*' destinations
  *  @returns {
  *      "i": "contentResources",
+ *      "tmsUrl": "XX",
+ *      "countCasNodes": 4,
  *       "nodes": [
- *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
- *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","dest":"CAS_STG","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
- *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","dest":"CAS_PRE","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
- *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
+ *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","casUrl":"XX","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+ *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","dest":"CAS_STG","casUrl":"XX","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+ *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","dest":"CAS_PRE","casUrl":"XX","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+ *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","casUrl":"XX","r":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
  *           {"idx":0,"name":"Sandbox"},
@@ -42,6 +44,12 @@ const getContentResources = async function(req) {
     try {
         // get list of destinations
         const allDestinations = await getAllDestinationsFromDestinationService();
+        // extract tms url
+        const tmsDestination = allDestinations.find( dest => dest.name === config.tmsDestination );
+        const tmsUrl = tmsDestination?.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+            return `https://${subdomain}.ts.cfapps.${region}.hana.ondemand.com/main/webapp/index.html`
+        });
+        
         // filter conten-agent destiation with prerix 'CAS_' and additional property 'TMS_NODE'
         const filteredDestinations = allDestinations.filter(dest => dest.name.startsWith(config.casDestinationPrefix) && dest.originalProperties.TMS_NODE);
         if (!filteredDestinations || filteredDestinations.length == 0) 
@@ -51,7 +59,10 @@ const getContentResources = async function(req) {
             group: dest.originalProperties.NODE_GROUP,
             alias: dest.originalProperties.NODE_ALIAS || dest.originalProperties.TMS_NODE.split("_").at(-1),
             tmsNode: dest.originalProperties.TMS_NODE,
-            dest: dest.name,
+            dest: dest.name, // cas destination name
+            casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+                return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
+            }),
             r: {},
             obj: {}, // result object to be deleted after merge
         }));
@@ -102,11 +113,14 @@ const getContentResources = async function(req) {
         });
         const durationMs = Date.now() - startTime;
         logger.debug(`completed loading contentResources from all nodes, takes time ${durationMs} ms`);
+       
         // merge objs array into single contentResources
         const merged = {
             "repoUrl": config.repoUrl,
+            "tmsUrl": tmsUrl,
             "lastUpdated": startDate.toISOString(),
             "table": {}, // to bev deleted after merge
+            "countCasNodes": nodes.length, // only nodes with contentResources will be included the UI tree table
             "nodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
             "groups": groups,
             "routes": [],
@@ -120,7 +134,6 @@ const getContentResources = async function(req) {
 
         _recursiveDelete(merged,["table"]);
         _recursiveSort(merged);
-        merged.countCasNodes = nodes.length; // only nodes with contentResources will be included the UI tree table
 
         // done with contentResources, now added tms resource into merged result
         const tmsLandscape = await tmsPromise;

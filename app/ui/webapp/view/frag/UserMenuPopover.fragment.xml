@@ -19,7 +19,7 @@
 		<List>
             <items>
                 <!-- <StandardListItem icon="sap-icon://action-settings" title="Settings" type="Active" press="onUserMenuListItemPress" /> -->
-                <StandardListItem icon="sap-icon://sys-help" title="Issue / Feedback" type="Active" press="onUserMenuListItemPress" />
+                <StandardListItem icon="sap-icon://sys-help" title="Report Issue" type="Active" press="onUserMenuListItemPress" />
                 <StandardListItem icon="sap-icon://hint" title="About" type="Active" press="onUserMenuListItemPress" />
                 <StandardListItem icon="sap-icon://log" title="Sign Out" type="Active" press="onUserMenuListItemPress" />
             </items>

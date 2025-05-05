@@ -157,7 +157,7 @@ sap.ui.define(
 						type: sap.m.DialogType.Message,
 						title: "About",
 						content: new sap.m.Label({
-							text: "SAP Integration DevOps v{buildInfo>/version}-{buildInfo>/commit} ({buildInfo>/date})"
+							text: "SAP Integration DevOps v{buildInfo>/version}-{buildInfo>/commit} (built at {buildInfo>/date})"
 						}),
 						beginButton: new sap.m.Button({
 							type: sap.m.ButtonType.Emphasized,

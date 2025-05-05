@@ -21,6 +21,8 @@
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green -f --retries 1",
     "gen-env": "export CF_APP_NAME=int-devops-srv && curl https://raw.githubusercontent.com/sap-pilot/btp-util/main/cf/gen-default-env.js | node",
+    "logs-app": "cf logs int-devops-app | grep -E \"\\x1b\\[34mdebug|\\x1b\\[32minfo|\\x1b\\[33warn|\\x1b\\[31merror\"",
+    "logs-srv": "cf logs int-devops-srv | grep -E \"\\x1b\\[34mdebug|\\x1b\\[32minfo|\\x1b\\[33warn|\\x1b\\[31merror\"",
     "start": "cds-serve",
     "start:debug": "npx -n=\"--inspect\" cds-serve",
     "test": "echo \"Error: no test specified\" && exit 1",

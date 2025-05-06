@@ -186,12 +186,21 @@ sap.ui.define([
 			if (!sText) {
 				this.getView().getModel("resourceTree").setProperty("/value/c",this.oOriginTree);
 			} else {
+				let arr = sText.split(" ");
+				const matchAll = function(str) {
+					if (!str) return false;
+					return arr.every( (s) => str.indexOf(s) > -1 );
+				};
 				const oFilteredTree = this.filterTree(this.oOriginTree, node => {
+					let nonStatusFields = [];
 					for (const [key, value] of Object.entries(node) ) {
-						if ((key == 'i' || key == 'n') && value.toLowerCase().indexOf(sText) > -1)
-							return {exactMatch: true}; // this case will include the node and all its children
-						else if (key != 'c' && value && value.toLowerCase().indexOf(sText) > -1 )
-							return true;
+						if ((key != 's' && key != 'c' && value && typeof value === 'string'))
+							nonStatusFields.push(value.toLowerCase());
+					}
+					if (matchAll(nonStatusFields.join(' '))) {
+						return {exactMatch: true}; // this case will include the node itself and all its children
+					} else if (node.s?.indexOf(sText) > -1) {
+						return true; // this case will include the node itself only
 					}
 					return false;
 				});

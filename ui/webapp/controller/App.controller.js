@@ -16,7 +16,7 @@ sap.ui.define(
 				jQuery("#splash-screen").remove();
 				jQuery("#ui5-container").css("display", "block");
 				this.oMenuModel = new JSONModel();
-				this.oMenuModel.loadData(sap.ui.require.toUrl("org/sapux/int/model/menu.json"), null, false);
+				this.oMenuModel.loadData(sap.ui.require.toUrl("org/sapux/int/menu.json"), null, false);
 				this.getView().setModel(this.oMenuModel);
 
 				// initialize avatar popover

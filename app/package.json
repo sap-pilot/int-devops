@@ -1,8 +1,8 @@
 {
     "name": "int-devops-app",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "engines": {
-        "node": ">=22"
+        "node": ">=20"
     },
     "dependencies": {
         "@sap/approuter": "^20",

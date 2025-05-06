@@ -100,7 +100,7 @@ sap.ui.define([
 		loadContentResources(forceRefresh) {
 			this.setBusy(true);
 			const appStateModel = this.getOwnerComponent().getModel("appState");
-			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
+			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"demo.json";
 			this.oResourceTreeModel.loadData(sResourcePath);
 		},
 

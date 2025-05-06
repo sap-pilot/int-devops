@@ -13,9 +13,9 @@ const config = {
     "tmsUrl": process.env.TMS_URL ? process.env.TMS_URL : "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com",
     "repo": {
         "url": process.env.REPO_URL,
-        "branches": process.env.REPO_BRANCHES ? JSON.parse(process.env.REPO_BRANCHES) : ["dev", "release", "maint", "master"],
+        "branches": process.env.REPO_BRANCHES ? JSON.parse(process.env.REPO_BRANCHES) : ["release", "maint", "master"],
         "nodeMapping": process.env.REPO_NODE_MAPPING ? JSON.parse(process.env.REPO_NODE_MAPPING) : {
-            "INT_DEV": "dev",
+            "INT_DEV": "release",
             "INT_PREPROD2": "release",
             "INT_DEV2": "maint",
             "INT_STAGING": "maint",

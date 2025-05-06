@@ -30,7 +30,7 @@
 		{
 			"source": "^/favicon(.*)$",
 			"target": "favicon$1",
-			"localDir": "ui/dist/",
+			"localDir": "dist/ui/",
 			"authenticationType": "none"
 		},
 		{
@@ -42,7 +42,7 @@
 		{
 			"source": "^/ui(.*)$",
 			"target": "$1",
-			"localDir": "ui/dist",
+			"localDir": "dist/ui",
 			"authenticationType": "xsuaa",
 			"cacheControl": "max-age=0, must-revalidate"
 		}

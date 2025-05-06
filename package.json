@@ -1,6 +1,6 @@
 {
   "name": "int-devops",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "SAP Integration Suite DevOps Service",
   "license": "ISC",
   "author": "Da Chen <da.chen@me.com>",
@@ -16,7 +16,7 @@
   "scripts": {
     "bd": "mbt build -p=cf --mtar=int-devops.mtar && cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "build": "mbt build --mtar=int-devops.mtar",
-    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"date\\\": \\\"$(date +\"%Y-%m-%d %H:%M %Z\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > app/ui/webapp/build-info.json",
+    "build-info": "echo \"{\\\"version\\\": \\\"${npm_package_version}\\\",\\\"date\\\": \\\"$(date +\"%Y-%m-%d %H:%M %Z\")\\\", \\\"commit\\\": \\\"$(git log --format=\"%H\" -n 1 | cut -c -8)\\\"}\"  > ui/webapp/build-info.json",
     "clean": "rimraf gen resources mta_archives",
     "deploy": "cf deploy mta_archives/int-devops.mtar -f --retries 1",
     "deploy-bg": "cf deploy mta_archives/int-devops.mtar --strategy blue-green --skip-testing-phase -f --retries 1",

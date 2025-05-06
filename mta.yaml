@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: int-devops
-version: 0.8.1
+version: 0.9.0
 description: "SAP Integration Suite DevOps Utilities"
 parameters:
   enable-parallel-deployments: true
@@ -15,7 +15,7 @@ build-parameters:
 modules:
   - name: int-devops-ui
     type: html5
-    path: app/ui
+    path: ui
     build-parameters:
       build-result: dist
       builder: custom
@@ -56,7 +56,17 @@ modules:
     build-parameters:
       builder: custom
       commands: []
-      ignore: ["node_modules/","default-*.json","*.env"]      
+      ignore: ["node_modules/","default-*.json","*.env"]    
+      requires:
+        - artifacts:
+            - index.html
+            - Component*.*
+            - manifest.json
+            - build-info.json
+            - menu.json
+            - demo.json
+          name: int-devops-ui
+          target-path: dist/ui
 
   - name: int-devops-srv
     type: nodejs

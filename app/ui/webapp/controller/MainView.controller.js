@@ -30,63 +30,22 @@ sap.ui.define([
 			this.setUpOrientationSelect();
 
 			// load resource tree depending on liveMode
-			this.oResourceTreeModel = new JSONModel();
-			this.oTreeTable = this.byId("resourceTreeTable");
-			this.getView().setModel(this.oResourceTreeModel,"resourceTree");
+			this.oCasResourcesModel = new JSONModel();
+			this.oCasResourcesTable = this.byId("casResourcesTable");
+			this.getView().setModel(this.oCasResourcesModel,"casResources");
 
 			// initial landscape model (need to format contentResources response)
 			this.oLandscapeModel = new JSONModel();
 			this.getView().setModel(this.oLandscapeModel,"landscape");
 
-			// list to nodes change event so to update columns
-			const fnContentResourcesLoaded = function(result) {
-				this.setBusy(false);
-				const aColumns = this.oTreeTable.getColumns();
-				// remove existing columns
-				for (let i = aColumns.length-1; i>2; i--) {
-					this.oTreeTable.removeColumn(i);
-				}	
-				// add new columns
-				const oContentResources = this.oResourceTreeModel.getProperty("/value");
-				const selectedIndicesSet = new Set();
-				const aNodes = oContentResources?.nodes || [];
-				const maxCasNodes = oContentResources?.countCasNodes || 0;
-				for (let i = 0; i < maxCasNodes; i++) {
-					const node = aNodes[i];
-					const columnVisible = !node.r?.error && !node.r?.warning;
-					let column = new Column({
-						label: node.casUrl?
-							new sap.m.Link({
-								text: node.alias, href:`${node.casUrl}`, 
-								tooltip: `Open Content-Agent for ${node.alias}`,
-								emphasized: true,
-								target:"_blank",  wrapping: false})
-							: new Text({text: node.alias, wrapping: false}),
-						template: new Text({text: `{resourceTree>v${node.idx}}`, wrapping: false}),
-						width: "5em",
-						visible: columnVisible
-					});
-					this.oTreeTable.addColumn(column);
-					if (columnVisible) {
-						selectedIndicesSet.add(node.idx);
-					}
-				}
-				// update comparision status
-				this.updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
-				this._updateLandscapeModel(oContentResources);
-				// add readable date to oContentResources
-				if (oContentResources?.lastUpdated) {
-					this.oResourceTreeModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
-				} 
-			}.bind(this);
-			this.oResourceTreeModel.attachRequestCompleted(fnContentResourcesLoaded);
-			this.oResourceTreeModel.attachRequestFailed(function(oEvent) {
+			this.oCasResourcesModel.attachRequestCompleted(this.processContentResources.bind(this));
+			this.oCasResourcesModel.attachRequestFailed(function(oEvent) {
 				console.log("Content resources load failed");
 				const oParams = oEvent.getParameters();
 				Common.reportError(oParams,"Error loading content resources", null);
 			}.bind(this));
 
-			// list to appState>/liveMode change event
+			// listen to appState>/liveMode change event
 			const appStateModel = this.getOwnerComponent().getModel("appState");
 			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadContentResources(false)}.bind(this));
 
@@ -102,10 +61,62 @@ sap.ui.define([
 			this.setBusy(true);
 			const appStateModel = this.getOwnerComponent().getModel("appState");
 			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
-			this.oResourceTreeModel.loadData(sResourcePath);
+			this.oCasResourcesModel.loadData(sResourcePath);
 		},
 
-		_updateLandscapeModel(oContentResources) {
+		processContentResources(result) {
+			this.setBusy(false);
+			// update treeTable
+			const aColumns = this.oCasResourcesTable.getColumns();
+			// remove existing columns
+			for (let i = aColumns.length-1; i>2; i--) {
+				this.oCasResourcesTable.removeColumn(i);
+			}	
+			// add new columns
+			const oContentResources = this.oCasResourcesModel.getProperty("/value");
+			const selectedIndicesSet = new Set();
+			const aNodes = oContentResources?.nodes || [];
+			const maxCasNodes = oContentResources?.countCasNodes || 0;
+			for (let i = 0; i < maxCasNodes; i++) {
+				const node = aNodes[i];
+				const columnVisible = !node.r?.error && !node.r?.warning;
+				let column = new Column({
+					label: node.casUrl?
+						new sap.m.Link({
+							text: node.alias, href:`${node.casUrl}`, 
+							tooltip: `Open Content-Agent for ${node.alias}`,
+							emphasized: true,
+							target:"_blank",  wrapping: false})
+						: new Text({text: node.alias, wrapping: false}),
+					template: new Text({text: `{casResources>v${node.idx}}`, wrapping: false}),
+					width: "5em",
+					visible: columnVisible
+				});
+				this.oCasResourcesTable.addColumn(column);
+				if (columnVisible) {
+					selectedIndicesSet.add(node.idx);
+				}
+			}
+			// add allowUploadNodes and allowExportNodes for Export Dialog
+			let allowUploadNodes = [], allowExportNodes = [];
+			for (let node of aNodes) {
+				if (node.casDest) allowExportNodes.push(node);
+				if (node.tmsUploadAllowed) allowUploadNodes.push(node);
+			}
+			this.oCasResourcesModel.setProperty("/allowUploadNodes",allowUploadNodes);
+			this.oCasResourcesModel.setProperty("/allowExportNodes",allowExportNodes);
+
+			// update comparision status
+			this.updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
+			this.updateLandscapeModel(oContentResources);
+			
+			// add readable date to oContentResources
+			if (oContentResources?.lastUpdated) {
+				this.oCasResourcesModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
+			} 
+		},
+
+		updateLandscapeModel(oContentResources) {
 			const obj = {
 				nodes: structuredClone(oContentResources?.nodes) || [],
 				groups: structuredClone(oContentResources?.groups) || [],
@@ -159,16 +170,16 @@ sap.ui.define([
 			});
 			let oTitleLabel = new sap.m.Link({
 				text:"TMS Landscape",
-				href:"{resourceTree>/value/tmsUrl}",
+				href:"{casResources>/value/tmsUrl}",
 				tooltip: "Open TMS",
 				target:"_blank",
 				emphasized: true,
-				enabled:"{=${resourceTree>/value/tmsUrl} !== undefined}"
+				enabled:"{=${casResources>/value/tmsUrl} !== undefined}"
 			});
 			oToolbar.insertContent(oTitleLabel, 0);
 			let oLabel = new Label({
-				text:"(updated as of {resourceTree>/value/lastUpdatedFormatted})", 
-				visible:"{=${resourceTree>/value/lastUpdatedFormatted} !== undefined && !${viewState>/busy}}"
+				text:"(updated as of {casResources>/value/lastUpdatedFormatted})", 
+				visible:"{=${casResources>/value/lastUpdatedFormatted} !== undefined && !${viewState>/busy}}"
 			});
 			oToolbar.insertContent(oLabel, 1);
 			let spacer = new sap.m.ToolbarSpacer();
@@ -181,11 +192,11 @@ sap.ui.define([
 		onTreeFilterChange: function() {
 			const oTreeFilter = this.byId("treeFilter");
 			const sText = oTreeFilter.getValue().toLowerCase();
-			const oModel = this.getView().getModel("resourceTree");
+			const oModel = this.getView().getModel("casResources");
 			if (!this.oOriginTree)
 				this.oOriginTree = oModel.getProperty("/value/c");
 			if (!sText) {
-				this.getView().getModel("resourceTree").setProperty("/value/c",this.oOriginTree);
+				this.getView().getModel("casResources").setProperty("/value/c",this.oOriginTree);
 			} else {
 				let arr = sText.split(" ");
 				const matchAll = function(str) {
@@ -205,7 +216,7 @@ sap.ui.define([
 					}
 					return false;
 				});
-				this.getView().getModel("resourceTree").setProperty("/value/c", oFilteredTree);
+				this.getView().getModel("casResources").setProperty("/value/c", oFilteredTree);
 				this.handleTreeAction("expandAll");
 			}			
 		},
@@ -230,16 +241,16 @@ sap.ui.define([
 		handleTreeAction: function (action) {
 			switch (action) {
 				case "collapseAll":
-					this.oTreeTable.collapseAll();
+					this.oCasResourcesTable.collapseAll();
 					break;
 				case "expandAll":
-					this.oTreeTable.expandToLevel(3);
+					this.oCasResourcesTable.expandToLevel(3);
 					break;
 				case "collapseSelection":
-					this.oTreeTable.collapse(this.oTreeTable.getSelectedIndices());
+					this.oCasResourcesTable.collapse(this.oCasResourcesTable.getSelectedIndices());
 					break;
 				case "expandSelection":
-					this.oTreeTable.expand(this.oTreeTable.getSelectedIndices());
+					this.oCasResourcesTable.expand(this.oCasResourcesTable.getSelectedIndices());
 					break;
 			}
 		},
@@ -252,9 +263,9 @@ sap.ui.define([
 		},
 
 		onGraphSelectionChange: function(oEvent) {
-			const maxCasNodes = this.oResourceTreeModel.getProperty("/value/countCasNodes");
+			const maxCasNodes = this.oCasResourcesModel.getProperty("/value/countCasNodes");
 			const nodes = this.oLandscapeModel.getProperty("/nodes");
-			const columns = this.oTreeTable.getColumns();
+			const columns = this.oCasResourcesTable.getColumns();
 			const selectedIndexSet = new Set();
 			for (const node of nodes) {
 				node.selected = node.pSelected;
@@ -266,9 +277,9 @@ sap.ui.define([
 				if (node.selected)
 					selectedIndexSet.add(node.idx);
 			}
-			const oResourceTree = this.oResourceTreeModel.getData();
-			this.updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet, maxCasNodes);
-			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
+			const oCasResources = this.oCasResourcesModel.getData();
+			this.updateVerisonCompareStatus(oCasResources.value,selectedIndexSet, maxCasNodes);
+			this.oCasResourcesModel.setProperty("/value/c",oCasResources.value.c);
 		},
 
 		updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
@@ -316,7 +327,7 @@ sap.ui.define([
 			this.bSuppressSelectionEvent = true;
 			const entry = oParams.rowContext?.getObject();
 			if (entry) {
-				const bSelected = oParams.rowIndex !== -1 && this.oTreeTable.isIndexSelected(oParams.rowIndex); // Check if the row is selected
+				const bSelected = oParams.rowIndex !== -1 && this.oCasResourcesTable.isIndexSelected(oParams.rowIndex); // Check if the row is selected
 				this.recursiveUpdateEntrySelection(entry, bSelected);
 			}
 			// update selected rows
@@ -331,23 +342,23 @@ sap.ui.define([
 		},
 
 		updateRowSelection: function() {
-			const oRootEntry = this.oResourceTreeModel.getProperty("/value");
+			const oRootEntry = this.oCasResourcesModel.getProperty("/value");
 			const aSelectedEntries = [], aSelectedTransportableEntries = [], aAllEntries = [];
 			this.addSelectedEntries(oRootEntry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
 			// update selection
 			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
-			this.oTreeTable.clearSelection();
+			this.oCasResourcesTable.clearSelection();
 			for (let i = 0; i < aAllEntries.length; i++) {
-				const oRowContext = this.oTreeTable.getContextByIndex(i);
+				const oRowContext = this.oCasResourcesTable.getContextByIndex(i);
 				if (!oRowContext) {
 					break; // reach end of rows;
 				}
 				if (aSelectedEntries.indexOf(oRowContext.getObject()) > -1) {
-					this.oTreeTable.addSelectionInterval(i,i);
+					this.oCasResourcesTable.addSelectionInterval(i,i);
 				}
 			}
 			const oExportBtn = this.byId("exportBtn");
-			this.oResourceTreeModel.setProperty("/value/selectedTransportableEntries", aSelectedTransportableEntries.length);
+			this.oCasResourcesModel.setProperty("/value/selectedTransportableEntries", aSelectedTransportableEntries.length);
 			// oExportBtn.setText(`Export (${aSelectedTransportableEntries.length})`)
 			// oExportBtn.setEnabled(aSelectedTransportableEntries.length > 0);
 		},
@@ -390,7 +401,7 @@ sap.ui.define([
 
 		openExportDialog: function() {
 			// get selected tree entries
-			const oRootEntry = this.oResourceTreeModel.getProperty("/value");
+			const oRootEntry = this.oCasResourcesModel.getProperty("/value");
 			const oFilteredRoot = this.filterSelectedTree(oRootEntry);
 			if (!this.oCasExportModel) {
 				this.oCasExportModel = new JSONModel();

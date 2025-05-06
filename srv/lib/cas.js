@@ -11,10 +11,10 @@ const { getTmsLandscapeAsync } = require("./tms");
  *      "tmsUrl": "XX",
  *      "countCasNodes": 4,
  *       "nodes": [
- *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","casUrl":"XX","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
- *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","dest":"CAS_STG","casUrl":"XX","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
- *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","dest":"CAS_PRE","casUrl":"XX","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
- *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","casUrl":"XX","r":{"error":"Permission denied"}}
+ *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","casDest":"CAS_DEV","casUrl":"XX","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+ *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","casDest":"CAS_STG","casUrl":"XX","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+ *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","casDest":"CAS_PRE","casUrl":"XX","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+ *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","casDest":"CAS_PROD","casUrl":"XX","r":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
  *           {"idx":0,"name":"Sandbox"},
@@ -59,7 +59,7 @@ const getContentResources = async function(req) {
             group: dest.originalProperties.NODE_GROUP,
             alias: dest.originalProperties.NODE_ALIAS || dest.originalProperties.TMS_NODE.split("_").at(-1),
             tmsNode: dest.originalProperties.TMS_NODE,
-            dest: dest.name, // cas destination name
+            casDest: dest.name, // cas destination name
             casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
                 return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
             }),
@@ -80,14 +80,14 @@ const getContentResources = async function(req) {
         // also start loading tms landscape
         const tmsPromise = getTmsLandscapeAsync(req, true);
         for (const node of nodes) {
-            let p = executeHttpRequest({destinationName: node.dest}, { 
+            let p = executeHttpRequest({destinationName: node.casDest}, { 
                 method: "GET", 
                 url: "/v1/contentResources?filters=(type eq 'API Management') or (type eq 'Cloud Integration')" 
             })
             p.then(result => {
                 // check if response is valid
                 if (!result?.data?.contentResources) {
-                    logger.warn(`no contentResources found from destination '${node.dest}', response: ${JSON.stringify(resp.data,null,2)}`);
+                    logger.warn(`no contentResources found from destination '${node.casDest}', response: ${JSON.stringify(resp.data,null,2)}`);
                     node.r.warning = "No contentResources found";
                 } else {
                     node.obj = _reorgResources(result.data, node.r); // parse/reorg and count resources by subType
@@ -95,11 +95,11 @@ const getContentResources = async function(req) {
             })
             // .catch(error => {
             //     node.r.error = error.message;
-            //     logger.warn(`failed to load contentResource from destination ${node.dest}: ${error}`,error);
+            //     logger.warn(`failed to load contentResource from destination ${node.casDest}: ${error}`,error);
             // })
             .finally(() => {
                 const durationMs = Date.now() - startTime;
-                logger.debug(`completed loading contentResource from ${node.dest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.r,null,2)}`);
+                logger.debug(`completed loading contentResource from ${node.casDest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.r,null,2)}`);
             });
             promises.push(p);
         }
@@ -108,7 +108,7 @@ const getContentResources = async function(req) {
         results.forEach((result, index) => {
             if (result.status === "rejected") {
                 nodes[index].r.error = result.reason.message;
-                logger.warn(`Failed to load contentResource from destination ${nodes[index].dest}: ${result.reason}`);
+                logger.warn(`Failed to load contentResource from destination ${nodes[index].casDest}: ${result.reason}`);
             }
         });
         const durationMs = Date.now() - startTime;
@@ -303,6 +303,7 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
             continue;
         }
         node.tmsNodeId = tmsNode.id;
+        node.tmsUploadAllowed = tmsNode.uploadAllowed;
         nodeTmsIdMap[node.tmsNodeId] = node;
     }
     // add existing routes
@@ -360,6 +361,7 @@ const _convertTmsNode = function(tmsNode, groups) {
         group: -1, // TODO: assign a group for this one
         tmsNode: tmsNode.name,
         tmsNodeId: tmsNode.id,
+        tmsUploadAllowed: tmsNode.uploadAllowed,
         r: {
             warning: "CAS not connected"
         }

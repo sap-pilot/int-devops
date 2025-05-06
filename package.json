@@ -26,7 +26,8 @@
     "start": "cds-serve",
     "start:debug": "npx -n=\"--inspect\" cds-serve",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ui": "npm run local --prefix app"
+    "ui": "npm run local --prefix app",
+    "undeploy": "cf undeploy int-devops --delete-services --delete-service-keys"
   },
   "devDependencies": {
     "@sap/cds-dk": "^8.9.3",

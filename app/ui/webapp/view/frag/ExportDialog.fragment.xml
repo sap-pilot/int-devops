@@ -4,7 +4,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core"
 	xmlns:table="sap.ui.table">
-	<Dialog title="Export ({resourceTree>/value/selectedTransportableEntries}) selected artifacts"
+	<Dialog title="Export ({casResources>/value/selectedTransportableEntries}) selected artifacts"
         resizable="true" draggable="true" contentWidth="980px" contentHeight="700px" 
         horizontalScrolling="false" verticalScrolling="false">
 		<content>
@@ -42,18 +42,19 @@
                                     <f:fields>
                                         <Select
                                             forceSelection="false"
-                                            selectedKey="{resourceTree>/value/selectedSourceNode}"
+                                            required="true"
+                                            selectedKey="{casExport>/selectedSourceNode}"
                                             items="{
-                                                path: 'resourceTree>/value/nodes',
-                                                sorter: { path: 'resourceTree>tmsNode' }
+                                                path: 'casResources>/allowExportNodes',
+                                                sorter: { path: 'casResources>tmsNode' }
                                             }">
-                                            <core:Item key="{resourceTree>tmsNode}" text="{resourceTree>tmsNode}" />
+                                            <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
                                         </Select>
                                     </f:fields>
                                 </f:FormElement>
                                 <f:FormElement label="Description">
                                     <f:fields>
-                                        <Input value="{Twitter}" rows="3" />
+                                        <Input value="{casExport>/description}" required="true"/>
                                     </f:fields>
                                 </f:FormElement>
                             </f:formElements>
@@ -64,12 +65,13 @@
                                     <f:fields>
                                         <Select
                                             forceSelection="false"
-                                            selectedKey="{resourceTree>/value/selectedTargetNode}"
+                                            required="true"
+                                            selectedKey="{casExport>/selectedTargetNode}"
                                             items="{
-                                                path: 'resourceTree>/value/nodes',
-                                                sorter: { path: 'resourceTree>tmsNode' }
+                                                path: 'casResources>/allowUploadNodes',
+                                                sorter: { path: 'casResources>tmsNode' }
                                             }">
-                                            <core:Item key="{resourceTree>tmsNode}" text="{resourceTree>tmsNode}" />
+                                            <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
                                         </Select>
                                     </f:fields>
                                 </f:FormElement>
@@ -110,7 +112,7 @@
                             <Label text="Content Resources"/>
                             <table:template>
                                 <Link text="{casExport>n}" wrapping="false" 
-                                    href="{resourceTree>/value/repoUrl}{casExport>p}" target="_blank"/>
+                                    href="{casResources>/value/repoUrl}{casExport>p}" target="_blank"/>
                             </table:template>
                         </table:Column>
                         <table:Column width="17rem">

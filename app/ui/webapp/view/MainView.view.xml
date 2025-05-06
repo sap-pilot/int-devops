@@ -127,8 +127,9 @@
                                             icon="sap-icon://synchronize" 
                                             tooltip="Force refresh content resources list from all connected Content Agent services" />
                                         <Button id="exportBtn" 
-                                            enabled="false"
-                                            text="Export (0)" 
+                                            press="openExportDialog"
+                                            enabled="{=${resourceTree>/value/selectedTransportableEntries} > 0}"
+                                            text="Export ({resourceTree>/value/selectedTransportableEntries})" 
                                             icon="sap-icon://shipping-status" 
                                             tooltip="Export selected artifacts to TMS" />
 									</OverflowToolbar>

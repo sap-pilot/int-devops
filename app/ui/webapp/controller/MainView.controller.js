@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/table/Column",
 	"sap/m/Label",
 	"sap/m/Text",
+	"sap/ui/core/Fragment",
 	"org/sapux/int/model/formatter"
-], function (BaseController, Common, JSONModel, Select, Item, SwimLaneChainLayout, Column, Label, Text, formatter) {
+], function (BaseController, Common, JSONModel, Select, Item, SwimLaneChainLayout, Column, Label, Text, Fragment, formatter) {
 	"use strict";
 
 	return BaseController.extend("org.sapux.int.controller.Monitor", {
@@ -336,7 +337,7 @@ sap.ui.define([
 			// update selection
 			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
 			this.oTreeTable.clearSelection();
-			for (let i = 1; i < aAllEntries.length; i++) {
+			for (let i = 0; i < aAllEntries.length; i++) {
 				const oRowContext = this.oTreeTable.getContextByIndex(i);
 				if (!oRowContext) {
 					break; // reach end of rows;
@@ -346,8 +347,9 @@ sap.ui.define([
 				}
 			}
 			const oExportBtn = this.byId("exportBtn");
-			oExportBtn.setText(`Export (${aSelectedTransportableEntries.length})`)
-			oExportBtn.setEnabled(aSelectedTransportableEntries.length > 0);
+			this.oResourceTreeModel.setProperty("/value/selectedTransportableEntries", aSelectedTransportableEntries.length);
+			// oExportBtn.setText(`Export (${aSelectedTransportableEntries.length})`)
+			// oExportBtn.setEnabled(aSelectedTransportableEntries.length > 0);
 		},
 
 		addSelectedEntries: function(entry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries) {
@@ -373,7 +375,52 @@ sap.ui.define([
 					this.recursiveUpdateEntrySelection(child, selected);
 				}
 			}
-		}
+		},
+
+		filterSelectedTree: function(entry) {
+			if (entry.c && entry.c.length > 0) {
+				entry.selectedChildren = entry.c.filter(child => this.filterSelectedTree(child));
+			}
+			if (entry.selected || entry.selectedChildren?.length > 0) {
+				return entry;
+			} else {
+				return null;
+			}
+		},
+
+		openExportDialog: function() {
+			// get selected tree entries
+			const oRootEntry = this.oResourceTreeModel.getProperty("/value");
+			const oFilteredRoot = this.filterSelectedTree(oRootEntry);
+			if (!this.oCasExportModel) {
+				this.oCasExportModel = new JSONModel();
+			}
+			this.oCasExportModel.setProperty("/resources",oFilteredRoot);
+			this.getView().setModel(this.oCasExportModel,"casExport");
+			if (!this.oExportDialog) {
+				Fragment.load({
+					id: this.getView().getId(),
+					name: "org.sapux.int.view.frag.ExportDialog",
+					controller: this
+				}).then(function(oDialog) {
+					this.getView().addDependent(oDialog);
+					this.oExportDialog = oDialog;
+					this.oExportDialog.open();
+					this.byId("exportTreeTable").expandToLevel(3);
+					//this.bindFullscreenTable(sSource);
+				}.bind(this));
+				// to get access to the controller's model
+			} else {
+				this.oExportDialog.open();
+				//this.bindFullscreenTable(sSource);
+			}
+		},
+
+		closeExportDialog: function(event) {
+			if (this.oExportDialog) {
+				this.oExportDialog.close();
+			}
+		},
 	});
 
 });

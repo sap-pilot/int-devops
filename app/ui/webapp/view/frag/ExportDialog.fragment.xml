@@ -1,0 +1,167 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:table="sap.ui.table">
+	<Dialog title="Export ({resourceTree>/value/selectedTransportableEntries}) selected artifacts"
+        resizable="true" draggable="true" contentWidth="980px" contentHeight="700px" 
+        horizontalScrolling="false" verticalScrolling="false">
+		<content>
+			<VBox class="sapUiSmallMargin sapUiNoMarginTop">
+                <f:Form id="exportForm" editable="true">
+                    <!-- <f:layout>
+                        <f:ColumnLayout
+                            columnsS="1"
+                            columnsM="2"
+                            columnsL="2"
+                            columnsXL="2"
+                        />
+                    </f:layout> -->
+                    <f:layout>
+                    <f:ResponsiveGridLayout
+                        labelSpanXL="4"
+                        labelSpanL="4"
+                        labelSpanM="3"
+                        labelSpanS="12"
+                        adjustLabelSpan="false"
+                        emptySpanXL="0"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        emptySpanS="0"
+                        columnsXL="2"
+                        columnsL="2"
+                        columnsM="2"
+                        columnsS="1"
+                        singleContainerFullSize="false" />
+                    </f:layout>
+                    <f:formContainers>
+                        <f:FormContainer>
+                            <f:formElements>
+                                <f:FormElement label="Source Node">
+                                    <f:fields>
+                                        <Select
+                                            forceSelection="false"
+                                            selectedKey="{resourceTree>/value/selectedSourceNode}"
+                                            items="{
+                                                path: 'resourceTree>/value/nodes',
+                                                sorter: { path: 'resourceTree>tmsNode' }
+                                            }">
+                                            <core:Item key="{resourceTree>tmsNode}" text="{resourceTree>tmsNode}" />
+                                        </Select>
+                                    </f:fields>
+                                </f:FormElement>
+                                <f:FormElement label="Description">
+                                    <f:fields>
+                                        <Input value="{Twitter}" rows="3" />
+                                    </f:fields>
+                                </f:FormElement>
+                            </f:formElements>
+                        </f:FormContainer>
+                        <f:FormContainer>
+                            <f:formElements>
+                                <f:FormElement label="Target Node">
+                                    <f:fields>
+                                        <Select
+                                            forceSelection="false"
+                                            selectedKey="{resourceTree>/value/selectedTargetNode}"
+                                            items="{
+                                                path: 'resourceTree>/value/nodes',
+                                                sorter: { path: 'resourceTree>tmsNode' }
+                                            }">
+                                            <core:Item key="{resourceTree>tmsNode}" text="{resourceTree>tmsNode}" />
+                                        </Select>
+                                    </f:fields>
+                                </f:FormElement>
+                                <f:FormElement label="Result">
+                                    <f:fields>
+                                        <Input value="Not initiated" editable="false"/>
+                                        <Link text="TR not available">
+                                            <layoutData>
+                                                <l:GridData span="XL2 L2 M4 S4" />
+                                            </layoutData>
+                                        </Link>
+                                    </f:fields>
+                                </f:FormElement>
+                            </f:formElements>
+                        </f:FormContainer>
+                    </f:formContainers>
+                </f:Form>
+                <table:TreeTable
+                    id="exportTreeTable"
+                    busy="{viewState>/busy}"
+                    busyIndicatorDelay="0"
+                    rows="{path:'casExport>/resources/selectedChildren', parameters: {arrayNames:['selectedChildren']}}"
+                    selectionMode="None"
+                    enableSelectAll="false"
+                    width="100%"
+                    ariaLabelledBy="title">
+                    <table:rowMode>
+                        <rowmodes:Interactive rowCount="17" xmlns:rowmodes="sap.ui.table.rowmodes" />
+                    </table:rowMode>
+                    <table:rowSettingsTemplate>
+                        <table:RowSettings highlight="{
+                            path: 'casExport>s',
+                            formatter: '.formatter.statusHighlight'
+                        }" highlightText="{casExport>s}"/>
+                    </table:rowSettingsTemplate>
+                    <table:columns>
+                        <table:Column width="24rem">
+                            <Label text="Content Resources"/>
+                            <table:template>
+                                <Link text="{casExport>n}" wrapping="false" 
+                                    href="{resourceTree>/value/repoUrl}{casExport>p}" target="_blank"/>
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="17rem">
+                            <Label text="ID"/>
+                            <table:template>
+                                <Text text="{casExport>i}" wrapping="false" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="6rem">
+                            <Label text="Sub-Type"/>
+                            <table:template>
+                                <Text text="{casExport>t}" wrapping="false" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="5rem">
+                            <Label text="PRE"/>
+                            <table:template>
+                                <Text text="{casExport>v0}" wrapping="false" />
+                            </table:template>
+                        </table:Column>
+                        <table:Column width="5rem">
+                            <Label text="DEV2"/>
+                            <table:template>
+                                <Text text="{casExport>v1}" wrapping="false" />
+                            </table:template>
+                        </table:Column>
+                    </table:columns>
+                </table:TreeTable>
+            </VBox>
+		</content>
+		<footer>
+			<Toolbar>
+				<content>
+					 <!-- <ProgressIndicator
+                        id="exportProgress"
+                        state="Information"
+                        displayOnly="true"
+                        displayAnimation="true" /> -->
+					<ToolbarSpacer />
+					<Button
+						icon="sap-icon://shipping-status"
+						type="Emphasized"
+						text="Export to TMS (not available yet)"
+						tooltip="Export selected artifacts to TMS"
+						press=".onExportToTMS()" 
+                        enabled="false"/>
+					<Button 
+						text="Close"
+						press=".closeExportDialog" />
+				</content>
+			</Toolbar>
+		</footer>
+	</Dialog>
+</core:FragmentDefinition>

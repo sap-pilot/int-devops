@@ -107,7 +107,8 @@
 									selectionMode="MultiToggle"
 									rowMode="Auto"
                                     rowSelectionChange="onTreeSelectionChange"
-									enableSelectAll="false"
+									toggleOpenState="onToggleOpenState"
+                                    enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">

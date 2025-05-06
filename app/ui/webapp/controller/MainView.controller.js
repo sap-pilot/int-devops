@@ -71,7 +71,7 @@ sap.ui.define([
 					}
 				}
 				// update comparision status
-				this._updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
+				this.updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
 				this._updateLandscapeModel(oContentResources);
 				// add readable date to oContentResources
 				if (oContentResources?.lastUpdated) {
@@ -266,17 +266,17 @@ sap.ui.define([
 					selectedIndexSet.add(node.idx);
 			}
 			const oResourceTree = this.oResourceTreeModel.getData();
-			this._updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet, maxCasNodes);
+			this.updateVerisonCompareStatus(oResourceTree.value,selectedIndexSet, maxCasNodes);
 			this.oResourceTreeModel.setProperty("/value/c",oResourceTree.value.c);
 		},
 
-		_updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
+		updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
 			if (!entry)
 				return 0;
 			let maxUnique = 1;
 			if (entry.c && entry.c.length > 0) {
 				for (let child of entry.c) {
-					const cd = this._updateVerisonCompareStatus(child, selectedIndexSet, maxCasNodes);
+					const cd = this.updateVerisonCompareStatus(child, selectedIndexSet, maxCasNodes);
 					if (cd > maxUnique)
 						maxUnique = cd;
 				}
@@ -289,7 +289,7 @@ sap.ui.define([
 				const v = `v${idx}`;
 				arr.push(entry[v]);
 			}
-			u = this._countUnique(arr);
+			u = this.countUnique(arr);
 			//debugger;
 			if (u <= 1 && maxUnique <= 1)
 				entry.s = 'ok';
@@ -300,16 +300,79 @@ sap.ui.define([
 			return u == 1? maxUnique : u;
 		},
 
-		_countUnique: function(iterable) {
+		countUnique: function(iterable) {
 			return new Set(iterable).size;
 		},
 
+		bSuppressSelectionEvent: false, // supress tree selection event so to prevent infinite loop when operating tree selection
+
 		onTreeSelectionChange: function(oEvent) {
 			const oParams = oEvent.getParameters();
-			console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}`);
-			// const oSource = this.oResourceTreeModel.getProperty(oParams.rowContext.toString());
-			const aSelection = this.oTreeTable.getSelectedIndices() || [];
-			this.byId("exportBtn").setText(`Export (${aSelection.length})`)
+			//console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}, userInteraction? ${oParams.userInteraction}`);
+			if (this.bSuppressSelectionEvent || !oParams.userInteraction) {
+				return; 
+			}
+			this.bSuppressSelectionEvent = true;
+			const entry = oParams.rowContext?.getObject();
+			if (entry) {
+				const bSelected = oParams.rowIndex !== -1 && this.oTreeTable.isIndexSelected(oParams.rowIndex); // Check if the row is selected
+				this.recursiveUpdateEntrySelection(entry, bSelected);
+			}
+			// update selected rows
+			this.updateRowSelection();
+			this.bSuppressSelectionEvent = false;
+		},
+
+		onToggleOpenState: function(oEvent) {	
+			this.bSuppressSelectionEvent = true;
+			this.updateRowSelection();
+			this.bSuppressSelectionEvent = false;
+		},
+
+		updateRowSelection: function() {
+			const oRootEntry = this.oResourceTreeModel.getProperty("/value");
+			const aSelectedEntries = [], aSelectedTransportableEntries = [], aAllEntries = [];
+			this.addSelectedEntries(oRootEntry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
+			// update selection
+			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
+			this.oTreeTable.clearSelection();
+			for (let i = 1; i < aAllEntries.length; i++) {
+				const oRowContext = this.oTreeTable.getContextByIndex(i);
+				if (!oRowContext) {
+					break; // reach end of rows;
+				}
+				if (aSelectedEntries.indexOf(oRowContext.getObject()) > -1) {
+					this.oTreeTable.addSelectionInterval(i,i);
+				}
+			}
+			const oExportBtn = this.byId("exportBtn");
+			oExportBtn.setText(`Export (${aSelectedTransportableEntries.length})`)
+			oExportBtn.setEnabled(aSelectedTransportableEntries.length > 0);
+		},
+
+		addSelectedEntries: function(entry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries) {
+			aAllEntries.push(entry);
+			if (entry.selected) {
+				aSelectedEntries.push(entry);
+				if (entry.t) {
+					// has subType, hence transportable
+					aSelectedTransportableEntries.push(entry);
+				}
+			}
+			if (entry.c && entry.c.length > 0) {
+				for (let child of entry.c) {
+					this.addSelectedEntries(child, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
+				}
+			}
+		},
+
+		recursiveUpdateEntrySelection: function(entry, selected) {
+			entry.selected = selected;
+			if (entry.c && entry.c.length > 0) {
+				for (let child of entry.c) {
+					this.recursiveUpdateEntrySelection(child, selected);
+				}
+			}
 		}
 	});
 

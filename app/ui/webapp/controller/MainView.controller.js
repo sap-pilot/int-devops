@@ -163,6 +163,10 @@ sap.ui.define([
 			if (oContentResources?.lastUpdated) {
 				this.oCasResourcesModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
 			} 
+
+			this.bSuppressSelectionEvent = true;
+			this.updateRowSelection();
+			this.bSuppressSelectionEvent = false;
 		},
 
 		updateTreeTableColumns(oTreeTable, aCasNodes, oResourceRoot, sModelName, bColumnsInitialVisible) {
@@ -364,7 +368,7 @@ sap.ui.define([
 			const aSelectedEntries = [], aSelectedTransportableEntries = [], aAllEntries = [];
 			this.addSelectedEntries(oRootEntry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
 			// update selection
-			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
+			// console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
 			this.oCasResourcesTable.clearSelection();
 			for (let i = 0; i < aAllEntries.length; i++) {
 				const oRowContext = this.oCasResourcesTable.getContextByIndex(i);
@@ -478,7 +482,7 @@ sap.ui.define([
 			let oSourceNode = nodes.find(node => node.tmsNode === sSourceNode);
 			const cnt = oSourceNode?.idx ? this.countNonExistEntries(oCasExportRoot, `v${oSourceNode.idx}`) : 0;
 			this.oCasExportModel.setProperty("/nonExistEntriesCount", cnt);
-			console.log(`idx: ${oSourceNode?.idx}, nonExistEntriesCount: ${cnt}`);
+			//console.log(`idx: ${oSourceNode?.idx}, nonExistEntriesCount: ${cnt}`);
 		},
 
 		countNonExistEntries: function(entry, sProp) {

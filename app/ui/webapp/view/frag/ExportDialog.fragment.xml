@@ -22,7 +22,7 @@
                     <f:ResponsiveGridLayout
                         labelSpanXL="3"
                         labelSpanL="3"
-                        labelSpanM="3"
+                        labelSpanM="4"
                         labelSpanS="12"
                         adjustLabelSpan="false"
                         emptySpanXL="0"
@@ -49,7 +49,7 @@
                                             change=".onExportNodeChange"
                                             items="{
                                                 path: 'casResources>/allowExportNodes',
-                                                sorter: { path: 'casResources>tmsNode' }
+                                                sorter: { path: 'tmsNode' }
                                             }">
                                             <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
                                         </Select>
@@ -59,7 +59,7 @@
                                     <f:fields>
                                         <Input value="{casExport>/description}" required="false" 
                                             valueState="{=${casExport>/description} === undefined ? 'Error' : 'None'}"
-                                            valueStateText="Non-empty text for instance: Export XX from {casExport>/sourceNode}"
+                                            valueStateText="describe the content eg: 'util package from {casExport>/sourceNode}'"
                                             placeholder="Enter transport description" />
                                     </f:fields>
                                 </f:FormElement>
@@ -67,7 +67,7 @@
                         </f:FormContainer>
                         <f:FormContainer>
                             <f:formElements>
-                                <f:FormElement label="Target Node">
+                                <f:FormElement label="Target TMS Node">
                                     <f:fields>
                                         <Select
                                             forceSelection="false"

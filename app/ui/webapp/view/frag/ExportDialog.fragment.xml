@@ -20,8 +20,8 @@
                     </f:layout> -->
                     <f:layout>
                     <f:ResponsiveGridLayout
-                        labelSpanXL="4"
-                        labelSpanL="4"
+                        labelSpanXL="3"
+                        labelSpanL="3"
                         labelSpanM="3"
                         labelSpanS="12"
                         adjustLabelSpan="false"
@@ -43,7 +43,10 @@
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            selectedKey="{casExport>/selectedSourceNode}"
+                                            valueState="{=${casExport>/sourceNode} === undefined ? 'Error' : 'None'}"
+                                            valueStateText="Select source node with content agent connected"
+                                            selectedKey="{casExport>/sourceNode}"
+                                            change=".onExportNodeChange"
                                             items="{
                                                 path: 'casResources>/allowExportNodes',
                                                 sorter: { path: 'casResources>tmsNode' }
@@ -54,7 +57,10 @@
                                 </f:FormElement>
                                 <f:FormElement label="Description">
                                     <f:fields>
-                                        <Input value="{casExport>/description}" required="true"/>
+                                        <Input value="{casExport>/description}" required="false" 
+                                            valueState="{=${casExport>/description} === undefined ? 'Error' : 'None'}"
+                                            valueStateText="Non-empty text for instance: Export XX from {casExport>/sourceNode}"
+                                            placeholder="Enter transport description" />
                                     </f:fields>
                                 </f:FormElement>
                             </f:formElements>
@@ -66,10 +72,13 @@
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            selectedKey="{casExport>/selectedTargetNode}"
+                                            valueState="{=${casExport>/targetNode} === undefined ? 'Error' : 'None'}"
+                                            valueStateText="Select target TMS node with upload allowed"
+                                            selectedKey="{casExport>/targetNode}"
+                                            change=".onExportNodeChange"
                                             items="{
                                                 path: 'casResources>/allowUploadNodes',
-                                                sorter: { path: 'casResources>tmsNode' }
+                                                sorter: { path: 'tmsNode' }
                                             }">
                                             <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
                                         </Select>
@@ -93,7 +102,7 @@
                     id="exportTreeTable"
                     busy="{viewState>/busy}"
                     busyIndicatorDelay="0"
-                    rows="{path:'casExport>/resources/selectedChildren', parameters: {arrayNames:['selectedChildren']}}"
+                    rows="{path:'casExport>/value/c', parameters: {arrayNames:['c']}}"
                     selectionMode="None"
                     enableSelectAll="false"
                     width="100%"
@@ -127,7 +136,7 @@
                                 <Text text="{casExport>t}" wrapping="false" />
                             </table:template>
                         </table:Column>
-                        <table:Column width="5rem">
+                        <!-- <table:Column width="5rem">
                             <Label text="PRE"/>
                             <table:template>
                                 <Text text="{casExport>v0}" wrapping="false" />
@@ -138,7 +147,7 @@
                             <table:template>
                                 <Text text="{casExport>v1}" wrapping="false" />
                             </table:template>
-                        </table:Column>
+                        </table:Column> -->
                     </table:columns>
                 </table:TreeTable>
             </VBox>
@@ -151,6 +160,12 @@
                         state="Information"
                         displayOnly="true"
                         displayAnimation="true" /> -->
+                    <GenericTag class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                        visible="{=${casExport>/nonExistEntriesCount} > 0}"
+                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) not found in source node, export will skip them" status="Warning" />
+                    <!-- <Label
+                        icon="sap-icon://shipping-status"
+                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) doesnt exist in source node" /> -->
 					<ToolbarSpacer />
 					<Button
 						icon="sap-icon://shipping-status"

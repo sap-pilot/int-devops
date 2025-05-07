@@ -27,7 +27,7 @@ sap.ui.define([
 			this._selectedNodes = new Set(); // Store selected node keys
 			let oGraph = this.byId("graph");
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
-			this.setUpOrientationSelect();
+			this.setupGraphControls();
 
 			// load resource tree depending on liveMode
 			this.oCasResourcesModel = new JSONModel();
@@ -50,104 +50,12 @@ sap.ui.define([
 			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadContentResources(false)}.bind(this));
 
 			// now load resource tree, delay a bit otherwise busy indicator wont work on initial load
-			setTimeout(function(){this.loadContentResources(false)}.bind(this),200);
+			setTimeout(function(){this.loadContentResources(false)}.bind(this),100);
 		},
 
-		setBusy(bBusy) {
-			this.oViewStateModel.setProperty("/busy",bBusy);
-		},
-
-		loadContentResources(forceRefresh) {
-			this.setBusy(true);
-			const appStateModel = this.getOwnerComponent().getModel("appState");
-			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
-			this.oCasResourcesModel.loadData(sResourcePath);
-		},
-
-		processContentResources(result) {
-			this.setBusy(false);
-			// update treeTable
-			const aColumns = this.oCasResourcesTable.getColumns();
-			// remove existing columns
-			for (let i = aColumns.length-1; i>2; i--) {
-				this.oCasResourcesTable.removeColumn(i);
-			}	
-			// add new columns
-			const oContentResources = this.oCasResourcesModel.getProperty("/value");
-			const selectedIndicesSet = new Set();
-			const aNodes = oContentResources?.nodes || [];
-			const maxCasNodes = oContentResources?.countCasNodes || 0;
-			for (let i = 0; i < maxCasNodes; i++) {
-				const node = aNodes[i];
-				const columnVisible = !node.r?.error && !node.r?.warning;
-				let column = new Column({
-					label: node.casUrl?
-						new sap.m.Link({
-							text: node.alias, href:`${node.casUrl}`, 
-							tooltip: `Open Content-Agent for ${node.alias}`,
-							emphasized: true,
-							target:"_blank",  wrapping: false})
-						: new Text({text: node.alias, wrapping: false}),
-					template: new Text({text: `{casResources>v${node.idx}}`, wrapping: false}),
-					width: "5em",
-					visible: columnVisible
-				});
-				this.oCasResourcesTable.addColumn(column);
-				if (columnVisible) {
-					selectedIndicesSet.add(node.idx);
-				}
-			}
-			// add allowUploadNodes and allowExportNodes for Export Dialog
-			let allowUploadNodes = [], allowExportNodes = [];
-			for (let node of aNodes) {
-				if (node.casDest) allowExportNodes.push(node);
-				if (node.tmsUploadAllowed) allowUploadNodes.push(node);
-			}
-			this.oCasResourcesModel.setProperty("/allowUploadNodes",allowUploadNodes);
-			this.oCasResourcesModel.setProperty("/allowExportNodes",allowExportNodes);
-
-			// update comparision status
-			this.updateVerisonCompareStatus(oContentResources,selectedIndicesSet, maxCasNodes);
-			this.updateLandscapeModel(oContentResources);
-			
-			// add readable date to oContentResources
-			if (oContentResources?.lastUpdated) {
-				this.oCasResourcesModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
-			} 
-		},
-
-		updateLandscapeModel(oContentResources) {
-			const obj = {
-				nodes: structuredClone(oContentResources?.nodes) || [],
-				groups: structuredClone(oContentResources?.groups) || [],
-				routes: structuredClone(oContentResources?.routes) || []
-			};
-			for (const node of obj.nodes) {
-				node.attrs = [];
-				if (node.alias) {
-					node.attrs.push({key:"alias",value:node.alias});
-				}
-				for (const [key, value] of Object.entries(node.r)) {
-					const attr = {key: key, value: value};
-					node.attrs.push(attr);
-				}
-				//node.checkboxState = "Checked"; // dont show checkbox yet
-				if (node.r.error) {
-					node.status = "Error";
-				} else if (node.r.warning) { 
-					node.status = "Warning";
-				} else {
-					node.selected = true;
-					node.pSelected = true;
-				}
-			}
-			this.oLandscapeModel.setData(obj);
-		},
-
-		setUpOrientationSelect: function () {
+		setupGraphControls: function () {
 			var oGraph = this.byId("graph"),
 				oToolbar = this.byId("graph-toolbar");
-				
 			// disable some existing content
 			let aExistingContent = oToolbar.getContent();
 			aExistingContent[0].setVisible(false); // disable 1st spacer
@@ -185,8 +93,140 @@ sap.ui.define([
 			let spacer = new sap.m.ToolbarSpacer();
 			oToolbar.insertContent(spacer, 2);
 			oToolbar.insertContent(oOrientation, 3);
-			
+		},
 
+		onNodePress: function (oEvent) {
+			const oNode = oEvent.getSource();
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const sKey = oNode.getKey();
+			const node = nodes.find( (elemenet) => elemenet.tmsNodeId == sKey);
+			if (node)
+				node.pSelected = !node.pSelected; // flip true selected state
+		},
+
+		onGraphSelectionChange: function(oEvent) {
+			const nodes = this.oLandscapeModel.getProperty("/nodes");
+			const columns = this.oCasResourcesTable.getColumns();
+			const selectedIndexSet = new Set();
+			for (const node of nodes) {
+				node.selected = node.pSelected;
+				if (node.idx === undefined)
+					continue; // skip non-cas nodes (or "otherTmsNodes")
+				if (node.error || node.warning) 
+					continue; // skip nodes with error or warning
+				columns[node.idx+3].setVisible(node.selected);
+				if (node.selected)
+					selectedIndexSet.add(node.idx);
+			}
+			const oCasResources = this.oCasResourcesModel.getProperty("/value");
+			this.updateVerisonCompareStatus(oCasResources,selectedIndexSet);
+			this.oCasResourcesModel.setProperty("/value/c",oCasResources.c);
+		},
+
+		setBusy(bBusy) {
+			this.oViewStateModel.setProperty("/busy",bBusy);
+		},
+
+		loadContentResources(forceRefresh) {
+			this.setBusy(true);
+			const appStateModel = this.getOwnerComponent().getModel("appState");
+			const sResourcePath = appStateModel.getProperty("/liveMode")?`/srv/cas/resources(forceRefresh=${forceRefresh?true:false})`:"model/resources.json";
+			this.oCasResourcesModel.loadData(sResourcePath);
+		},
+
+		processContentResources(result) {
+			this.setBusy(false);
+
+			// update tree table
+			const oContentResources = this.oCasResourcesModel.getProperty("/value");
+			const aCasNodes = oContentResources?.casNodes || [];
+			this.updateTreeTableColumns(this.oCasResourcesTable, aCasNodes, oContentResources, "casResources", true)
+
+			// merge cas and tms nodes
+			const allNodes = [ ...oContentResources?.casNodes || [], ...oContentResources?.otherTmsNodes || [] ];
+			oContentResources.allNodes = allNodes;
+			this.oCasResourcesModel.setProperty("/allNodes", allNodes);
+
+			// update landscape graph model
+			this.updateLandscapeModel(oContentResources);
+
+			// add allowUploadNodes and allowExportNodes for Export Dialog
+			let allowUploadNodes = [], allowExportNodes = [];
+			for (let node of allNodes || []) {
+				if (node.casDest && !node.error) allowExportNodes.push(node);
+				if (node.tmsUploadAllowed) allowUploadNodes.push(node);
+			}
+			this.oCasResourcesModel.setProperty("/allowUploadNodes",allowUploadNodes);
+			this.oCasResourcesModel.setProperty("/allowExportNodes",allowExportNodes);
+
+			// add readable date to oContentResources
+			if (oContentResources?.lastUpdated) {
+				this.oCasResourcesModel.setProperty("/value/lastUpdatedFormatted",new Date(oContentResources.lastUpdated).toLocaleString());
+			} 
+		},
+
+		updateTreeTableColumns(oTreeTable, aCasNodes, oResourceRoot, sModelName, bColumnsInitialVisible) {
+			// remove existing columns
+			const aColumns = oTreeTable.getColumns();
+			for (let i = aColumns.length-1; i>2; i--) {
+				oTreeTable.removeColumn(i);
+			}	
+			// add new columns
+			const selectedIndicesSet = new Set();
+			for (const node of aCasNodes) {
+				const columnVisible = bColumnsInitialVisible && (!node.error && !node.warning);
+				let column = new Column({
+					label: node.casUrl?
+						new sap.m.Link({
+							text: node.alias, href:`${node.casUrl}`, 
+							tooltip: `Open Content-Agent for ${node.alias}`,
+							emphasized: true,
+							target:"_blank",  wrapping: false})
+						: new Text({text: node.alias, wrapping: false}),
+					template: new Text({text: `{${sModelName}>v${node.idx}}`, wrapping: false}),
+					width: "5em",
+					visible: columnVisible
+				});
+				oTreeTable.addColumn(column);
+				if (columnVisible) {
+					selectedIndicesSet.add(node.idx);
+				}
+			}
+			// update comparision status
+			this.updateVerisonCompareStatus(oResourceRoot, selectedIndicesSet);
+		},
+
+		updateLandscapeModel(oContentResources) {
+			const obj = {
+				nodes: structuredClone(oContentResources?.allNodes) || [],
+				groups: structuredClone(oContentResources?.groups) || [],
+				routes: structuredClone(oContentResources?.routes) || []
+			};
+			for (const node of obj.nodes) {
+				node.attrs = [];
+				if (node.alias) {
+					node.attrs.push({key:"alias",value:node.alias});
+				}
+				if (node.resources) {
+					for (const [key, value] of Object.entries(node.resources)) {
+						const attr = {key: key, value: value};
+						node.attrs.push(attr);
+					}
+				}
+				//node.checkboxState = "Checked"; // dont show checkbox yet
+				if (node.error) {
+					node.status = "Error";
+				} else if (node.warning) { 
+					node.status = "Warning";
+				} else if (node.idx === undefined) { // not a cas node
+					node.status = "Warning";
+					node.attrs.push({key: "warning", value: "CAS not connected"});
+				} else {
+					node.selected = true;
+					node.pSelected = true;
+				}
+			}
+			this.oLandscapeModel.setData(obj);
 		},
 
 		onTreeFilterChange: function() {
@@ -253,42 +293,18 @@ sap.ui.define([
 					this.oCasResourcesTable.expand(this.oCasResourcesTable.getSelectedIndices());
 					break;
 			}
+			this.bSuppressSelectionEvent = true;
+			this.updateRowSelection();
+			this.bSuppressSelectionEvent = false;
 		},
 
-		onNodePress: function (oEvent) {
-			const oNode = oEvent.getSource();
-			const nodes = this.oLandscapeModel.getProperty("/nodes");
-			const node = nodes[oNode.getKey()];
-			node.pSelected = !node.pSelected; // flip true selected state
-		},
-
-		onGraphSelectionChange: function(oEvent) {
-			const maxCasNodes = this.oCasResourcesModel.getProperty("/value/countCasNodes");
-			const nodes = this.oLandscapeModel.getProperty("/nodes");
-			const columns = this.oCasResourcesTable.getColumns();
-			const selectedIndexSet = new Set();
-			for (const node of nodes) {
-				node.selected = node.pSelected;
-				if (node.idx >= maxCasNodes)
-					continue; // skip nodes without contentResourcees
-				if (node.r?.error || node.r?.warning) 
-					continue; // skip nodes with error or warning
-				columns[node.idx+3].setVisible(node.selected);
-				if (node.selected)
-					selectedIndexSet.add(node.idx);
-			}
-			const oCasResources = this.oCasResourcesModel.getData();
-			this.updateVerisonCompareStatus(oCasResources.value,selectedIndexSet, maxCasNodes);
-			this.oCasResourcesModel.setProperty("/value/c",oCasResources.value.c);
-		},
-
-		updateVerisonCompareStatus: function(entry, selectedIndexSet, maxCasNodes) {
+		updateVerisonCompareStatus: function(entry, selectedIndexSet) {
 			if (!entry)
 				return 0;
 			let maxUnique = 1;
 			if (entry.c && entry.c.length > 0) {
 				for (let child of entry.c) {
-					const cd = this.updateVerisonCompareStatus(child, selectedIndexSet, maxCasNodes);
+					const cd = this.updateVerisonCompareStatus(child, selectedIndexSet);
 					if (cd > maxUnique)
 						maxUnique = cd;
 				}
@@ -296,8 +312,6 @@ sap.ui.define([
 			let u = 0;
 			let arr = [];
 			for (let idx of selectedIndexSet) {
-				if (idx >= maxCasNodes)
-					continue; // skip nodes without contentResourcees
 				const v = `v${idx}`;
 				arr.push(entry[v]);
 			}
@@ -308,12 +322,16 @@ sap.ui.define([
 			else if (u > 2 || maxUnique > 2)
 				entry.s = 'error'
 			else
-			entry.s = 'warning';
+				entry.s = 'warning';
 			return u == 1? maxUnique : u;
 		},
 
 		countUnique: function(iterable) {
-			return new Set(iterable).size;
+			let set = new Set(iterable);
+			if (set.has('-')) // if artifact is missing then return at least warning
+				return set.size > 2? set.size : 2;
+			else
+				return set.size;
 		},
 
 		bSuppressSelectionEvent: false, // supress tree selection event so to prevent infinite loop when operating tree selection
@@ -357,10 +375,7 @@ sap.ui.define([
 					this.oCasResourcesTable.addSelectionInterval(i,i);
 				}
 			}
-			const oExportBtn = this.byId("exportBtn");
 			this.oCasResourcesModel.setProperty("/value/selectedTransportableEntries", aSelectedTransportableEntries.length);
-			// oExportBtn.setText(`Export (${aSelectedTransportableEntries.length})`)
-			// oExportBtn.setEnabled(aSelectedTransportableEntries.length > 0);
 		},
 
 		addSelectedEntries: function(entry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries) {
@@ -389,24 +404,26 @@ sap.ui.define([
 		},
 
 		filterSelectedTree: function(entry) {
+			let filteredChildren = null;
 			if (entry.c && entry.c.length > 0) {
-				entry.selectedChildren = entry.c.filter(child => this.filterSelectedTree(child));
+				filteredChildren = entry.c.filter(child => this.filterSelectedTree(child));
 			}
-			if (entry.selected || entry.selectedChildren?.length > 0) {
-				return entry;
+			if (entry.selected || filteredChildren?.length > 0) {
+				return {...entry, c: filteredChildren}; // copy node 
 			} else {
 				return null;
 			}
 		},
 
 		openExportDialog: function() {
-			// get selected tree entries
-			const oRootEntry = this.oCasResourcesModel.getProperty("/value");
-			const oFilteredRoot = this.filterSelectedTree(oRootEntry);
+			// build export model base on selected tree entries
+			const oContentResources = this.oCasResourcesModel.getProperty("/value");
+			const aCasNodes = oContentResources?.casNodes || [];
+			const oFilteredRoot = this.filterSelectedTree(oContentResources);
 			if (!this.oCasExportModel) {
 				this.oCasExportModel = new JSONModel();
 			}
-			this.oCasExportModel.setProperty("/resources",oFilteredRoot);
+			this.oCasExportModel.setProperty("/value",oFilteredRoot);
 			this.getView().setModel(this.oCasExportModel,"casExport");
 			if (!this.oExportDialog) {
 				Fragment.load({
@@ -417,14 +434,18 @@ sap.ui.define([
 					this.getView().addDependent(oDialog);
 					this.oExportDialog = oDialog;
 					this.oExportDialog.open();
-					this.byId("exportTreeTable").expandToLevel(3);
-					//this.bindFullscreenTable(sSource);
+					this.oExportTreeTable = this.byId("exportTreeTable");
+					// add columns
+					this.updateTreeTableColumns(this.oExportTreeTable, aCasNodes, oFilteredRoot, "casExport", false);
+					this.oExportTreeTable.expandToLevel(3);
 				}.bind(this));
-				// to get access to the controller's model
 			} else {
 				this.oExportDialog.open();
-				//this.bindFullscreenTable(sSource);
-			}
+				// update columns
+				this.updateTreeTableColumns(this.oExportTreeTable, aCasNodes, oFilteredRoot, "casExport", false);
+				this.onExportNodeChange();
+				this.oExportTreeTable.expandToLevel(3);
+			}			
 		},
 
 		closeExportDialog: function(event) {
@@ -432,6 +453,45 @@ sap.ui.define([
 				this.oExportDialog.close();
 			}
 		},
+
+		onExportNodeChange: function(oEvent) {
+			let sSourceNode = this.oCasExportModel.getProperty("/sourceNode");
+			let sTargetNode = this.oCasExportModel.getProperty("/targetNode");
+			//console.log(`export node change, source=${sSourceNode}, target=${sTargetNode}`);
+			const nodes = this.oCasResourcesModel.getProperty("/value/allNodes");
+			const columns = this.oExportTreeTable.getColumns();
+			let selectedIndexSet = new Set();
+			for (const node of nodes) {
+				if (node.idx != undefined && node.tmsNode !== undefined && (node.tmsNode == sSourceNode || node.tmsNode == sTargetNode)) {
+					columns[node.idx+3].setVisible(true);
+					selectedIndexSet.add(node.idx);
+				}
+				else if (node.idx != undefined) {
+					columns[node.idx+3].setVisible(false);
+				}
+			}
+			const oCasExportRoot = this.oCasExportModel.getProperty("/value");
+			this.updateVerisonCompareStatus(oCasExportRoot,selectedIndexSet); // update compare status "s"
+			this.oCasExportModel.setProperty("/value",oCasExportRoot);
+
+			// count nonexist entries in source
+			let oSourceNode = nodes.find(node => node.tmsNode === sSourceNode);
+			const cnt = oSourceNode?.idx ? this.countNonExistEntries(oCasExportRoot, `v${oSourceNode.idx}`) : 0;
+			this.oCasExportModel.setProperty("/nonExistEntriesCount", cnt);
+			console.log(`idx: ${oSourceNode?.idx}, nonExistEntriesCount: ${cnt}`);
+		},
+
+		countNonExistEntries: function(entry, sProp) {
+			let cnt = 0;
+			if (entry[sProp] === undefined || entry[sProp] == '-')
+				cnt++;
+			if (entry.c && entry.c.length > 0) {
+				for (let child of entry.c) {
+					cnt += this.countNonExistEntries(child, sProp);
+				}
+			}
+			return cnt;
+		}
 	});
 
 });

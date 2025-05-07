@@ -60,7 +60,7 @@ const getResources = async function(req) {
         // logger.debug(`serving cached contentResources from "${cachePath}"`)
         const rawData = fs.readFileSync(cachePath, 'utf8');
         data = JSON.parse(rawData);
-        // await new Promise(r => setTimeout(r, 5000));
+        //await new Promise(r => setTimeout(r, 10000));
     } else {
          // forceRefresh or cache file doesn't exist, so we should read data from remote resource
         data = await getContentResources(req);

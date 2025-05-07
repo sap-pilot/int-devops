@@ -10,11 +10,11 @@ const { getTmsLandscapeAsync } = require("./tms");
  *      "i": "contentResources",
  *      "tmsUrl": "XX",
  *      "countCasNodes": 4,
- *       "nodes": [
- *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","casDest":"CAS_DEV","casUrl":"XX","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
- *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","casDest":"CAS_STG","casUrl":"XX","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
- *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","casDest":"CAS_PRE","casUrl":"XX","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
- *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","casDest":"CAS_PROD","casUrl":"XX","r":{"error":"Permission denied"}}
+ *       "casNOdes": [
+ *           {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","tmsNodeId":100,"casDest":"CAS_DEV","casUrl":"XX","resources":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+ *           {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","tmsNodeId":101,"casDest":"CAS_STG","casUrl":"XX","resources":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+ *           {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","tmsNodeId":102,"casDest":"CAS_PRE","casUrl":"XX","resources":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+*            {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","tmsNodeId":103,"casDest":"CAS_PROD","casUrl":"XX","resources":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
  *           {"idx":0,"name":"Sandbox"},
@@ -24,9 +24,9 @@ const { getTmsLandscapeAsync } = require("./tms");
  *           {"idx":4,"name":"Production"}
  *       ],
  *       "routes": [
- *           {"from":0,"to":1},
- *           {"from":1,"to":2},
- *           {"from":2,"to":3}
+ *           {"from":100,"to":101},
+ *           {"from":101,"to":102},
+ *           {"from":102,"to":103}
  *       ],
  *      "c": [
  *          {"n": "Cloud Integration","v0":"1.0.0","c":[
@@ -63,7 +63,7 @@ const getContentResources = async function(req) {
             casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
                 return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
             }),
-            r: {},
+            resources: {},
             obj: {}, // result object to be deleted after merge
         }));
         nodes.sort((a, b) => a.idx - b.idx);
@@ -88,18 +88,18 @@ const getContentResources = async function(req) {
                 // check if response is valid
                 if (!result?.data?.contentResources) {
                     logger.warn(`no contentResources found from destination '${node.casDest}', response: ${JSON.stringify(resp.data,null,2)}`);
-                    node.r.warning = "No contentResources found";
+                    node.error = "No content resources found";
                 } else {
-                    node.obj = _reorgResources(result.data, node.r); // parse/reorg and count resources by subType
+                    node.obj = _reorgResources(result.data, node.resources); // parse/reorg and count resources by subType
                 }
             })
             // .catch(error => {
-            //     node.r.error = error.message;
+            //     node.error = error.message;
             //     logger.warn(`failed to load contentResource from destination ${node.casDest}: ${error}`,error);
             // })
             .finally(() => {
                 const durationMs = Date.now() - startTime;
-                logger.debug(`completed loading contentResource from ${node.casDest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.r,null,2)}`);
+                logger.debug(`completed loading contentResource from ${node.casDest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.resources,null,2)}`);
             });
             promises.push(p);
         }
@@ -107,7 +107,7 @@ const getContentResources = async function(req) {
         const results = await Promise.allSettled(promises);
         results.forEach((result, index) => {
             if (result.status === "rejected") {
-                nodes[index].r.error = result.reason.message;
+                nodes[index].error = result.reason.message;
                 logger.warn(`Failed to load contentResource from destination ${nodes[index].casDest}: ${result.reason}`);
             }
         });
@@ -120,15 +120,15 @@ const getContentResources = async function(req) {
             "tmsUrl": tmsUrl,
             "lastUpdated": startDate.toISOString(),
             "table": {}, // to bev deleted after merge
-            "countCasNodes": nodes.length, // only nodes with contentResources will be included the UI tree table
-            "nodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
+            "casNodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
+            "otherTmsNodes": [],
             "groups": groups,
             "routes": [],
             "c": []
         };
         for (const node of nodes) {
             const v = `v${node.idx}`;
-            _recursiveMerge(node.obj, merged, v);
+            _recursiveMerge(node.obj, merged, v, nodes.length);
             delete node.obj; // merged, delete this obj to avoid excessive result in response
         }
 
@@ -229,11 +229,15 @@ const _recursiveDelete = function(obj, keysToDelete) {
     return obj;
 }
 
-const _recursiveMerge = function(obj, merged, vProp) {
+const _recursiveMerge = function(obj, merged, vProp, iNodes) {
     for (const entry of obj.c) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {
             mergedEntry = {"i":entry.i, "n":entry.n,"t":entry.t,"table":{}};
+            // enter initial/non-exist version for each node 
+            for ( let i = 0; i < iNodes; i++) {
+                mergedEntry[`v${i}`] = '-';
+            }
             if (entry.p)
                 mergedEntry.p = entry.p;
             merged.table[entry.i] = mergedEntry;
@@ -243,7 +247,7 @@ const _recursiveMerge = function(obj, merged, vProp) {
         if (entry.c && entry.c.length > 0) {
             if(!mergedEntry.c) 
                 mergedEntry.c = [];
-            _recursiveMerge(entry, mergedEntry, vProp);
+            _recursiveMerge(entry, mergedEntry, vProp, iNodes);
         }
     }
 }
@@ -296,7 +300,7 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
         tmsNodeIdMap[tmsNode.id] = tmsNode;
     }
     // enrich content resources nodes with tms info
-    for (const node of merged.nodes) {
+    for (const node of merged.casNodes) {
         const tmsNode = tmsNodeNameMap[node.tmsNode];
         if (!tmsNode) {
             logger.warn(`tmsNode not found for ${node.tmsNode}, node: ${JSON.stringify(node,null,2)}`);
@@ -327,15 +331,13 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
                 if (!fromNode) {
                     const fromTmsNode = tmsNodeIdMap[route.sourceNodeId]
                     fromNode = _convertTmsNode(fromTmsNode, merged.groups);
-                    fromNode.idx = merged.nodes.length;
-                    merged.nodes.push(fromNode);
+                    merged.otherTmsNodes.push(fromNode);
                     nodeTmsIdMap[fromNode.tmsNodeId] = fromNode;
                     logger.debug(`added node from tms: ${JSON.stringify(fromNode,null,2)}`);
                 } else if (!toNode) {
                     const toTmsNode = tmsNodeIdMap[route.targetNodeId]
                     toNode = _convertTmsNode(toTmsNode, merged.groups);
-                    toNode.idx = merged.nodes.length;
-                    merged.nodes.push(toNode);
+                    merged.otherTmsNodes.push(toNode);
                     nodeTmsIdMap[toNode.tmsNodeId] = toNode;
                     logger.debug(`added node from tms: ${JSON.stringify(toNode,null,2)}`);
                 } else {
@@ -343,10 +345,10 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
                 }
             }
             // now add route if not done already
-            const routeKey = `${fromNode.idx}-${toNode.idx}`;
+            const routeKey = `${fromNode.tmsNodeId}-${toNode.tmsNodeId}`;
             if (!routeSet.has(routeKey)) {
                 routeSet.add(routeKey);
-                const route = {from: fromNode.idx, to: toNode.idx};
+                const route = {from: fromNode.tmsNodeId, to: toNode.tmsNodeId};
                 merged.routes.push(route);
                 logger.debug(`added route from tms: ${JSON.stringify(route,null,2)}`);
             }
@@ -357,14 +359,10 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
 
 const _convertTmsNode = function(tmsNode, groups) {
     let node = {
-        idx: -1,
         group: -1, // TODO: assign a group for this one
         tmsNode: tmsNode.name,
         tmsNodeId: tmsNode.id,
         tmsUploadAllowed: tmsNode.uploadAllowed,
-        r: {
-            warning: "CAS not connected"
-        }
     };
     _assignOrCreateGroup(node, groups);
     return node;

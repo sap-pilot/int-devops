@@ -178,14 +178,14 @@ const _reorgResources = function(data, typeCounter) {
     const apim = { "i":"APIM", "n": "API Management", "t":"", "v": "", "c": [], "subTypes": {} };
     for ( const entry of data.contentResources ) {
         if (entry.type == "Cloud Integration") {
-            const package = { "i":entry.id, "n": entry.name, "t": entry.subType, "v": entry.version, "c": []};
+            const package = { "i":entry.id, "ri": entry.resourceID, "n": entry.name, "t": entry.type, "st": entry.subType, "v": entry.version, "c": []};
             if (entry.subType) typeCounter[entry.subType] = typeCounter[entry.subType]? typeCounter[entry.subType]+1 : 1;
             if (config.repoUrl) {
                 package.p = `/${entry.id}&version=GBdev`;
-             };
+            };
             if ( entry.components ) {
                 for ( const comp of entry.components ) {
-                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "v": comp.version}
+                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "et": comp.exportable, "v": comp.version}
                     if (comp.type) typeCounter[comp.type] = typeCounter[comp.type]? typeCounter[comp.type]+1 : 1;
                     if (config.repoUrl) {
                         iflow.p = `/${package.i}/${comp.id}_content/&version=GBdev`;
@@ -202,7 +202,7 @@ const _reorgResources = function(data, typeCounter) {
                 apim.c.push(subType);
             }
             if (entry.subType) typeCounter[entry.subType] = typeCounter[entry.subType]? typeCounter[entry.subType]+1 : 1;
-            const apimObj = {"i":entry.id, "n":entry.name || entry.id, "t":entry.subType, "v": entry.version};
+            const apimObj = {"i":entry.id, "ri":entry.resourceID, "n":entry.name || entry.id, "t":entry.type, "st":entry.subType, "v": entry.version};
             subType.c.push(apimObj);
         } else {
             // other entry types are ignored

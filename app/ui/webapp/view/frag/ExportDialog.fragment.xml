@@ -43,7 +43,8 @@
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            valueState="{=${casExport>/sourceNode} === undefined ? 'Error' : 'None'}"
+                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                            valueState="{=${casExport>/sourceNode} === '' ? 'Error' : 'None'}"
                                             valueStateText="Select source node with content agent connected"
                                             selectedKey="{casExport>/sourceNode}"
                                             change=".onExportNodeChange"
@@ -58,8 +59,9 @@
                                 <f:FormElement label="Description">
                                     <f:fields>
                                         <Input value="{casExport>/description}" required="false" 
-                                            valueState="{=${casExport>/description} === undefined ? 'Error' : 'None'}"
-                                            valueStateText="describe the content eg: 'util package from {casExport>/sourceNode}'"
+                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                            valueState="{=${casExport>/description} === '' ? 'Error' : 'None'}"
+                                            valueStateText="Describe the content eg: 'Util package from {casExport>/sourceNode}'"
                                             placeholder="Enter transport description" />
                                     </f:fields>
                                 </f:FormElement>
@@ -72,7 +74,8 @@
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            valueState="{=${casExport>/targetNode} === undefined ? 'Error' : 'None'}"
+                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                            valueState="{=${casExport>/targetNode} === '' ? 'Error' : 'None'}"
                                             valueStateText="Select target TMS node with upload allowed"
                                             selectedKey="{casExport>/targetNode}"
                                             change=".onExportNodeChange"
@@ -86,8 +89,10 @@
                                 </f:FormElement>
                                 <f:FormElement label="Result">
                                     <f:fields>
-                                        <Input value="Not initiated" editable="false"/>
-                                        <Link text="TR not available">
+                                        <Input value="{casExport>/result/message}" editable="false"/>
+                                        <Link text="{=${casExport>/result/tr}?${casExport>/result/tr}:'TR not available'}" 
+                                                href="{casResources>/value/tmsUrl}#/transportRequest/{casExport>/result/tr}"
+                                                target="_blank">
                                             <layoutData>
                                                 <l:GridData span="XL2 L2 M4 S4" />
                                             </layoutData>
@@ -102,7 +107,7 @@
                     id="exportTreeTable"
                     busy="{viewState>/busy}"
                     busyIndicatorDelay="0"
-                    rows="{path:'casExport>/value/c', parameters: {arrayNames:['c']}}"
+                    rows="{path:'casExport>/contentResources/c', parameters: {arrayNames:['c']}}"
                     selectionMode="None"
                     enableSelectAll="false"
                     width="100%"
@@ -170,10 +175,10 @@
 					<Button
 						icon="sap-icon://shipping-status"
 						type="Emphasized"
-						text="Export to TMS (not available yet)"
+						text="{=${appState>/liveMode}? 'Export to TMS' : 'Export to TMS (Not available for DEMO mode)'}"
 						tooltip="Export selected artifacts to TMS"
 						press=".onExportToTMS()" 
-                        enabled="false"/>
+                        enabled="{=${appState>/liveMode} &amp;&amp; !${viewState>/busyExporting} &amp;&amp; ${casExport>/sourceNode} !== '' &amp;&amp; ${casExport>/targetNode} !== '' &amp;&amp;${casExport>/description} !== '' &amp;&amp; !${casExport>/exported}}"/>
 					<Button 
 						text="Close"
 						press=".closeExportDialog" />

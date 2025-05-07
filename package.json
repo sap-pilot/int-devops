@@ -23,6 +23,8 @@
     "gen-env": "export CF_APP_NAME=int-devops-srv && curl https://raw.githubusercontent.com/sap-pilot/btp-util/main/cf/gen-default-env.js | node",
     "logs-app": "cf logs int-devops-app | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",
     "logs-srv": "cf logs int-devops-srv | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",
+    "logs-app-recent": "cf logs int-devops-app --recent | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",
+    "logs-srv-recent": "cf logs int-devops-srv --recent | grep -v -E \"\\[RTR|\\[API|\\[CELL|\\[PROXY|\\[STG|OUT {\" --line-buffered | sed -E \"s/^[^T]+T([^.]+)(.+)(OUT|ERR)(.+)/\\1\\4/g\"",
     "start": "cds-serve",
     "start:debug": "npx -n=\"--inspect\" cds-serve",
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -7,6 +7,7 @@ const { getContentResources } = require("./lib/cas");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
+    srv.on("export", handleExport);
 });
 
 /**
@@ -80,4 +81,18 @@ const getResources = async function(req) {
     const durationMs = Date.now() - startTime;
     logger.debug(`completed serving contentResource, takes time ${durationMs} ms`);
     return data;
+}
+
+const handleExport = async function(req) {  
+    const sPayload = req.data?.payload;
+    const userId = req.user?.id; 
+    const startTime = Date.now();
+    logger.info(`handling export request from user ${userId}`);
+    const oPayload = JSON.parse(sPayload);
+    logger.debug(`export payload: ${JSON.stringify(oPayload,null,2)}`);
+    await new Promise(r => setTimeout(r, 5000));
+    const durationMs = Date.now() - startTime;
+    const response = {"message":"Export completed","tr":"193861"};
+    logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(response)}`);
+    return response;
 }

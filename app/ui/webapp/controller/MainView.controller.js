@@ -20,7 +20,8 @@ sap.ui.define([
         onInit: function () {
 
 			this.oViewStateModel = new JSONModel({
-				busy: true
+				busy: true,
+				busyExporting: false
 			});
 			this.getView().setModel(this.oViewStateModel,"viewState");
 
@@ -342,7 +343,7 @@ sap.ui.define([
 
 		onTreeSelectionChange: function(oEvent) {
 			const oParams = oEvent.getParameters();
-			//console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}, userInteraction? ${oParams.userInteraction}`);
+			console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}, userInteraction? ${oParams.userInteraction}`);
 			if (this.bSuppressSelectionEvent || !oParams.userInteraction) {
 				return; 
 			}
@@ -368,7 +369,7 @@ sap.ui.define([
 			const aSelectedEntries = [], aSelectedTransportableEntries = [], aAllEntries = [];
 			this.addSelectedEntries(oRootEntry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
 			// update selection
-			// console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
+			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
 			this.oCasResourcesTable.clearSelection();
 			for (let i = 0; i < aAllEntries.length; i++) {
 				const oRowContext = this.oCasResourcesTable.getContextByIndex(i);
@@ -423,12 +424,22 @@ sap.ui.define([
 			// build export model base on selected tree entries
 			const oContentResources = this.oCasResourcesModel.getProperty("/value");
 			const aCasNodes = oContentResources?.casNodes || [];
-			const oFilteredRoot = this.filterSelectedTree(oContentResources);
+			const oFilteredRoot = {c:this.filterSelectedTree(oContentResources).c}; // keep only content resources
 			if (!this.oCasExportModel) {
 				this.oCasExportModel = new JSONModel();
+				this.getView().setModel(this.oCasExportModel,"casExport");
 			}
-			this.oCasExportModel.setProperty("/value",oFilteredRoot);
-			this.getView().setModel(this.oCasExportModel,"casExport");
+			this.oCasExportModel.setData({
+				sourceNode: '',
+				targetNode: '',
+				description: '',
+				nonExistEntriesCount: 0,
+				exported: false,
+				contentResources: oFilteredRoot, // content resources
+				result: {
+					message: "Not initiated"
+				}
+			})
 			if (!this.oExportDialog) {
 				Fragment.load({
 					id: this.getView().getId(),
@@ -474,9 +485,9 @@ sap.ui.define([
 					columns[node.idx+3].setVisible(false);
 				}
 			}
-			const oCasExportRoot = this.oCasExportModel.getProperty("/value");
+			const oCasExportRoot = this.oCasExportModel.getProperty("/contentResources");
 			this.updateVerisonCompareStatus(oCasExportRoot,selectedIndexSet); // update compare status "s"
-			this.oCasExportModel.setProperty("/value",oCasExportRoot);
+			this.oCasExportModel.setProperty("/contentResources",oCasExportRoot);
 
 			// count nonexist entries in source
 			let oSourceNode = nodes.find(node => node.tmsNode === sSourceNode);
@@ -495,6 +506,42 @@ sap.ui.define([
 				}
 			}
 			return cnt;
+		},
+
+		onExportToTMS: function() {
+			this.oViewStateModel.setProperty("/busyExporting",true);
+			this.oCasExportModel.setProperty("/result/message","Export in progress");
+			let oExportData = this.oCasExportModel.getData();
+			debugger;
+			fetch("/srv/cas/export", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({payload:JSON.stringify(oExportData)}) // urgly but seems to be the only way to pass any/tree object type
+			})
+			.then(response => {
+				if (!response.ok) {
+				  	throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.json(); // or response.text(), response.blob(), etc.
+			})
+			.then(this.handleExportResponse.bind(this))
+			.catch(function(error) {
+				Common.reportError(error, "Error exporting to TMS", null);
+				this.oCasExportModel.setProperty("/result/message","Error during export");
+			}.bind(this))
+			.finally(function(){
+				this.oViewStateModel.setProperty("/busyExporting",false);
+			}.bind(this));
+		},
+
+		handleExportResponse: function(response) {
+			console.log(response);
+			if (response?.value) {
+				this.oCasExportModel.setProperty("/result",response.value);
+				this.oCasExportModel.setProperty("/exported", true);
+			} 
 		}
 	});
 

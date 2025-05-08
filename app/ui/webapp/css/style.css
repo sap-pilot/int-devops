@@ -102,3 +102,11 @@ div.sapMTabContainer > .sapMTabStripContainer > .sapMTabStrip > .sapMTSTabsConta
 .sapMSwtLabel {
   font-size: 9px !important;
 }
+
+h6.sapMWizardStepTitle {
+  display: none;
+}
+
+div.sapSuiteUiCommonsTimelineHeaderBar {
+  display: none;
+}

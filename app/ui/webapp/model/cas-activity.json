@@ -1,0 +1,53 @@
+{
+    "activityId": "6558f6c4-2bd6-11f0-91d8-eeee0a84b499",
+    "processId": "6558f6c4-2bd6-11f0-91d8-eeee0a84b499",
+    "processType": "MTAR_EXPORT",
+    "startedAt": "2025-05-08T06:33:47.000+00:00",
+    "endedAt": "2025-05-08T06:33:54.038+00:00",
+    "state": "FINISHED",
+    "progress": 100,
+    "messages": [
+        {
+            "id": "acdf8a99-0f0e-4fdf-845f-80f49e9e34ae",
+            "text": "Export process has Initialized ",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:47.204+00:00"
+        },
+        {
+            "id": "ebb21b11-9d0d-4570-9b19-82dd7ff8480d",
+            "text": "Export process has started ",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:47.218+00:00"
+        },
+        {
+            "id": "2ad1a628-d89f-456d-8e49-efb0d05ed126",
+            "text": "Content is fetched for module Generic Utilities ",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:47.893+00:00"
+        },
+        {
+            "id": "c5242fad-725f-4fb6-900e-47527eac372b",
+            "text": "Valid required section updated for the module Generic Utilities",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:48.108+00:00"
+        },
+        {
+            "id": "9923c2cd-71d5-48f6-bb32-99f9e5530f49",
+            "text": "MTAR creation has started",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:48.194+00:00"
+        },
+        {
+            "id": "044432c4-4eb6-4c17-8d3f-b8933148e0a7",
+            "text": "MTAR creation is successful",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:49.252+00:00"
+        },
+        {
+            "id": "8bde40e8-6f65-401a-b065-61931b20509a",
+            "text": "Content Transported successfully in TMS with fileId 193937 and trId 193943 for process instance with id 6558f6c4-2bd6-11f0-91d8-eeee0a84b499",
+            "type": "INFO",
+            "timestamp": "2025-05-08T06:33:54.006+00:00"
+        }
+    ]
+}

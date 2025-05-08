@@ -1,185 +1,207 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
+    xmlns:commons="sap.suite.ui.commons"
     xmlns:l="sap.ui.layout"
 	xmlns:f="sap.ui.layout.form"
 	xmlns:core="sap.ui.core"
 	xmlns:table="sap.ui.table">
 	<Dialog title="Export ({casResources>/value/selectedTransportableEntries}) selected artifacts"
-        resizable="true" draggable="true" contentWidth="980px" contentHeight="700px" 
+        resizable="true" draggable="true" contentWidth="980px" contentHeight="710px" 
         horizontalScrolling="false" verticalScrolling="false">
 		<content>
-			<VBox class="sapUiSmallMargin sapUiNoMarginTop">
-                <f:Form id="exportForm" editable="true">
-                    <!-- <f:layout>
-                        <f:ColumnLayout
-                            columnsS="1"
-                            columnsM="2"
-                            columnsL="2"
+			<Wizard id="casExportWizard"
+                    showNextButton="true"
+                    renderMode="Page"
+                    stepTitleLevel="H6"
+                    complete="wizardCompletedHandler">
+                <WizardStep id="casExportRequestStep"
+                            title="Enter parameters"
+                            validated="true">
+                    <f:Form id="exportForm" editable="true">
+                        <f:layout>
+                        <f:ResponsiveGridLayout
+                            labelSpanXL="3"
+                            labelSpanL="3"
+                            labelSpanM="4"
+                            labelSpanS="12"
+                            adjustLabelSpan="false"
+                            emptySpanXL="0"
+                            emptySpanL="0"
+                            emptySpanM="0"
+                            emptySpanS="0"
                             columnsXL="2"
-                        />
-                    </f:layout> -->
-                    <f:layout>
-                    <f:ResponsiveGridLayout
-                        labelSpanXL="3"
-                        labelSpanL="3"
-                        labelSpanM="4"
-                        labelSpanS="12"
-                        adjustLabelSpan="false"
-                        emptySpanXL="0"
-                        emptySpanL="0"
-                        emptySpanM="0"
-                        emptySpanS="0"
-                        columnsXL="2"
-                        columnsL="2"
-                        columnsM="2"
-                        columnsS="1"
-                        singleContainerFullSize="false" />
-                    </f:layout>
-                    <f:formContainers>
-                        <f:FormContainer>
-                            <f:formElements>
-                                <f:FormElement label="Source Node">
-                                    <f:fields>
-                                        <Select
-                                            forceSelection="false"
-                                            required="true"
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
-                                            valueState="{=${casExport>/sourceNode} === '' ? 'Error' : 'None'}"
-                                            valueStateText="Select source node with content agent connected"
-                                            selectedKey="{casExport>/sourceNode}"
-                                            change=".onExportNodeChange"
-                                            items="{
-                                                path: 'casResources>/allowExportNodes',
-                                                sorter: { path: 'tmsNode' }
-                                            }">
-                                            <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
-                                        </Select>
-                                    </f:fields>
-                                </f:FormElement>
-                                <f:FormElement label="Description" style="margin-top: 20px">
-                                    <f:fields>
-                                        <Input value="{casExport>/description}" required="false" 
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
-                                            valueState="{=${casExport>/description} === '' ? 'Error' : 'None'}"
-                                            valueStateText="Describe the content eg: 'Util package from {casExport>/sourceNode}'"
-                                            placeholder="Enter transport description" />
-                                    </f:fields>
-                                </f:FormElement>
-                            </f:formElements>
-                        </f:FormContainer>
-                        <f:FormContainer>
-                            <f:formElements>
-                                <f:FormElement label="Target TMS Node">
-                                    <f:fields>
-                                        <Select
-                                            forceSelection="false"
-                                            required="true"
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
-                                            valueState="{=${casExport>/targetNode} === '' ? 'Error' : 'None'}"
-                                            valueStateText="Select target TMS node with upload allowed"
-                                            selectedKey="{casExport>/targetNode}"
-                                            change=".onExportNodeChange"
-                                            items="{
-                                                path: 'casResources>/allowUploadNodes',
-                                                sorter: { path: 'tmsNode' }
-                                            }">
-                                            <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
-                                        </Select>
-                                    </f:fields>
-                                </f:FormElement>
-                                <f:FormElement label="Result" style="margin-top: 20px">
-                                    <f:fields>
-                                        <ProgressIndicator
-                                            id="exportProgress"
-                                            state="Information"
-                                            displayValue="{casExport>/result/message}"
-                                            percentageValue="0"
-                                            displayOnly="true"
-                                            displayAnimation="true" />
-                                        <!-- <Text text="{casExport>/result/message}"/>
-                                        <Link text="TR: {casExport>/result/tr}" 
-                                                visible="{= ${casExport>/result/tr} !== undefined }"
-                                                href="{casResources>/value/tmsUrl}#/transportRequest/{casExport>/result/tr}"
-                                                target="_blank">
-                                            <layoutData>
-                                                <l:GridData span="XL2 L2 M3 S3" />
-                                            </layoutData>
-                                        </Link> -->
-                                    </f:fields>
-                                </f:FormElement>
-                            </f:formElements>
-                        </f:FormContainer>
-                    </f:formContainers>
-                </f:Form>
-                <table:TreeTable
-                    id="exportTreeTable"
-                    busy="{viewState>/busy}"
-                    busyIndicatorDelay="0"
-                    rows="{path:'casExport>/contentResources/c', parameters: {arrayNames:['c']}}"
-                    selectionMode="None"
-                    enableSelectAll="false"
-                    width="100%"
-                    ariaLabelledBy="title">
-                    <table:rowMode>
-                        <rowmodes:Interactive rowCount="17" xmlns:rowmodes="sap.ui.table.rowmodes" />
-                    </table:rowMode>
-                    <table:rowSettingsTemplate>
-                        <table:RowSettings highlight="{
-                            path: 'casExport>s',
-                            formatter: '.formatter.statusHighlight'
-                        }" highlightText="{casExport>s}"/>
-                    </table:rowSettingsTemplate>
-                    <table:columns>
-                        <table:Column width="24rem">
-                            <Label text="Content Resources"/>
-                            <table:template>
-                                <Link text="{casExport>n}" wrapping="false" 
-                                    href="{casResources>/value/repoUrl}{casExport>p}" target="_blank"/>
-                            </table:template>
-                        </table:Column>
-                        <table:Column width="17rem">
-                            <Label text="ID"/>
-                            <table:template>
-                                <Text text="{casExport>i}" wrapping="false" />
-                            </table:template>
-                        </table:Column>
-                        <table:Column width="6rem">
-                            <Label text="Sub-Type/Type"/>
-                            <table:template>
-                                <Text text="{=${casExport>st} === undefined? ${casExport>t} : ${casExport>st}}" wrapping="false" />
-                            </table:template>
-                        </table:Column>
-                        <!-- <table:Column width="5rem">
-                            <Label text="PRE"/>
-                            <table:template>
-                                <Text text="{casExport>v0}" wrapping="false" />
-                            </table:template>
-                        </table:Column>
-                        <table:Column width="5rem">
-                            <Label text="DEV2"/>
-                            <table:template>
-                                <Text text="{casExport>v1}" wrapping="false" />
-                            </table:template>
-                        </table:Column> -->
-                    </table:columns>
-                </table:TreeTable>
-            </VBox>
+                            columnsL="2"
+                            columnsM="2"
+                            columnsS="1"
+                            singleContainerFullSize="false" />
+                        </f:layout>
+                        <f:formContainers>
+                            <f:FormContainer>
+                                <f:formElements>
+                                    <f:FormElement label="Source Node">
+                                        <f:fields>
+                                            <Select
+                                                forceSelection="false"
+                                                required="true"
+                                                editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                                valueState="{=${casExport>/sourceNode} === '' ? 'Error' : 'None'}"
+                                                valueStateText="Select source node with content agent connected"
+                                                selectedKey="{casExport>/sourceNode}"
+                                                change=".onExportNodeChange"
+                                                items="{
+                                                    path: 'casResources>/allowExportNodes',
+                                                    sorter: { path: 'tmsNode' }
+                                                }">
+                                                <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
+                                            </Select>
+                                        </f:fields>
+                                    </f:FormElement>
+                                    <f:FormElement label="Description" style="margin-top: 20px">
+                                        <f:fields>
+                                            <Input value="{casExport>/description}" required="false" 
+                                                editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                                valueState="{=${casExport>/description} === '' ? 'Error' : 'None'}"
+                                                valueStateText="Describe the content eg: 'Util package from {casExport>/sourceNode}'"
+                                                placeholder="Enter transport description" />
+                                        </f:fields>
+                                    </f:FormElement>
+                                </f:formElements>
+                            </f:FormContainer>
+                            <f:FormContainer>
+                                <f:formElements>
+                                    <f:FormElement label="Target TMS Node">
+                                        <f:fields>
+                                            <Select
+                                                forceSelection="false"
+                                                required="true"
+                                                editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                                valueState="{=${casExport>/targetNode} === '' ? 'Error' : 'None'}"
+                                                valueStateText="Select target TMS node with upload allowed"
+                                                selectedKey="{casExport>/targetNode}"
+                                                change=".onExportNodeChange"
+                                                items="{
+                                                    path: 'casResources>/allowUploadNodes',
+                                                    sorter: { path: 'tmsNode' }
+                                                }">
+                                                <core:Item key="{casResources>tmsNode}" text="{casResources>tmsNode}" />
+                                            </Select>
+                                        </f:fields>
+                                    </f:FormElement>
+                                    <f:FormElement label="Validation" style="margin-top: 20px">
+                                        <f:fields>
+                                       
+                                            <!-- <ProgressIndicator
+                                                id="exportProgress"
+                                                state="Information"
+                                                displayValue="{casExport>/result/message}"
+                                                percentageValue="0"
+                                                displayOnly="true"
+                                                displayAnimation="true" /> -->
+                                            <!-- <Text text="{casExport>/result/message}"/> -->
+                                            <!--
+                                            <Link text="TR: {casExport>/result/tr}" 
+                                                    visible="{= ${casExport>/result/tr} !== undefined }"
+                                                    href="{casResources>/value/tmsUrl}#/transportRequest/{casExport>/result/tr}"
+                                                    target="_blank">
+                                                <layoutData>
+                                                    <l:GridData span="XL2 L2 M3 S3" />
+                                                </layoutData>
+                                            </Link> -->
+                                        </f:fields>
+                                    </f:FormElement>
+                                </f:formElements>
+                            </f:FormContainer>
+                        </f:formContainers>
+                    </f:Form>
+                    <table:TreeTable
+                        id="exportTreeTable"
+                        busy="{viewState>/busy}"
+                        busyIndicatorDelay="0"
+                        rows="{path:'casExport>/contentResources/c', parameters: {arrayNames:['c']}}"
+                        selectionMode="None"
+                        enableSelectAll="false"
+                        width="100%"
+                        ariaLabelledBy="title">
+                        <table:rowMode>
+                            <rowmodes:Interactive rowCount="13" xmlns:rowmodes="sap.ui.table.rowmodes" />
+                        </table:rowMode>
+                        <table:rowSettingsTemplate>
+                            <table:RowSettings highlight="{
+                                path: 'casExport>s',
+                                formatter: '.formatter.statusHighlight'
+                            }" highlightText="{casExport>s}"/>
+                        </table:rowSettingsTemplate>
+                        <table:columns>
+                            <table:Column width="24rem">
+                                <Label text="Content Resources"/>
+                                <table:template>
+                                    <Link text="{casExport>n}" wrapping="false" 
+                                        href="{casResources>/value/repoUrl}{casExport>p}" target="_blank"/>
+                                </table:template>
+                            </table:Column>
+                            <table:Column width="17rem">
+                                <Label text="ID"/>
+                                <table:template>
+                                    <Text text="{casExport>i}" wrapping="false" />
+                                </table:template>
+                            </table:Column>
+                            <table:Column width="6rem">
+                                <Label text="Sub-Type/Type"/>
+                                <table:template>
+                                    <Text text="{=${casExport>st} === undefined? ${casExport>t} : ${casExport>st}}" wrapping="false" />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:TreeTable>
+                </WizardStep>
+                <WizardStep id="casExportResponseStep"
+                            title="Export result"
+                            validated="false">
+                    <ProgressIndicator
+                        class="sapUiSmallMarginBottom"
+                        percentValue="66"
+                        displayValue="Export in progerss: 66%"
+                        showValue="true"
+                        state="Information" />
+                    	<commons:Timeline
+                            id="casExportTimeline"
+                            width="100%"
+                            showItemFilter="false"
+                            showSearch="false"
+                            showSort="false"
+                            showSuggestion="false"
+                            showTimeFilter="false"
+                            enableDoubleSided="false"
+                            sortOldestFirst="false"
+                            groupBy="HireDate"
+                            growingThreshold="0"
+                            icon="sap-icon://message-information"
+                            content="{casExportResult>/messages}">
+                            <commons:content>
+                                <commons:TimelineItem
+                                    id="casExportTimelineItem"
+                                    dateTime="{casExportResult>timestamp}"
+                                    text="{casExportResult>text}">
+                                </commons:TimelineItem>
+                            </commons:content>
+                        </commons:Timeline>
+                </WizardStep>
+            </Wizard>
 		</content>
 		<footer>
 			<Toolbar>
-				<content>
-					 <!-- <ProgressIndicator
-                        id="exportProgress"
-                        state="Information"
-                        displayOnly="true"
-                        displayAnimation="true" /> -->
-                    <GenericTag class="sapUiNoMarginTop sapUiNoMarginBottom"
-                        visible="{=${casExport>/nonExistEntriesCount} > 0}"
-                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) not found in source node, export will skip them" status="Warning" />
-
-                    <!-- <Label
-                        icon="sap-icon://shipping-status"
-                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) doesnt exist in source node" /> -->
+				<content>					 
+                    <MessageStrip
+                        text="{casExport>/validation/message}"
+                        visible="{=${casExport>/validation/message} !== ''}"
+                        type="{casExport>/validation/type}"
+                        showIcon="true"
+                        showCloseButton="false">
+                    </MessageStrip>
+                    <!-- <GenericTag class="sapUiNoMarginTop sapUiNoMarginBottom"
+                        visible="{=${casExport>/validation/status} !== 'None'}"
+                        text="{casExport>/validation/message}" 
+                        status="{casExport>/validation/status}" /> -->
 					<ToolbarSpacer />
 					<Button
 						icon="sap-icon://shipping-status"

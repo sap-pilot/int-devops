@@ -96,9 +96,9 @@ const handleExport = async function(req) {
     logger.info(`handling export request: ${JSON.stringify(oPayload,null,2)}`);
     // await new Promise(r => setTimeout(r, 5000));
     const durationMs = Date.now() - startTime;
-    const result = await exportContent(oPayload) || {};
-    result.message = "Export completed";
-    result.tr = "193861";
+    //const result = await exportContent(oPayload) || {};
+    const rawData = fs.readFileSync('./srv/tmp/cas-activity.json', 'utf8');
+    const result = JSON.parse(rawData);
     logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(result)}`);
     return result;
 }

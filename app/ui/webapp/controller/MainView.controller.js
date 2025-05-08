@@ -425,6 +425,9 @@ sap.ui.define([
 			const oContentResources = this.oCasResourcesModel.getProperty("/value");
 			const aCasNodes = oContentResources?.casNodes || [];
 			const oFilteredRoot = {c:this.filterSelectedTree(oContentResources).c}; // keep only content resources
+			// if (!this.oCasExportResultModel)
+			// 	this.oCasExportResultModel = new JSONModel("./model/cas-activity.json");
+			// this.getView().setModel(this.oCasExportResultModel,"casExportResult");
 			if (!this.oCasExportModel) {
 				this.oCasExportModel = new JSONModel();
 				this.getView().setModel(this.oCasExportModel,"casExport");
@@ -436,6 +439,10 @@ sap.ui.define([
 				nonExistEntriesCount: 0,
 				exported: false,
 				contentResources: oFilteredRoot, // content resources
+				validation: {
+					type: "Information",
+					message: ""
+				},
 				result: {
 					message: "Not initiated"
 				}
@@ -492,7 +499,19 @@ sap.ui.define([
 			// count nonexist entries in source
 			let oSourceNode = nodes.find(node => node.tmsNode === sSourceNode);
 			const cnt = oSourceNode?.idx ? this.countNonExistEntries(oCasExportRoot, `v${oSourceNode.idx}`) : 0;
-			this.oCasExportModel.setProperty("/nonExistEntriesCount", cnt);
+			if (cnt > 0) {
+				//selected arfifact(s) not found in source node, export will skip them
+				this.oCasExportModel.setProperty("/validation", {
+					"type": "Warning",
+					"message": `${cnt} artifact(s) not found in ${sSourceNode}.`
+				});
+			} else {
+				this.oCasExportModel.setProperty("/validation", {
+					"type": "Information",
+					"message": ``
+				});
+			}
+			
 			//console.log(`idx: ${oSourceNode?.idx}, nonExistEntriesCount: ${cnt}`);
 		},
 
@@ -594,8 +613,11 @@ sap.ui.define([
 		handleExportResponse: function(response) {
 			console.log(response);
 			if (response?.value) {
-				this.oCasExportModel.setProperty("/result",response.value);
 				this.oCasExportModel.setProperty("/exported", true);
+				if (!this.oCasExportResultModel)
+					this.oCasExportResultModel = new JSONModel();
+				this.oCasExportResultModel.setData(response.value);
+				this.getView().setModel(this.oCasExportResultModel,"casExportResult");
 			} 
 		}
 	});

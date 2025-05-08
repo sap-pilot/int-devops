@@ -155,9 +155,9 @@
 										</table:template>
 									</table:Column>
 									<table:Column width="7rem">
-										<Label text="Sub-Type"/>
+										<Label text="Sub-Type/Type"/>
 										<table:template>
-											<Text text="{casResources>t}" wrapping="false" />
+											<Text text="{=${casResources>st} === undefined? ${casResources>t} : ${casResources>st}}" wrapping="false" />
 										</table:template>
 									</table:Column>
 									<!-- <table:Column width="5rem">

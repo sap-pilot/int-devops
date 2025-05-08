@@ -508,17 +508,72 @@ sap.ui.define([
 			return cnt;
 		},
 
+		/** build export payload accoding to: https://api.sap.com/api/contentagentapi/path/%2Fcontent-export */
+		buildExportPayload: function() {
+			const aCasNodes = this.oCasResourcesModel.getProperty("/value/casNodes");
+			const aAllNodes = this.oCasResourcesModel.getProperty("/allNodes");
+			const sSourceNode = this.oCasExportModel.getProperty("/sourceNode");
+			const sTargetNode = this.oCasExportModel.getProperty("/targetNode");
+			const sDescription = this.oCasExportModel.getProperty("/description");
+			const aResourceRoot = this.oCasExportModel.getProperty("/contentResources");
+			const oSourceNode = aCasNodes.find(node => node.tmsNode === sSourceNode);
+			const oTargetNode = aAllNodes.find(node => node.tmsNode === sTargetNode);
+			if (!oSourceNode || !oTargetNode) {
+				return;
+			}
+			const iSourceIndex = oSourceNode.idx;
+			const aContentResources = [];
+			this.flatternExportTree(aResourceRoot, iSourceIndex, aContentResources);
+			const oPayload = { 
+				id: `int-devops-export-${Date.now()}`, // api doc is wrong.. specify id here instead of activityId
+				version: "1.0.0",
+				requestor: "int-devops-ui",
+				exportMode: "TransportManagementService",
+				exportMediaType: "MTAR",
+				sourceNode: sTargetNode,
+				description: sDescription,
+				transportUser: "", // to be replaced with actual user id in srv/lib/cas.js
+				contentResources: aContentResources
+			};
+			this.oLastPayload = oPayload;
+			const oRequest = {
+				casDestination: oSourceNode.casDest,
+				targetTmsNodeId: oTargetNode.tmsNodeId,
+				countContentResources : aContentResources.length,
+				payload: JSON.stringify(oPayload)// urgly but seems to be the only way to pass any/tree object type
+			}  
+			return oRequest;
+		},
+
+		/** flattern and convert content resources */
+		flatternExportTree: function(entry, iSourceIndex, aExportResources) {
+			const vProp = `v${iSourceIndex}`;
+			const oContent = {id: entry.i, resourceID: entry.ri, name: entry.n, version: entry[vProp], type: entry.t, subType: entry.st};
+			if (oContent.type && oContent.version != '-') {
+				aExportResources.push(oContent);
+			}
+			if (entry.c && entry.c.length > 0) {
+				const arrayToPush = oContent.type == 'Cloud Integration' && oContent.subType == 'package' ? oContent.components = [] : aExportResources;
+				for (let child of entry.c) {
+					this.flatternExportTree(child, iSourceIndex, arrayToPush);
+				}
+			}			
+		},
+
 		onExportToTMS: function() {
+			let oExportData = this.buildExportPayload();
+			if (!oExportData || oExportData.countContentResources == 0) {
+				this.oCasExportModel.setProperty("/result/message","Nothing to export");
+				return; 
+			}
 			this.oViewStateModel.setProperty("/busyExporting",true);
 			this.oCasExportModel.setProperty("/result/message","Export in progress");
-			let oExportData = this.oCasExportModel.getData();
-			debugger;
 			fetch("/srv/cas/export", {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({payload:JSON.stringify(oExportData)}) // urgly but seems to be the only way to pass any/tree object type
+				body: JSON.stringify(oExportData) 
 			})
 			.then(response => {
 				if (!response.ok) {
@@ -528,8 +583,8 @@ sap.ui.define([
 			})
 			.then(this.handleExportResponse.bind(this))
 			.catch(function(error) {
-				Common.reportError(error, "Error exporting to TMS", null);
 				this.oCasExportModel.setProperty("/result/message","Error during export");
+				Common.reportError(error, "Error exporting to TMS", null);
 			}.bind(this))
 			.finally(function(){
 				this.oViewStateModel.setProperty("/busyExporting",false);

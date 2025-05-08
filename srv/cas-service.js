@@ -3,7 +3,7 @@ const path = require("path");
 const cds = require("@sap/cds");
 const { logger } = require("./lib/logger");
 const { config } = require("./lib/config");
-const { getContentResources } = require("./lib/cas");
+const { getContentResources, exportContent } = require("./lib/cas");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
@@ -84,15 +84,21 @@ const getResources = async function(req) {
 }
 
 const handleExport = async function(req) {  
-    const sPayload = req.data?.payload;
-    const userId = req.user?.id; 
     const startTime = Date.now();
-    logger.info(`handling export request from user ${userId}`);
-    const oPayload = JSON.parse(sPayload);
-    logger.debug(`export payload: ${JSON.stringify(oPayload,null,2)}`);
-    await new Promise(r => setTimeout(r, 5000));
+    const oPayload = {
+        userId: req.user?.id,
+        casDestination: req.data?.casDestination,
+        targetTmsNodeId : req.data?.targetTmsNodeId,
+        countContentResources: req.data?.countContentResources,
+        payload: JSON.parse(req.data?.payload)
+    }
+    oPayload.payload.transportUser = req.user?.id;
+    logger.info(`handling export request: ${JSON.stringify(oPayload,null,2)}`);
+    // await new Promise(r => setTimeout(r, 5000));
     const durationMs = Date.now() - startTime;
-    const response = {"message":"Export completed","tr":"193861"};
-    logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(response)}`);
-    return response;
+    const result = await exportContent(oPayload) || {};
+    result.message = "Export completed";
+    result.tr = "193861";
+    logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(result)}`);
+    return result;
 }

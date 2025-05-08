@@ -10,3 +10,45 @@ grant_type=client_credentials&client_id={{casClientId}}&client_secret={{casClien
 GET {{casUrl}}/v1/contentResources?filters=(type eq 'API Management') or (type eq 'Cloud Integration')
 Authorization: Bearer {{casLogin.response.body.access_token}}
 Accept: application/json
+
+###
+# @name casExportContentResources
+POST {{casUrl}}/v1/contentResources/export
+Authorization: Bearer {{casLogin.response.body.access_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "id": "int-devops-export-1746682816653",
+    "version": "1.0.0",
+    "requestor": "int-devops-ui",
+    "exportMode": "TransportManagementService",
+    "exportMediaType": "MTAR",
+    "sourceNode": "INT_DEV2",
+    "description": "CICDDemoPackage from STAGING",
+    "transportUser": "techscp@chevron.com",
+    "contentResources": [
+      {
+        "id": "CICDDemoPackage",
+        "resourceID": "d263867cf3de40f4b8e4b83cf83d81ba",
+        "name": "CICDDemoPackage",
+        "version": "",
+        "type": "Cloud Integration",
+        "subType": "package",
+        "components": [
+          {
+            "id": "7df927a9376a405db163e5a9bb169c01",
+            "name": "TestFlow",
+            "version": "1.0.1",
+            "type": "IFlow"
+          }
+        ]
+      }
+    ]
+  }
+
+###
+# @name casGetActivity
+GET {{casUrl}}/v1/operations/{{casExportContentResources.response.body.activityId}}
+Authorization: Bearer {{casLogin.response.body.access_token}}
+Accept: application/json

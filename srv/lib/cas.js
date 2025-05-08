@@ -233,7 +233,7 @@ const _recursiveMerge = function(obj, merged, vProp, iNodes) {
     for (const entry of obj.c) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {
-            mergedEntry = {"i":entry.i, "n":entry.n,"t":entry.t,"table":{}};
+            mergedEntry = {"i":entry.i, "ri":entry.ri, "n":entry.n, "t":entry.t, "st":entry.st, "table":{}};
             // enter initial/non-exist version for each node 
             for ( let i = 0; i < iNodes; i++) {
                 mergedEntry[`v${i}`] = '-';
@@ -271,8 +271,8 @@ const _assignOrCreateGroup = function(node, groups) {
         groupName = "Staging";
     } else if (nodeName.includes("pre") || nodeName.includes("qa") ) {
         groupName = "Preprod";
-    } else if (nodeName.includes("sbx") || nodeName.includes("sandbox") ) {
-        groupName = "Sandbox";
+    } else if (nodeName.includes("sbx") || nodeName.includes("sandbox") || nodeName.includes("virtual") ) {
+        groupName = "Sandbox/Virtual";
     } else if (nodeName.includes("prod")) {
         groupName = "Production";
     } else {
@@ -368,4 +368,25 @@ const _convertTmsNode = function(tmsNode, groups) {
     return node;
 }
 
-module.exports = { getContentResources };
+const exportContent = async function(payload) {
+    if (!payload?.casDestination || !payload?.targetTmsNodeId) {
+        throw new Error(`Invalid parameters, casDestination: ${payload?.casDestination}, tmsNodeId: ${payload?.targetTmsNodeId}`);
+    }
+    if (!payload.casDestination.startsWith(config.casDestinationPrefix)) {
+        throw new Error(`Invalid casDestination '${payload.casDestination}', must start with ${config.casDestinationPrefix}`);
+    }
+    if (!payload?.payload?.contentResources || payload.payload.contentResources.length == 0) {
+        throw new Error(`Invalid payload, no contentResources found`);
+    }
+    let response = await executeHttpRequest({destinationName: payload.casDestination}, { 
+        method: "POST",
+        url: "/v1/contentResources/export",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        data: payload.payload
+    })
+    return response?.data;
+}
+
+module.exports = { getContentResources, exportContent };

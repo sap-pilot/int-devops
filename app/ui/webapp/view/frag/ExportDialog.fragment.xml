@@ -22,32 +22,32 @@
                     <f:ResponsiveGridLayout
                         labelSpanXL="3"
                         labelSpanL="3"
-                        labelSpanM="4"
+                        labelSpanM="3"
                         labelSpanS="12"
                         adjustLabelSpan="false"
                         emptySpanXL="0"
                         emptySpanL="0"
                         emptySpanM="0"
                         emptySpanS="0"
-                        columnsXL="2"
-                        columnsL="2"
-                        columnsM="2"
+                        columnsXL="3"
+                        columnsL="3"
+                        columnsM="3"
                         columnsS="1"
                         singleContainerFullSize="false" />
                     </f:layout>
                     <f:formContainers>
                         <f:FormContainer>
                             <f:formElements>
-                                <f:FormElement label="Source Node">
+                                <f:FormElement label="Source">
                                     <f:fields>
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                            editable="{=!${viewState>/busyExporting}}"
                                             valueState="{=${casExport>/sourceNode} === '' ? 'Error' : 'None'}"
                                             valueStateText="Select source node with content agent connected"
                                             selectedKey="{casExport>/sourceNode}"
-                                            change=".onExportNodeChange"
+                                            change=".onExportParamsChange"
                                             items="{
                                                 path: 'casResources>/allowExportNodes',
                                                 sorter: { path: 'tmsNode' }
@@ -56,29 +56,20 @@
                                         </Select>
                                     </f:fields>
                                 </f:FormElement>
-                                <f:FormElement label="Description" style="margin-top: 20px">
-                                    <f:fields>
-                                        <Input value="{casExport>/description}" required="false" 
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
-                                            valueState="{=${casExport>/description} === '' ? 'Error' : 'None'}"
-                                            valueStateText="Describe the content eg: 'Util package from {casExport>/sourceNode}'"
-                                            placeholder="Enter transport description" />
-                                    </f:fields>
-                                </f:FormElement>
-                            </f:formElements>
+                             </f:formElements>
                         </f:FormContainer>
                         <f:FormContainer>
                             <f:formElements>
-                                <f:FormElement label="Target TMS Node">
+                                <f:FormElement label="Target">
                                     <f:fields>
                                         <Select
                                             forceSelection="false"
                                             required="true"
-                                            editable="{=!${viewState>/busyExporting} &amp;&amp; !${casExport>/exported}}"
+                                            editable="{=!${viewState>/busyExporting}}"
                                             valueState="{=${casExport>/targetNode} === '' ? 'Error' : 'None'}"
                                             valueStateText="Select target TMS node with upload allowed"
                                             selectedKey="{casExport>/targetNode}"
-                                            change=".onExportNodeChange"
+                                            change=".onExportParamsChange"
                                             items="{
                                                 path: 'casResources>/allowUploadNodes',
                                                 sorter: { path: 'tmsNode' }
@@ -87,30 +78,50 @@
                                         </Select>
                                     </f:fields>
                                 </f:FormElement>
-                                <f:FormElement label="Result" style="margin-top: 20px">
+                            </f:formElements>
+                        </f:FormContainer>
+                        <f:FormContainer>
+                            <f:formElements>
+                                <f:FormElement label="Note">
                                     <f:fields>
-                                        <ProgressIndicator
-                                            id="exportProgress"
-                                            state="Information"
-                                            displayValue="{casExport>/result/message}"
-                                            percentageValue="0"
-                                            displayOnly="true"
-                                            displayAnimation="true" />
-                                        <!-- <Text text="{casExport>/result/message}"/>
-                                        <Link text="TR: {casExport>/result/tr}" 
-                                                visible="{= ${casExport>/result/tr} !== undefined }"
-                                                href="{casResources>/value/tmsUrl}#/transportRequest/{casExport>/result/tr}"
-                                                target="_blank">
-                                            <layoutData>
-                                                <l:GridData span="XL2 L2 M3 S3" />
-                                            </layoutData>
-                                        </Link> -->
+                                        <Input value="{casExport>/description}" required="true" 
+                                            change=".onExportParamsChange"
+                                            editable="{=!${viewState>/busyExporting}}"
+                                            valueState="{=${casExport>/description} === '' ? 'Error' : 'None'}"
+                                            valueStateText="Describe the content eg: 'Util package from {casExport>/sourceNode}'"
+                                            placeholder="Enter transport description" />
                                     </f:fields>
                                 </f:FormElement>
                             </f:formElements>
                         </f:FormContainer>
                     </f:formContainers>
                 </f:Form>
+                <MessageStrip
+                    text="{casExport>/result/message}"
+                    type="{casExport>/result/type}"
+                    visible="{=!${viewState>/busyExporting}}"
+                    showCloseButton="false"
+                    showIcon="true">
+                    <link>
+                        <Link text="Content Agent Log"
+                            visible="{= ${casExport>/result/tr} !== undefined}"
+                            target="_blank"
+                            href="https://ncfaws-24.us10.content-agent.cloud.sap/index.html#/activityDetails/6558f6c4-2bd6-11f0-91d8-eeee0a84b499" />
+                        <Link text="TR: {casExport>/result/tr}"
+                            visible="{= ${casExport>/result/tr} !== undefined}"
+                            target="_blank"
+                            href="{casResources>/value/tmsUrl}#/transportRequest/{casExport>/result/tr}" />
+                    </link>
+                </MessageStrip>
+                <ProgressIndicator
+                        id="exportProgress"
+                        state="Success"
+                        visible="{viewState>/busyExporting}"
+                        displayValue="Export in progress: 66%"
+                        percentValue="66"
+                        showValue="true"
+                        displayOnly="true"
+                        displayAnimation="true" />
                 <table:TreeTable
                     id="exportTreeTable"
                     busy="{viewState>/busy}"
@@ -149,18 +160,6 @@
                                 <Text text="{=${casExport>st} === undefined? ${casExport>t} : ${casExport>st}}" wrapping="false" />
                             </table:template>
                         </table:Column>
-                        <!-- <table:Column width="5rem">
-                            <Label text="PRE"/>
-                            <table:template>
-                                <Text text="{casExport>v0}" wrapping="false" />
-                            </table:template>
-                        </table:Column>
-                        <table:Column width="5rem">
-                            <Label text="DEV2"/>
-                            <table:template>
-                                <Text text="{casExport>v1}" wrapping="false" />
-                            </table:template>
-                        </table:Column> -->
                     </table:columns>
                 </table:TreeTable>
             </VBox>
@@ -168,26 +167,14 @@
 		<footer>
 			<Toolbar>
 				<content>
-					 <!-- <ProgressIndicator
-                        id="exportProgress"
-                        state="Information"
-                        displayOnly="true"
-                        displayAnimation="true" /> -->
-                    <GenericTag class="sapUiNoMarginTop sapUiNoMarginBottom"
-                        visible="{=${casExport>/nonExistEntriesCount} > 0}"
-                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) not found in source node, export will skip them" status="Warning" />
-
-                    <!-- <Label
-                        icon="sap-icon://shipping-status"
-                        text="{casExport>/nonExistEntriesCount} selected arfifact(s) doesnt exist in source node" /> -->
 					<ToolbarSpacer />
 					<Button
 						icon="sap-icon://shipping-status"
 						type="Emphasized"
-						text="{=${appState>/liveMode}? 'Export to TMS' : 'Export to TMS (Not available for DEMO mode)'}"
+						text="Export to TMS"
 						tooltip="Export selected artifacts to TMS"
 						press=".onExportToTMS()" 
-                        enabled="{=${appState>/liveMode} &amp;&amp; !${viewState>/busyExporting} &amp;&amp; ${casExport>/sourceNode} !== '' &amp;&amp; ${casExport>/targetNode} !== '' &amp;&amp;${casExport>/description} !== '' &amp;&amp; !${casExport>/exported}}"/>
+                        enabled="{=!${viewState>/busyExporting} &amp;&amp; ${casExport>/sourceNode} !== '' &amp;&amp; ${casExport>/targetNode} !== '' &amp;&amp;${casExport>/description} !== '' &amp;&amp; ${casExport>/result/counter/valid} > 0}"/>
 					<Button 
 						text="Close"
 						press=".closeExportDialog" />

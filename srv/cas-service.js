@@ -4,6 +4,7 @@ const cds = require("@sap/cds");
 const { logger } = require("./lib/logger");
 const { config } = require("./lib/config");
 const { getContentResources, exportContent } = require("./lib/cas");
+const { message } = require("@sap/cds/lib/log/cds-error");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
@@ -94,11 +95,14 @@ const handleExport = async function(req) {
     }
     oPayload.payload.transportUser = req.user?.id;
     logger.info(`handling export request: ${JSON.stringify(oPayload,null,2)}`);
-    // await new Promise(r => setTimeout(r, 5000));
+    //const result = await exportContent(oPayload) || {};
+    await new Promise(r => setTimeout(r, 5000));
+    const result = {
+        message: "Export into TMS completed successfully",
+        type: "Success",
+        tr: "193861"
+    }
     const durationMs = Date.now() - startTime;
-    const result = await exportContent(oPayload) || {};
-    result.message = "Export completed";
-    result.tr = "193861";
     logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(result)}`);
     return result;
 }

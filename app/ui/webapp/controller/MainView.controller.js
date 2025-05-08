@@ -41,7 +41,7 @@ sap.ui.define([
 
 			this.oCasResourcesModel.attachRequestCompleted(this.processContentResources.bind(this));
 			this.oCasResourcesModel.attachRequestFailed(function(oEvent) {
-				console.log("Content resources load failed");
+				//console.log("Content resources load failed");
 				const oParams = oEvent.getParameters();
 				Common.reportError(oParams,"Error loading content resources", null);
 			}.bind(this));
@@ -343,7 +343,7 @@ sap.ui.define([
 
 		onTreeSelectionChange: function(oEvent) {
 			const oParams = oEvent.getParameters();
-			console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}, userInteraction? ${oParams.userInteraction}`);
+			//console.log(`tree selection source index: ${oParams.rowIndex}, context: ${oParams.rowContext}, userInteraction? ${oParams.userInteraction}`);
 			if (this.bSuppressSelectionEvent || !oParams.userInteraction) {
 				return; 
 			}
@@ -369,7 +369,7 @@ sap.ui.define([
 			const aSelectedEntries = [], aSelectedTransportableEntries = [], aAllEntries = [];
 			this.addSelectedEntries(oRootEntry, aSelectedEntries, aSelectedTransportableEntries, aAllEntries);
 			// update selection
-			console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
+			//console.log(`update row selection, selected entries: ${aSelectedEntries.length}, transportable: ${aSelectedTransportableEntries.length}, all: ${aAllEntries.length}`);
 			this.oCasResourcesTable.clearSelection();
 			for (let i = 0; i < aAllEntries.length; i++) {
 				const oRowContext = this.oCasResourcesTable.getContextByIndex(i);
@@ -437,7 +437,8 @@ sap.ui.define([
 				exported: false,
 				contentResources: oFilteredRoot, // content resources
 				result: {
-					message: "Not initiated"
+					message: "Select source/target TMS node and enter transport description to proceed",
+					type: "Information"
 				}
 			})
 			if (!this.oExportDialog) {
@@ -469,9 +470,10 @@ sap.ui.define([
 			}
 		},
 
-		onExportNodeChange: function(oEvent) {
+		onExportParamsChange: function(oEvent) {
 			let sSourceNode = this.oCasExportModel.getProperty("/sourceNode");
 			let sTargetNode = this.oCasExportModel.getProperty("/targetNode");
+			let sDescription = this.oCasExportModel.getProperty("/description");
 			//console.log(`export node change, source=${sSourceNode}, target=${sTargetNode}`);
 			const nodes = this.oCasResourcesModel.getProperty("/value/allNodes");
 			const columns = this.oExportTreeTable.getColumns();
@@ -491,21 +493,44 @@ sap.ui.define([
 
 			// count nonexist entries in source
 			let oSourceNode = nodes.find(node => node.tmsNode === sSourceNode);
-			const cnt = oSourceNode?.idx ? this.countNonExistEntries(oCasExportRoot, `v${oSourceNode.idx}`) : 0;
-			this.oCasExportModel.setProperty("/nonExistEntriesCount", cnt);
-			//console.log(`idx: ${oSourceNode?.idx}, nonExistEntriesCount: ${cnt}`);
+			// input validation
+			let oMessage = { 
+				type: "Information",
+				message: `Select source/target node and enter transport description to proceed`,
+				counter: {
+					nonExist : 0,
+					valid: 0
+				}
+			};
+			if (oSourceNode?.idx !== undefined ) {
+				this.countExportEntries(oCasExportRoot, `v${oSourceNode.idx}`,oMessage.counter);
+				// console.log(`count export: ${JSON.stringify(oMessage.counter)}`);
+				oMessage.type = oMessage.counter.nonExist || oMessage.counter.valid == 0? "Warning":"Information";
+				if (oMessage.counter.valid == 0) {
+					oMessage.message = `None of the selected artifacts exists in ${sSourceNode}`;
+					oMessage.type = `Error`;
+				} else if (oMessage.counter.nonExist > 0) {
+					oMessage.message = `${oMessage.counter.nonExist } of the selected artifact(s) not found in ${sSourceNode}, export will include remaining ${oMessage.counter.valid} item(s)`;
+				} else if (sTargetNode && sDescription) {
+					oMessage.message = `Good to export ${oMessage.counter.valid} artifact(s) from '${sSourceNode}' into TMS node '${sTargetNode}'`;
+					oMessage.type = 'Success';
+				} else {
+					oMessage.message = `Select target node and enter transport description to proceed`
+				}
+			} 
+			this.oCasExportModel.setProperty("/result", oMessage);
 		},
 
-		countNonExistEntries: function(entry, sProp) {
+		countExportEntries: function(entry, sProp, oCounter) {
 			let cnt = 0;
-			if (entry[sProp] === undefined || entry[sProp] == '-')
-				cnt++;
-			if (entry.c && entry.c.length > 0) {
-				for (let child of entry.c) {
-					cnt += this.countNonExistEntries(child, sProp);
-				}
+			if (entry[sProp] == '-')
+				oCounter.nonExist++;
+			else if (entry.t)
+				oCounter.valid++;
+			for (let child of entry.c || []) {
+				this.countExportEntries(child, sProp, oCounter);
 			}
-			return cnt;
+			return oCounter;
 		},
 
 		/** build export payload accoding to: https://api.sap.com/api/contentagentapi/path/%2Fcontent-export */
@@ -583,7 +608,10 @@ sap.ui.define([
 			})
 			.then(this.handleExportResponse.bind(this))
 			.catch(function(error) {
-				this.oCasExportModel.setProperty("/result/message","Error during export");
+				this.oCasExportModel.setProperty("/result",{
+					"type": "Error",
+					"message": `Error during export: ${error.message}`
+				});
 				Common.reportError(error, "Error exporting to TMS", null);
 			}.bind(this))
 			.finally(function(){
@@ -592,7 +620,7 @@ sap.ui.define([
 		},
 
 		handleExportResponse: function(response) {
-			console.log(response);
+			//(response);
 			if (response?.value) {
 				this.oCasExportModel.setProperty("/result",response.value);
 				this.oCasExportModel.setProperty("/exported", true);

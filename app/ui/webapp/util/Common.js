@@ -58,7 +58,6 @@ sap.ui.define([
 			}
 			MessageBox.error(sMainMessage, {
 				title: sCode,
-				id: "errorMessage",
 				details: sErrorDetail,
 				contentWidth: "150px",
 				styleClass: sResponsivePaddingClasses

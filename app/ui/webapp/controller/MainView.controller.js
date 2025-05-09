@@ -135,8 +135,15 @@ sap.ui.define([
 			this.oCasResourcesModel.loadData(sResourcePath);
 		},
 
-		processContentResources(result) {
+		processContentResources(oEvent) {
 			this.setBusy(false);
+
+			// error handling
+			const error = oEvent.getParameter("errorobject");
+			if (error) {
+				Common.reportError(error,"Error loading content resources", null);
+				return;
+			}
 
 			// update tree table
 			const oContentResources = this.oCasResourcesModel.getProperty("/value");

@@ -408,7 +408,8 @@ sap.ui.define([
 
 		recursiveUpdateEntrySelection: function(entry, selected) {
 			entry.selected = selected;
-			if (entry.c && entry.c.length > 0) {
+			// note: no need to select content within cpi package explicitly 
+			if (entry.st != 'package' && entry.c && entry.c.length > 0) {
 				for (let child of entry.c) {
 					this.recursiveUpdateEntrySelection(child, selected);
 				}
@@ -416,12 +417,15 @@ sap.ui.define([
 		},
 
 		filterSelectedTree: function(entry) {
-			let filteredChildren = null;
-			if (entry.c && entry.c.length > 0) {
-				filteredChildren = entry.c.filter(child => this.filterSelectedTree(child));
+			let filteredChildren = [];
+			for (let child of entry.c || []) {
+				let fc = this.filterSelectedTree(child);
+				if (fc) filteredChildren.push(fc);
 			}
-			if (entry.selected || filteredChildren?.length > 0) {
-				return {...entry, c: filteredChildren}; // copy node 
+			if (filteredChildren.length > 0) {
+				return {...entry, c: filteredChildren}; // return node copy with selected children
+			} else if (entry.selected) {
+				return {...entry, c: undefined}; // return node copy only without children
 			} else {
 				return null;
 			}
@@ -466,7 +470,7 @@ sap.ui.define([
 				this.oExportDialog.open();
 				// update columns
 				this.updateTreeTableColumns(this.oExportTreeTable, aCasNodes, oFilteredRoot, "casExport", false);
-				this.onExportNodeChange();
+				this.onExportParamsChange();
 				this.oExportTreeTable.expandToLevel(3);
 			}			
 		},
@@ -516,8 +520,12 @@ sap.ui.define([
 				if (oMessage.counter.valid == 0) {
 					oMessage.message = `None of the selected artifacts exists in ${sSourceNode}`;
 					oMessage.type = `Error`;
-				} else if (oMessage.counter.nonExist > 0) {
-					oMessage.message = `${oMessage.counter.nonExist } of the selected artifact(s) not found in ${sSourceNode}, export will include remaining ${oMessage.counter.valid} item(s)`;
+				} else if (oMessage.counter.nonExist > 0 && oMessage.counter.valid < 30) {
+					oMessage.message = `${oMessage.counter.nonExist} of the selected artifact(s) not found in ${sSourceNode}, export will include remaining ${oMessage.counter.valid} item(s)`;
+					oMessage.type = `Warning`;
+				} else if (oMessage.counter.valid >= 30) {
+					oMessage.message = `Content agent allows only up to 30 artifacts (currently selected: ${oMessage.counter.valid})`;
+					oMessage.type = `Warning`;
 				} else if (sTargetNode && sDescription) {
 					oMessage.message = `Good to export ${oMessage.counter.valid} artifact(s) from '${sSourceNode}' into TMS node '${sTargetNode}'`;
 					oMessage.type = 'Success';

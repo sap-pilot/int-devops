@@ -262,8 +262,8 @@ sap.ui.define([
 					return false;
 				});
 				this.getView().getModel("casResources").setProperty("/value/c", oFilteredTree);
-				this.handleTreeAction("expandAll");
 			}			
+			this.handleTreeAction("expandAll");
 		},
 
 		filterTree: function (tree, condition) {

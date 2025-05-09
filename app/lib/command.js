@@ -13,7 +13,7 @@ const { logger } = require("./logger");
 const command = function(cmd, args, path){
     const startTime = Date.now();
     logger.info(`${path} > ${cmd} ${args}'`);
-    //const result = execSync(`./srv/helper/mtar-extractor.sh ${mtarFile} ${destDir}`);
+    //const result = execSync(`./srv/lib/mtar-extractor.sh ${mtarFile} ${destDir}`);
     const result = spawnSync(cmd, args.split(' '), {shell: true, cwd: path});
     const durationMs = Date.now() - startTime;
     logger.debug(`completed: '${cmd} ${args}', takes time ${durationMs} ms`);

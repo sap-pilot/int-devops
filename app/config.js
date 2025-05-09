@@ -1,6 +1,6 @@
 const path = require("path");
 const rootPath = path.join(__dirname, '..');
-const { logger } = require('./helper/logger');
+const { logger } = require('./lib/logger');
 
 // config variables
 const config = {
@@ -15,6 +15,7 @@ const config = {
         "url": process.env.REPO_URL,
         "branches": process.env.REPO_BRANCHES ? JSON.parse(process.env.REPO_BRANCHES) : ["dev", "release", "maint", "master"],
         "nodeMapping": process.env.REPO_NODE_MAPPING ? JSON.parse(process.env.REPO_NODE_MAPPING) : {
+            "INT_VIRTUAL": "dev",
             "INT_DEV": "dev",
             "INT_PREPROD2": "release",
             "INT_DEV2": "maint",

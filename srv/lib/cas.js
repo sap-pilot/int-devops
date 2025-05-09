@@ -8,11 +8,13 @@ const { getTmsLandscapeAsync } = require("./tms");
  * get contentResources from remote content agent services via specified 'CAS_*' destinations
  *  @returns {
  *      "i": "contentResources",
- *       "nodes": [
- *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
- *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","dest":"CAS_STG","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
- *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","dest":"CAS_PRE","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
- *           {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
+ *      "tmsUrl": "XX",
+ *      "countCasNodes": 4,
+ *       "casNOdes": [
+ *           {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","tmsNodeId":100,"casDest":"CAS_DEV","casUrl":"XX","resources":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+ *           {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","tmsNodeId":101,"casDest":"CAS_STG","casUrl":"XX","resources":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+ *           {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","tmsNodeId":102,"casDest":"CAS_PRE","casUrl":"XX","resources":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+*            {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","tmsNodeId":103,"casDest":"CAS_PROD","casUrl":"XX","resources":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
  *           {"idx":0,"name":"Sandbox"},
@@ -22,9 +24,9 @@ const { getTmsLandscapeAsync } = require("./tms");
  *           {"idx":4,"name":"Production"}
  *       ],
  *       "routes": [
- *           {"from":0,"to":1},
- *           {"from":1,"to":2},
- *           {"from":2,"to":3}
+ *           {"from":100,"to":101},
+ *           {"from":101,"to":102},
+ *           {"from":102,"to":103}
  *       ],
  *      "c": [
  *          {"n": "Cloud Integration","v0":"1.0.0","c":[
@@ -42,6 +44,12 @@ const getContentResources = async function(req) {
     try {
         // get list of destinations
         const allDestinations = await getAllDestinationsFromDestinationService();
+        // extract tms url
+        const tmsDestination = allDestinations.find( dest => dest.name === config.tmsDestination );
+        const tmsUrl = tmsDestination?.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+            return `https://${subdomain}.ts.cfapps.${region}.hana.ondemand.com/main/webapp/index.html`
+        });
+        
         // filter conten-agent destiation with prerix 'CAS_' and additional property 'TMS_NODE'
         const filteredDestinations = allDestinations.filter(dest => dest.name.startsWith(config.casDestinationPrefix) && dest.originalProperties.TMS_NODE);
         if (!filteredDestinations || filteredDestinations.length == 0) 
@@ -51,8 +59,11 @@ const getContentResources = async function(req) {
             group: dest.originalProperties.NODE_GROUP,
             alias: dest.originalProperties.NODE_ALIAS || dest.originalProperties.TMS_NODE.split("_").at(-1),
             tmsNode: dest.originalProperties.TMS_NODE,
-            dest: dest.name,
-            r: {},
+            casDest: dest.name, // cas destination name
+            casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+                return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
+            }),
+            resources: {},
             obj: {}, // result object to be deleted after merge
         }));
         nodes.sort((a, b) => a.idx - b.idx);
@@ -69,26 +80,26 @@ const getContentResources = async function(req) {
         // also start loading tms landscape
         const tmsPromise = getTmsLandscapeAsync(req, true);
         for (const node of nodes) {
-            let p = executeHttpRequest({destinationName: node.dest}, { 
+            let p = executeHttpRequest({destinationName: node.casDest}, { 
                 method: "GET", 
                 url: "/v1/contentResources?filters=(type eq 'API Management') or (type eq 'Cloud Integration')" 
             })
             p.then(result => {
                 // check if response is valid
                 if (!result?.data?.contentResources) {
-                    logger.warn(`no contentResources found from destination '${node.dest}', response: ${JSON.stringify(resp.data,null,2)}`);
-                    node.r.warning = "No contentResources found";
+                    logger.warn(`no contentResources found from destination '${node.casDest}', response: ${JSON.stringify(resp.data,null,2)}`);
+                    node.error = "No content resources found";
                 } else {
-                    node.obj = _reorgResources(result.data, node.r); // parse/reorg and count resources by subType
+                    node.obj = _reorgResources(result.data, node.resources); // parse/reorg and count resources by subType
                 }
             })
             // .catch(error => {
-            //     node.r.error = error.message;
-            //     logger.warn(`failed to load contentResource from destination ${node.dest}: ${error}`,error);
+            //     node.error = error.message;
+            //     logger.warn(`failed to load contentResource from destination ${node.casDest}: ${error}`,error);
             // })
             .finally(() => {
                 const durationMs = Date.now() - startTime;
-                logger.debug(`completed loading contentResource from ${node.dest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.r,null,2)}`);
+                logger.debug(`completed loading contentResource from ${node.casDest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.resources,null,2)}`);
             });
             promises.push(p);
         }
@@ -96,31 +107,33 @@ const getContentResources = async function(req) {
         const results = await Promise.allSettled(promises);
         results.forEach((result, index) => {
             if (result.status === "rejected") {
-                nodes[index].r.error = result.reason.message;
-                logger.warn(`Failed to load contentResource from destination ${nodes[index].dest}: ${result.reason}`);
+                nodes[index].error = result.reason.message;
+                logger.warn(`Failed to load contentResource from destination ${nodes[index].casDest}: ${result.reason}`);
             }
         });
         const durationMs = Date.now() - startTime;
         logger.debug(`completed loading contentResources from all nodes, takes time ${durationMs} ms`);
+       
         // merge objs array into single contentResources
         const merged = {
             "repoUrl": config.repoUrl,
+            "tmsUrl": tmsUrl,
             "lastUpdated": startDate.toISOString(),
             "table": {}, // to bev deleted after merge
-            "nodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
+            "casNodes": nodes, // array of {tmsNode, alias} for instance {name:'PRE2',tmsNode:'INT_PRE2'}
+            "otherTmsNodes": [],
             "groups": groups,
             "routes": [],
             "c": []
         };
         for (const node of nodes) {
             const v = `v${node.idx}`;
-            _recursiveMerge(node.obj, merged, v);
+            _recursiveMerge(node.obj, merged, v, nodes.length);
             delete node.obj; // merged, delete this obj to avoid excessive result in response
         }
 
         _recursiveDelete(merged,["table"]);
         _recursiveSort(merged);
-        merged.countCasNodes = nodes.length; // only nodes with contentResources will be included the UI tree table
 
         // done with contentResources, now added tms resource into merged result
         const tmsLandscape = await tmsPromise;
@@ -165,14 +178,14 @@ const _reorgResources = function(data, typeCounter) {
     const apim = { "i":"APIM", "n": "API Management", "t":"", "v": "", "c": [], "subTypes": {} };
     for ( const entry of data.contentResources ) {
         if (entry.type == "Cloud Integration") {
-            const package = { "i":entry.id, "n": entry.name, "t": entry.subType, "v": entry.version, "c": []};
+            const package = { "i":entry.id, "ri": entry.resourceID, "n": entry.name, "t": entry.type, "st": entry.subType, "v": entry.version, "c": []};
             if (entry.subType) typeCounter[entry.subType] = typeCounter[entry.subType]? typeCounter[entry.subType]+1 : 1;
             if (config.repoUrl) {
                 package.p = `/${entry.id}&version=GBdev`;
-             };
+            };
             if ( entry.components ) {
                 for ( const comp of entry.components ) {
-                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "v": comp.version}
+                    const iflow = {"i": comp.id, "n": comp.name, "t": comp.type, "et": comp.exportable, "v": comp.version}
                     if (comp.type) typeCounter[comp.type] = typeCounter[comp.type]? typeCounter[comp.type]+1 : 1;
                     if (config.repoUrl) {
                         iflow.p = `/${package.i}/${comp.id}_content/&version=GBdev`;
@@ -189,7 +202,7 @@ const _reorgResources = function(data, typeCounter) {
                 apim.c.push(subType);
             }
             if (entry.subType) typeCounter[entry.subType] = typeCounter[entry.subType]? typeCounter[entry.subType]+1 : 1;
-            const apimObj = {"i":entry.id, "n":entry.name || entry.id, "t":entry.subType, "v": entry.version};
+            const apimObj = {"i":entry.id, "ri":entry.resourceID, "n":entry.name || entry.id, "t":entry.type, "st":entry.subType, "v": entry.version};
             subType.c.push(apimObj);
         } else {
             // other entry types are ignored
@@ -216,11 +229,15 @@ const _recursiveDelete = function(obj, keysToDelete) {
     return obj;
 }
 
-const _recursiveMerge = function(obj, merged, vProp) {
+const _recursiveMerge = function(obj, merged, vProp, iNodes) {
     for (const entry of obj.c) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {
-            mergedEntry = {"i":entry.i, "n":entry.n,"t":entry.t,"table":{}};
+            mergedEntry = {"i":entry.i, "ri":entry.ri, "n":entry.n, "t":entry.t, "st":entry.st, "table":{}};
+            // enter initial/non-exist version for each node 
+            for ( let i = 0; i < iNodes; i++) {
+                mergedEntry[`v${i}`] = '-';
+            }
             if (entry.p)
                 mergedEntry.p = entry.p;
             merged.table[entry.i] = mergedEntry;
@@ -230,7 +247,7 @@ const _recursiveMerge = function(obj, merged, vProp) {
         if (entry.c && entry.c.length > 0) {
             if(!mergedEntry.c) 
                 mergedEntry.c = [];
-            _recursiveMerge(entry, mergedEntry, vProp);
+            _recursiveMerge(entry, mergedEntry, vProp, iNodes);
         }
     }
 }
@@ -254,8 +271,8 @@ const _assignOrCreateGroup = function(node, groups) {
         groupName = "Staging";
     } else if (nodeName.includes("pre") || nodeName.includes("qa") ) {
         groupName = "Preprod";
-    } else if (nodeName.includes("sbx") || nodeName.includes("sandbox") ) {
-        groupName = "Sandbox";
+    } else if (nodeName.includes("sbx") || nodeName.includes("sandbox") || nodeName.includes("virtual") ) {
+        groupName = "Sandbox/Virtual";
     } else if (nodeName.includes("prod")) {
         groupName = "Production";
     } else {
@@ -283,13 +300,14 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
         tmsNodeIdMap[tmsNode.id] = tmsNode;
     }
     // enrich content resources nodes with tms info
-    for (const node of merged.nodes) {
+    for (const node of merged.casNodes) {
         const tmsNode = tmsNodeNameMap[node.tmsNode];
         if (!tmsNode) {
             logger.warn(`tmsNode not found for ${node.tmsNode}, node: ${JSON.stringify(node,null,2)}`);
             continue;
         }
         node.tmsNodeId = tmsNode.id;
+        node.tmsUploadAllowed = tmsNode.uploadAllowed;
         nodeTmsIdMap[node.tmsNodeId] = node;
     }
     // add existing routes
@@ -313,15 +331,13 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
                 if (!fromNode) {
                     const fromTmsNode = tmsNodeIdMap[route.sourceNodeId]
                     fromNode = _convertTmsNode(fromTmsNode, merged.groups);
-                    fromNode.idx = merged.nodes.length;
-                    merged.nodes.push(fromNode);
+                    merged.otherTmsNodes.push(fromNode);
                     nodeTmsIdMap[fromNode.tmsNodeId] = fromNode;
                     logger.debug(`added node from tms: ${JSON.stringify(fromNode,null,2)}`);
                 } else if (!toNode) {
                     const toTmsNode = tmsNodeIdMap[route.targetNodeId]
                     toNode = _convertTmsNode(toTmsNode, merged.groups);
-                    toNode.idx = merged.nodes.length;
-                    merged.nodes.push(toNode);
+                    merged.otherTmsNodes.push(toNode);
                     nodeTmsIdMap[toNode.tmsNodeId] = toNode;
                     logger.debug(`added node from tms: ${JSON.stringify(toNode,null,2)}`);
                 } else {
@@ -329,10 +345,10 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
                 }
             }
             // now add route if not done already
-            const routeKey = `${fromNode.idx}-${toNode.idx}`;
+            const routeKey = `${fromNode.tmsNodeId}-${toNode.tmsNodeId}`;
             if (!routeSet.has(routeKey)) {
                 routeSet.add(routeKey);
-                const route = {from: fromNode.idx, to: toNode.idx};
+                const route = {from: fromNode.tmsNodeId, to: toNode.tmsNodeId};
                 merged.routes.push(route);
                 logger.debug(`added route from tms: ${JSON.stringify(route,null,2)}`);
             }
@@ -343,16 +359,59 @@ const _mergeTmsLandscapeData = function(merged, tmsLandscape) {
 
 const _convertTmsNode = function(tmsNode, groups) {
     let node = {
-        idx: -1,
         group: -1, // TODO: assign a group for this one
         tmsNode: tmsNode.name,
         tmsNodeId: tmsNode.id,
-        r: {
-            warning: "CAS not connected"
-        }
+        tmsUploadAllowed: tmsNode.uploadAllowed,
     };
     _assignOrCreateGroup(node, groups);
     return node;
 }
 
-module.exports = { getContentResources };
+const exportContent = async function(payload) {
+    if (!payload?.casDestination || !payload?.targetTmsNodeId) {
+        throw new Error(`Invalid parameters, casDestination: ${payload?.casDestination}, tmsNodeId: ${payload?.targetTmsNodeId}`);
+    }
+    if (!payload.casDestination.startsWith(config.casDestinationPrefix)) {
+        throw new Error(`Invalid casDestination '${payload.casDestination}', must start with ${config.casDestinationPrefix}`);
+    }
+    if (!payload?.payload?.contentResources || payload.payload.contentResources.length == 0) {
+        throw new Error(`Invalid payload, no contentResources found`);
+    }
+    let response = await executeHttpRequest({destinationName: payload.casDestination}, { 
+        method: "POST",
+        url: "/v1/contentResources/export",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        data: payload.payload
+    },{
+        fetchCsrfToken: false
+    })
+    if (!response?.status == 200) {
+        throw new Error(`unexpected response status [${response?.status}], body: ${response?.data? JSON.stringify(response.data) : null}`);
+    }
+    return response?.data;
+}
+
+const queryActivity = async function(casDestination, activityId) {
+    if (!casDestination) {
+        throw new Error(`casDestination not specified`);
+    } 
+    if (!activityId) {
+        throw new Error(`activityId not specified`);
+    }
+    let response = await executeHttpRequest({destinationName: casDestination}, { 
+        method: "GET",
+        url: `/v1/operations/${activityId}?messages=true`,
+        headers: {
+            "Accept": "application/json"
+        }
+    })
+    if (!response?.status == 200) {
+        throw new Error(`unexpected response status [${response?.status}], body:  ${response?.data? JSON.stringify(response.data) : null}`);
+    }
+    return response?.data;
+}
+
+module.exports = { getContentResources, exportContent, queryActivity };

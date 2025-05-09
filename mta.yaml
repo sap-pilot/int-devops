@@ -1,6 +1,6 @@
 _schema-version: 3.3.0
 ID: int-devops
-version: 0.8.0
+version: 0.9.0
 description: "SAP Integration Suite DevOps Utilities"
 parameters:
   enable-parallel-deployments: true
@@ -38,7 +38,7 @@ modules:
     parameters:
       buildpack: nodejs_buildpack
       readiness-health-check-type: http
-      readiness-health-check-http-endpoint: /health
+      readiness-health-check-http-endpoint: /public/health
       instances: 1 # TODO: minimal 2 in case one instance crash the other one can take over (multi-AZ)
       memory: 128M
       disk-quota: 1G
@@ -51,12 +51,13 @@ modules:
       LOG_LEVEL: "debug" # log level for custom-app, possible values: [trace|debug|info|warn|error|silent]
       LOG_PRETTY: "true" # [true|false]
       LOG_REDACT: "true" # [true|false]
+      COOKIE_BACKWARD_COMPATIBILITY: true # https://me.sap.com/notes/0003602671
       # TMS_URL: "https://transport-service-app-backend.ts.cfapps.us10.hana.ondemand.com"
       # REPO_URL: <YOUR_GIT_REPO_URL_WITH_KEY>
     build-parameters:
       builder: custom
       commands: []
-      ignore: ["node_modules/","default-*.json","*.env"]      
+      ignore: ["node_modules/","default-*.json","*.env","ui/webapp/"]      
 
   - name: int-devops-srv
     type: nodejs

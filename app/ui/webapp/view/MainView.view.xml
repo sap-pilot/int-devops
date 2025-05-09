@@ -29,12 +29,13 @@
                             </g:statuses>
                             <g:nodes>
                                 <g:Node
-                                        key="{landscape>idx}"
+                                        key="{landscape>tmsNodeId}"
                                         title="{landscape>tmsNode}"
                                         group="{landscape>group}"
                                         icon="{landscape>icon}"
                                         attributes="{path:'landscape>attrs', templateShareable:true}"
-                                        showActionLinksButton="false"
+                                        showActionLinksButton="true"
+                                        showDetailButton="false"
                                         status="{landscape>status}"
                                         headerCheckBoxState="{landscape>checkboxState}"
                                         selected="{landscape>selected}"
@@ -45,6 +46,28 @@
                                                 label="{landscape>key}"
                                                 value="{landscape>value}"/>
                                     </g:attributes>
+                                    <!-- <g:actionButtons>
+                                        <g:ActionButton 
+                                            icon="sap-icon://shipping-status" 
+                                            title="TMS Node - Import Queue" 
+                                            enabled="{=${casResources>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}"
+                                            press="onPressTmsLink"/>
+                                        <g:ActionButton 
+                                            icon="sap-icon://account" 
+                                            title="Content Agent" 
+                                            enabled="{=${landscape>casUrl} !== undefined}" 
+                                            press="onPressCasLink"/>
+                                    </g:actionButtons> -->
+                                    <g:actionLinks>
+                                        <Link text="Content Agent for {landscape>tmsNode}" 
+                                                href="{landscape>casUrl}" 
+                                                enabled="{=${landscape>casUrl} !== undefined}" 
+                                                target="_blank" />
+                                        <Link text="TMS Import Queue of {landscape>tmsNode}" 
+                                                href="{casResources>/value/tmsUrl}#/nodeObject/{landscape>tmsNodeId}" 
+                                                enabled="{=${casResources>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}" 
+                                                target="_blank" />
+                                    </g:actionLinks>
                                 </g:Node>
                             </g:nodes>
                             <g:lines>
@@ -71,20 +94,21 @@
                             </g:groups>
                         </g:Graph>
                      </l:SplitPane>
-                    <l:SplitPane id="resourceTreePane">   
+                    <l:SplitPane id="casResourcesPane">   
                         <l:layoutData>
-                            <l:SplitterLayoutData size="{appState>/resourceTreeWidth}" />
+                            <l:SplitterLayoutData size="{appState>/casResourcesWidth}" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
                             <table:TreeTable
-									id="resourceTreeTable"
+									id="casResourcesTable"
                                     busy="{viewState>/busy}"
                                     busyIndicatorDelay="0"
-									rows="{path:'resourceTree>/value/c', parameters: {arrayNames:['c']}}"
+									rows="{path:'casResources>/value/c', parameters: {arrayNames:['c']}}"
 									selectionMode="MultiToggle"
 									rowMode="Auto"
                                     rowSelectionChange="onTreeSelectionChange"
-									enableSelectAll="false"
+									toggleOpenState="onToggleOpenState"
+                                    enableSelectAll="false"
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
@@ -92,10 +116,10 @@
                                             enabled="{=!${viewState>/busy}}"
                                             change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
-										<Button icon="sap-icon://expand-all" press="onExpandAll"/>
-										<Button icon="sap-icon://collapse-all" press="onCollapseAll"/>
-										<!-- <Button icon="sap-icon://expand-group" press="onExpandSelection"/>
-										<Button icon="sap-icon://collapse-group" press="onCollapseSelection"/> -->
+										<Button icon="sap-icon://expand-all" press="handleTreeAction('expandAll')"/>
+										<Button icon="sap-icon://collapse-all" press="handleTreeAction('collapseAll')"/>
+										<!-- <Button icon="sap-icon://expand-group" press="handleTreeAction('expandSelection')"/>
+										<Button icon="sap-icon://collapse-group" press="handleTreeAction('collapseSelection')"/> -->
                                         <Button id="refreshBtn" 
                                             press="loadContentResources(true)"
                                             enabled="{=!${viewState>/busy}}"
@@ -103,42 +127,43 @@
                                             icon="sap-icon://synchronize" 
                                             tooltip="Force refresh content resources list from all connected Content Agent services" />
                                         <Button id="exportBtn" 
-                                            enabled="false"
-                                            text="Export (0)" 
+                                            press="openExportDialog"
+                                            enabled="{=${casResources>/value/selectedTransportableEntries} > 0}"
+                                            text="Export ({casResources>/value/selectedTransportableEntries})" 
                                             icon="sap-icon://shipping-status" 
                                             tooltip="Export selected artifacts to TMS" />
 									</OverflowToolbar>
 								</table:extension>
 								<table:rowSettingsTemplate>
                                     <table:RowSettings highlight="{
-                                        path: 'resourceTree>s',
+                                        path: 'casResources>s',
                                         formatter: '.formatter.statusHighlight'
-                                    }" highlightText="{resourceTree>s}"/>
+                                    }" highlightText="{casResources>s}"/>
                                 </table:rowSettingsTemplate>
 								<table:columns>
 									<table:Column width="16rem">
 										<Label text="Content Resources"/>
 										<table:template>
-                                            <Link text="{resourceTree>n}" wrapping="false" 
-                                                href="{resourceTree>/value/repoUrl}{resourceTree>p}" target="_blank"/>
+                                            <Link text="{casResources>n}" wrapping="false" 
+                                                href="{casResources>/value/repoUrl}{casResources>p}" target="_blank"/>
 										</table:template>
 									</table:Column>
                                     <table:Column width="5rem">
 										<Label text="ID"/>
 										<table:template>
-											<Text text="{resourceTree>i}" wrapping="false" />
+											<Text text="{casResources>i}" wrapping="false" />
 										</table:template>
 									</table:Column>
 									<table:Column width="7rem">
-										<Label text="Sub-Type"/>
+										<Label text="Sub-Type/Type"/>
 										<table:template>
-											<Text text="{resourceTree>t}" wrapping="false" />
+											<Text text="{=${casResources>st} === undefined? ${casResources>t} : ${casResources>st}}" wrapping="false" />
 										</table:template>
 									</table:Column>
 									<!-- <table:Column width="5rem">
 										<Label text="STG"/>
 										<table:template>
-											<Text text="{resourceTree>v0}" wrapping="false" />
+											<Text text="{casResources>v0}" wrapping="false" />
 										</table:template>
 									</table:Column> -->
 								</table:columns>

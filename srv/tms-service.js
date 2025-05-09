@@ -1,5 +1,5 @@
 const cds = require("@sap/cds");
-const { getTmsLandscapeSync, getTmsLandscapeFromCache } = require("./helper/tms");
+const { getTmsLandscapeFromCache } = require("./lib/tms");
 
 module.exports = cds.service.impl(srv => {
     //srv.on("landscape", getTmsLandscapeSync);

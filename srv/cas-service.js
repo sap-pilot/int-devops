@@ -1,12 +1,15 @@
 const fs = require("fs");
 const path = require("path");
 const cds = require("@sap/cds");
-const { logger } = require("./helper/logger");
-const { config } = require("./helper/config");
-const { getContentResources } = require("./helper/cas");
+const { logger } = require("./lib/logger");
+const { config } = require("./lib/config");
+const { getContentResources, exportContent, queryActivity } = require("./lib/cas");
+const { message } = require("@sap/cds/lib/log/cds-error");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
+    srv.on("export", handleExport);
+    srv.on("activity", getActivity);
 });
 
 /**
@@ -16,11 +19,13 @@ module.exports = cds.service.impl(srv => {
  * @param req.data.forceRefresh [false|true] whether to skip cache and force load data from remote services 
  * @returns {
  *      "i": "contentResources",
- *       "nodes": [
- *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","dest":"CAS_DEV","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
- *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","dest":"CAS_STG","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
- *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","dest":"CAS_PRE","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
- *          {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","dest":"CAS_PROD","r":{"error":"Permission denied"}}
+ *      "tmsUrl": "XX",
+ *      "countCasNodes": 4,
+ *      "nodes": [
+ *          {"idx":0,"group":0,"alias":"DEV","tmsNode":"INT_DEV","casDest":"CAS_DEV","casUrl":"XX","r":{"package":6,"IFlow":15,"APIProvider":11,"proxy":18}},
+ *          {"idx":1,"group":1,"alias":"STG","tmsNode":"INT_STG","casDest":"CAS_STG","casUrl":"XX","r":{"package":5,"IFlow":12,"APIProvider":10,"proxy":12}},
+ *          {"idx":2,"group":2,"alias":"PRE","tmsNode":"INT_PRE","casDest":"CAS_PRE","casUrl":"XX","r":{"package":5,"IFlow":10,"APIProvider":10,"proxy":15}},
+ *          {"idx":3,"group":3,"alias":"PROD","tmsNode":"INT_PROD","casDest":"CAS_PROD","casUrl":"XX","r":{"error":"Permission denied"}}
  *       ],
  *      "groups": [
  *          {"idx":0,"name":"Sandbox"},
@@ -52,13 +57,13 @@ const getResources = async function(req) {
     const cachePath = config.cachedContentResourcePath;
     const startTime = Date.now();
     let data = {};
-    logger.info(`serving contentResources for user=${req.user?req.user.id:'n/a'}, forceRefresh=${forceRefresh}`);
+    logger.info(`GET contentResources for user=${req.user?req.user.id:'n/a'}, forceRefresh=${forceRefresh}`);
     if (!forceRefresh && fs.existsSync(cachePath)) {
         // try to load result from local fs first
         // logger.debug(`serving cached contentResources from "${cachePath}"`)
         const rawData = fs.readFileSync(cachePath, 'utf8');
         data = JSON.parse(rawData);
-        // await new Promise(r => setTimeout(r, 5000));
+        //await new Promise(r => setTimeout(r, 10000));
     } else {
          // forceRefresh or cache file doesn't exist, so we should read data from remote resource
         data = await getContentResources(req);
@@ -76,6 +81,43 @@ const getResources = async function(req) {
         }
     }
     const durationMs = Date.now() - startTime;
-    logger.debug(`completed serving contentResource, takes time ${durationMs} ms`);
+    logger.debug(`GET serving contentResource, takes time ${durationMs} ms`);
     return data;
+}
+
+const handleExport = async function(req) {  
+    const startTime = Date.now();
+    const oPayload = {
+        userId: req.user?.id,
+        casDestination: req.data?.casDestination,
+        targetTmsNodeId : req.data?.targetTmsNodeId,
+        countContentResources: req.data?.countContentResources,
+        payload: JSON.parse(req.data?.payload)
+    }
+    oPayload.payload.transportUser = req.user?.id;
+    logger.info(`handling export request: ${JSON.stringify(oPayload,null,2)}`);
+    const exportResponse = await exportContent(oPayload) || {};
+    // await new Promise(r => setTimeout(r, 5000));
+    // const result = {
+    //     message: "Export into TMS completed successfully",
+    //     type: "Success",
+    //     tr: "193861"
+    // }
+    const exportTime = Date.now();
+    logger.debug(`POST contentResource export, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(exportResponse)}`);
+    if (!exportResponse.activityId) {
+        throw new Error(`activityId not found in export response: ${JSON.stringify(exportResponse)}`);
+    }
+    const activityResponse = await queryActivity(oPayload.casDestination, exportResponse.activityId);
+    logger.debug(`GET activity from casDestination: ${oPayload.casDestination}, activityId: ${exportResponse.activityId}, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    return activityResponse;
+}
+
+const getActivity = async function(req) {
+    const casDestination = req.data?.casDestination;
+    const activityId = req.data?.activityId;
+    const startTime = Date.now();
+    const activityResponse = await queryActivity(casDestination, activityId);
+    logger.debug(`GET activity for userId: ${req.user?.id} from casDestination: ${casDestination}, activityId: ${activityId}, takes time ${Date.now() - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    return activityResponse;
 }

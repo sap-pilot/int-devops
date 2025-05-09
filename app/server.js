@@ -3,9 +3,9 @@ const approuter = require('@sap/approuter');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// custom helpers
-const { logger } = require('./helper/logger');
-const { tmsProxyConfig } = require('./helper/tms-proxy');
+// custom libraries
+const { logger } = require('./lib/logger');
+const { tmsProxyConfig } = require('./lib/tms-proxy');
 const { config } = require('./config');
 
 // upload handling
@@ -13,7 +13,7 @@ const multer = require('multer')
 const upload = multer({ dest: config.uploadPath });
 
 let buildInfo = { "version": "N/A", "build": "N/A", "commit": "N/A"};
-try { buildInfo = require("./dist/build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
+try { buildInfo = require("./ui/dist/build-info.json") } catch (e) { logger.warn(`failed to load build-info.json: ${e}`) }
 
 const port = process.env.PORT || 4004;
 

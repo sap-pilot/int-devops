@@ -156,8 +156,8 @@ sap.ui.define(
 					this.oAboutDialog = new sap.m.Dialog({
 						type: sap.m.DialogType.Message,
 						title: "About",
-						content: new sap.m.Text({
-							text: "SAP Integration DevOps"
+						content: new sap.m.Label({
+							text: "SAP Integration DevOps v{buildInfo>/version}-{buildInfo>/commit} (built at {buildInfo>/date})"
 						}),
 						beginButton: new sap.m.Button({
 							type: sap.m.ButtonType.Emphasized,
@@ -167,6 +167,7 @@ sap.ui.define(
 							}.bind(this)
 						})
 					});
+					this.getView().addDependent(this.oAboutDialog);
 				}
 				this.oAboutDialog.open();
 			},

@@ -57,7 +57,7 @@ const getResources = async function(req) {
     const cachePath = config.cachedContentResourcePath;
     const startTime = Date.now();
     let data = {};
-    logger.info(`serving contentResources for user=${req.user?req.user.id:'n/a'}, forceRefresh=${forceRefresh}`);
+    logger.info(`GET contentResources for user=${req.user?req.user.id:'n/a'}, forceRefresh=${forceRefresh}`);
     if (!forceRefresh && fs.existsSync(cachePath)) {
         // try to load result from local fs first
         // logger.debug(`serving cached contentResources from "${cachePath}"`)
@@ -81,7 +81,7 @@ const getResources = async function(req) {
         }
     }
     const durationMs = Date.now() - startTime;
-    logger.debug(`completed serving contentResource, takes time ${durationMs} ms`);
+    logger.debug(`GET serving contentResource, takes time ${durationMs} ms`);
     return data;
 }
 
@@ -104,12 +104,12 @@ const handleExport = async function(req) {
     //     tr: "193861"
     // }
     const exportTime = Date.now();
-    logger.debug(`completed export contentResource, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(exportResponse)}`);
+    logger.debug(`POST contentResource export, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(exportResponse)}`);
     if (!exportResponse.activityId) {
         throw new Error(`activityId not found in export response: ${JSON.stringify(exportResponse)}`);
     }
     const activityResponse = await queryActivity(oPayload.casDestination, exportResponse.activityId);
-    logger.debug(`got activity from casDestination: ${oPayload.casDestination}, activityId: ${exportResponse.activityId}, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    logger.debug(`GET activity from casDestination: ${oPayload.casDestination}, activityId: ${exportResponse.activityId}, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
     return activityResponse;
 }
 
@@ -118,6 +118,6 @@ const getActivity = async function(req) {
     const activityId = req.data?.activityId;
     const startTime = Date.now();
     const activityResponse = await queryActivity(casDestination, activityId);
-    logger.debug(`got activity for userId: ${req.user?.id} from casDestination: ${casDestination}, activityId: ${activityId}, takes time ${Date.now() - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    logger.debug(`GET activity for userId: ${req.user?.id} from casDestination: ${casDestination}, activityId: ${activityId}, takes time ${Date.now() - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
     return activityResponse;
 }

@@ -567,7 +567,7 @@ sap.ui.define([
 			const oPayload = { 
 				id: `int-devops-export-${Date.now()}`, // api doc is wrong.. specify id here instead of activityId
 				version: "1.0.0",
-				requestor: "int-devops-ui",
+				requestor: "CASUI", // so to include this activity in content agent UI
 				exportMode: "TransportManagementService",
 				exportMediaType: "MTAR",
 				sourceNode: sTargetNode,

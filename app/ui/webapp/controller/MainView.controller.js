@@ -567,6 +567,7 @@ sap.ui.define([
 				countContentResources : aContentResources.length,
 				payload: JSON.stringify(oPayload)// urgly but seems to be the only way to pass any/tree object type
 			}  
+			this.lastCasDestination = oRequest.casDestination;
 			return oRequest;
 		},
 
@@ -592,7 +593,10 @@ sap.ui.define([
 				return; 
 			}
 			this.oViewStateModel.setProperty("/busyExporting",true);
-			this.oCasExportModel.setProperty("/result/message","Export in progress");
+			this.oCasExportModel.setProperty("/result",{
+				type: "Success",
+				message:"Export in progress"
+			});
 			fetch("/srv/cas/export", {
 				method: "POST",
 				headers: {
@@ -606,25 +610,86 @@ sap.ui.define([
 				}
 				return response.json(); // or response.text(), response.blob(), etc.
 			})
-			.then(this.handleExportResponse.bind(this))
+			.then(this.handleExportActivityResponse.bind(this))
 			.catch(function(error) {
 				this.oCasExportModel.setProperty("/result",{
 					"type": "Error",
 					"message": `Error during export: ${error.message}`
 				});
-				Common.reportError(error, "Error exporting to TMS", null);
-			}.bind(this))
-			.finally(function(){
 				this.oViewStateModel.setProperty("/busyExporting",false);
+				Common.reportError(error, "Error exporting to TMS", null);
 			}.bind(this));
 		},
 
-		handleExportResponse: function(response) {
+		handleExportActivityResponse: function(response) {
 			//(response);
-			if (response?.value) {
-				this.oCasExportModel.setProperty("/result",response.value);
-				this.oCasExportModel.setProperty("/exported", true);
+			if (!response?.value || !response.value.activityId) {
+				this.oCasExportModel.setProperty("/result",{
+					type: "Error",
+					message: `Unexpected response: ${JSON.stringify(response?.value)}`
+				});
+				this.oViewStateModel.setProperty("/busyExporting",false);
+				return;
 			} 
+			const oActivity = response.value;
+			this.lastActivityId = oActivity.activityId;
+			const oLastMessage = oActivity.messages?.at(-1);
+			let sLastMessage = oLastMessage?.text || '';
+			if (oActivity.state == 'STARTED' || oActivity.state == 'RUNNING') {
+				// update delta progress and query again in next few seconds
+				this.oViewStateModel.setProperty("/busyExporting",true);
+				if (oActivity.progress != undefined && oActivity.progress > -1) {
+					sLastMessage += ` (${oActivity.progress}%)`;
+				}
+				this.oCasExportModel.setProperty("/result",{
+					type: "Success",
+					progress: oActivity.progress,
+					message: sLastMessage? sLastMessage : 'Export in progress'
+				});
+				setTimeout(this.queryExportActivity.bind(this), 2000); // query again in 2s
+			} else {
+				// not STARTED or RUNNING so it's finished
+				sLastMessage = sLastMessage.replace('process instance with id', 'activityId'); // shorten message 
+				const aTokens = sLastMessage.split(" ");
+				const iTrIndex = aTokens? aTokens.indexOf("trId") : -1;
+				let sTrId = undefined;
+				if (iTrIndex > -1) {
+					sTrId = aTokens[iTrIndex+1];
+					sLastMessage = sLastMessage.replace(/and trId \d+\s/,''); // remove trId to shorten message
+				}
+				this.oCasExportModel.setProperty("/result",{
+					type: oActivity.state == 'FINISHED'? 'Success' : (oActivity.state == 'ERROR'? 'Error' : 'Information'),
+					progress: oActivity.progress,
+					tr: sTrId,
+					message: sLastMessage? sLastMessage : 'Export completed'
+				});
+				this.oViewStateModel.setProperty("/busyExporting",false);
+				// export completed
+			}
+		},
+
+		queryExportActivity: function() {
+			fetch(`/srv/cas/activity(casDestination='${this.lastCasDestination}', activityId='${this.lastActivityId}')`, {
+				method: "GET",
+				headers: {
+					'Accept': 'application/json'
+				},
+			})
+			.then(response => {
+				if (!response.ok) {
+				  	throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return response.json(); // or response.text(), response.blob(), etc.
+			})
+			.then(this.handleExportActivityResponse.bind(this))
+			.catch(function(error) {
+				this.oCasExportModel.setProperty("/result",{
+					"type": "Error",
+					"message": `Error during export: ${error.message}`
+				});
+				this.oViewStateModel.setProperty("/busyExporting",false);
+				Common.reportError(error, "Error exporting to TMS", null);
+			}.bind(this));
 		}
 	});
 

@@ -385,8 +385,33 @@ const exportContent = async function(payload) {
             "Content-Type": "application/json"
         },
         data: payload.payload
+    },{
+        fetchCsrfToken: false
     })
+    if (!response?.status == 200) {
+        throw new Error(`unexpected response status [${response?.status}], body: ${response?.data? JSON.stringify(response.data) : null}`);
+    }
     return response?.data;
 }
 
-module.exports = { getContentResources, exportContent };
+const queryActivity = async function(casDestination, activityId) {
+    if (!casDestination) {
+        throw new Error(`casDestination not specified`);
+    } 
+    if (!activityId) {
+        throw new Error(`activityId not specified`);
+    }
+    let response = await executeHttpRequest({destinationName: casDestination}, { 
+        method: "GET",
+        url: `/v1/operations/${activityId}?messages=true`,
+        headers: {
+            "Accept": "application/json"
+        }
+    })
+    if (!response?.status == 200) {
+        throw new Error(`unexpected response status [${response?.status}], body:  ${response?.data? JSON.stringify(response.data) : null}`);
+    }
+    return response?.data;
+}
+
+module.exports = { getContentResources, exportContent, queryActivity };

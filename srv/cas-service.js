@@ -3,12 +3,13 @@ const path = require("path");
 const cds = require("@sap/cds");
 const { logger } = require("./lib/logger");
 const { config } = require("./lib/config");
-const { getContentResources, exportContent } = require("./lib/cas");
+const { getContentResources, exportContent, queryActivity } = require("./lib/cas");
 const { message } = require("@sap/cds/lib/log/cds-error");
 
 module.exports = cds.service.impl(srv => {
     srv.on("resources", getResources);
     srv.on("export", handleExport);
+    srv.on("activity", getActivity);
 });
 
 /**
@@ -95,14 +96,28 @@ const handleExport = async function(req) {
     }
     oPayload.payload.transportUser = req.user?.id;
     logger.info(`handling export request: ${JSON.stringify(oPayload,null,2)}`);
-    //const result = await exportContent(oPayload) || {};
-    await new Promise(r => setTimeout(r, 5000));
-    const result = {
-        message: "Export into TMS completed successfully",
-        type: "Success",
-        tr: "193861"
+    const exportResponse = await exportContent(oPayload) || {};
+    // await new Promise(r => setTimeout(r, 5000));
+    // const result = {
+    //     message: "Export into TMS completed successfully",
+    //     type: "Success",
+    //     tr: "193861"
+    // }
+    const exportTime = Date.now();
+    logger.debug(`completed export contentResource, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(exportResponse)}`);
+    if (!exportResponse.activityId) {
+        throw new Error(`activityId not found in export response: ${JSON.stringify(exportResponse)}`);
     }
-    const durationMs = Date.now() - startTime;
-    logger.debug(`completed serving contentResource, takes time ${durationMs} ms, response: ${JSON.stringify(result)}`);
-    return result;
+    const activityResponse = await queryActivity(oPayload.casDestination, exportResponse.activityId);
+    logger.debug(`got activity from casDestination: ${oPayload.casDestination}, activityId: ${exportResponse.activityId}, takes time ${exportTime - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    return activityResponse;
+}
+
+const getActivity = async function(req) {
+    const casDestination = req.data?.casDestination;
+    const activityId = req.data?.activityId;
+    const startTime = Date.now();
+    const activityResponse = await queryActivity(casDestination, activityId);
+    logger.debug(`got activity for userId: ${req.user?.id} from casDestination: ${casDestination}, activityId: ${activityId}, takes time ${Date.now() - startTime} ms, response: ${JSON.stringify(activityResponse)}`);
+    return activityResponse;
 }

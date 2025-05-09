@@ -103,10 +103,6 @@
                     showCloseButton="false"
                     showIcon="true">
                     <link>
-                        <Link text="Content Agent Log"
-                            visible="{= ${casExport>/result/tr} !== undefined}"
-                            target="_blank"
-                            href="https://ncfaws-24.us10.content-agent.cloud.sap/index.html#/activityDetails/6558f6c4-2bd6-11f0-91d8-eeee0a84b499" />
                         <Link text="TR: {casExport>/result/tr}"
                             visible="{= ${casExport>/result/tr} !== undefined}"
                             target="_blank"
@@ -115,10 +111,10 @@
                 </MessageStrip>
                 <ProgressIndicator
                         id="exportProgress"
-                        state="Success"
+                        state="{casExport>/result/type}"
                         visible="{viewState>/busyExporting}"
-                        displayValue="Export in progress: 66%"
-                        percentValue="66"
+                        displayValue="{casExport>/result/message}"
+                        percentValue="{casExport>/result/progress}"
                         showValue="true"
                         displayOnly="true"
                         displayAnimation="true" />

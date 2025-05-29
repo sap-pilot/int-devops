@@ -31,7 +31,7 @@
 		{
 			"title": "SAPUX Analytics",
 			"icon": "sap-icon://globe",
-			"url": "https://analytics.sapux.org/4/realtime",
+			"url": "https://analytics.sapux.org/1/realtime",
 			"target": "_blank"
 		}
 	]

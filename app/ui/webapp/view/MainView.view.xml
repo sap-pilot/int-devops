@@ -59,11 +59,15 @@
                                             press="onPressCasLink"/>
                                     </g:actionButtons> -->
                                     <g:actionLinks>
+                                        <Link text="Inetgration Suite of {landscape>tmsNode}" 
+                                                href="{landscape>intUrl}" 
+                                                enabled="{=${landscape>intUrl} !== undefined}" 
+                                                target="_blank" />
                                         <Link text="Content Agent for {landscape>tmsNode}" 
                                                 href="{landscape>casUrl}" 
                                                 enabled="{=${landscape>casUrl} !== undefined}" 
                                                 target="_blank" />
-                                        <Link text="TMS Import Queue of {landscape>tmsNode}" 
+                                        <Link text="TMS Import Queue for {landscape>tmsNode}" 
                                                 href="{casResources>/value/tmsUrl}#/nodeObject/{landscape>tmsNodeId}" 
                                                 enabled="{=${casResources>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}" 
                                                 target="_blank" />

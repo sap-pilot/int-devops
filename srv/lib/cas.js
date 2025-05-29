@@ -63,6 +63,10 @@ const getContentResources = async function(req) {
             casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
                 return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
             }),
+            intUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+                const intRegion = dest.originalProperties.NODE_REGION || region;
+                return `https://${subdomain}.integrationsuite.cfapps.${intRegion}.hana.ondemand.com/shell/home`
+            }),
             resources: {},
             obj: {}, // result object to be deleted after merge
         }));

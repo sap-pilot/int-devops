@@ -185,162 +185,6 @@
 			]
 		},
         {
-			"key": "dest-api-dr2-http-pp",
-			"title": "API_DR2_HTTP_PP",
-			"group": "5-destination",
-			"status": "Success",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dr2"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "PP"
-				}
-			]
-		},
-        {
-			"key": "dest-api-dr2-http-basic",
-			"title": "API_DR2_HTTP_BASIC",
-			"group": "5-destination",
-			"status": "Success",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dr2-basic"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "Basic"
-				},
-                {
-					"label": "user",
-					"value": "CPI_USER"
-				}
-			]
-		},
-        {
-			"key": "dest-api-dru-http-pp",
-			"title": "API_DRU_HTTP_PP",
-			"group": "5-destination",
-			"status": "Success",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dru"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "PP"
-				}
-			]
-		},
-        {
-			"key": "dest-api-dru-http-basic",
-			"title": "API_DRU_HTTP_BASIC",
-			"group": "5-destination",
-			"status": "Success",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dru-basic"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "Basic"
-				},
-                {
-					"label": "user",
-					"value": "CPI_USER"
-				}
-			]
-		},
-        {
-			"key": "dest-api-dr4-http-pp",
-			"title": "API_DR4_HTTP_PP",
-			"group": "5-destination",
-			"status": "",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dr4"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "PP"
-				}
-			]
-		},
-        {
-			"key": "dest-api-dr4-http-basic",
-			"title": "API_DR4_HTTP_BASIC",
-			"group": "5-destination",
-			"status": "",
-			"attributes": [
-                {
-					"label": "type",
-					"value": "HTTP"
-				},
-                {
-					"label": "host",
-					"value": "dr4-basic"
-				},
-                {
-					"label": "sap-client",
-					"value": "200"
-				},
-				{
-					"label": "authentication",
-					"value": "Basic"
-				},
-                {
-					"label": "user",
-					"value": "CPI_USER"
-				}
-			]
-		},
-        {
 			"key": "s4-dr2",
 			"title": "DR2",
 			"group": "6-s4",
@@ -420,51 +264,351 @@
 		},
         {
 			"from": "dispatcher-dev2",
-			"to": "dest-api-dr2-http-pp"
+			"to": "s4-dr2",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR2_HTTP_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dr2"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
 		},
         {
 			"from": "dispatcher-dev2",
-			"to": "dest-api-dr2-http-basic"
+			"to": "s4-dr2",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR2_HTTP_BAASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dr2"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
+		},
+        {
+			"from": "dispatcher-dev2",
+			"to": "s4-dr2",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR2_RFC_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dr2-snc"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
+		},
+        {
+			"from": "dispatcher-dev2",
+			"to": "s4-dr2",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR2_RFC_BASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dr2"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
 		},
         {
 			"from": "dispatcher-dev2b",
-			"to": "dest-api-dru-http-pp"
+			"to": "s4-dru",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DRU_HTTP_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dru"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
 		},
         {
 			"from": "dispatcher-dev2b",
-			"to": "dest-api-dru-http-basic"
+			"to": "s4-dru",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DRU_HTTP_BAASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dru"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
 		},
         {
 			"from": "dispatcher-dev2b",
-			"to": "dest-api-dr4-http-pp"
+			"to": "s4-dru",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DRU_RFC_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dru-snc"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
 		},
         {
 			"from": "dispatcher-dev2b",
-			"to": "dest-api-dr4-http-basic"
+			"to": "s4-dru",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DRU_RFC_BASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dru"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
 		},
         {
-			"from": "dest-api-dr2-http-pp",
-			"to": "s4-dr2"
+			"from": "dispatcher-dev2b",
+			"to": "s4-dr4",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR4_HTTP_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dr4"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
 		},
         {
-			"from": "dest-api-dr2-http-basic",
-			"to": "s4-dr2"
+			"from": "dispatcher-dev2b",
+			"to": "s4-dr4",
+            "lineType": "Solid",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR4_HTTP_BASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "HTTP"
+                },
+                {
+                    "label": "host",
+                    "value": "dr4"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
 		},
         {
-			"from": "dest-api-dru-http-pp",
-			"to": "s4-dru"
+			"from": "dispatcher-dev2b",
+			"to": "s4-dr4",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR4_RFC_PP"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dr4-snc"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "PP"
+                }
+            ]
 		},
         {
-			"from": "dest-api-dru-http-basic",
-			"to": "s4-dru"
-		},
-        {
-			"from": "dest-api-dr4-http-pp",
-			"to": "s4-dr4"
-		},
-        {
-			"from": "dest-api-dr4-http-basic",
-			"to": "s4-dr4"
+			"from": "dispatcher-dev2b",
+			"to": "s4-dr4",
+            "lineType": "Dotted",
+            "attributes": [
+                {
+                    "label": "dest",
+                    "value": "API_DR4_RFC_BASIC"
+                },
+                {
+                    "label": "type",
+                    "value": "RFC"
+                },
+                {
+                    "label": "host",
+                    "value": "dr4"
+                },
+                {
+                    "label": "sap-client",
+                    "value": "200"
+                },
+                {
+                    "label": "authentication",
+                    "value": "basic"
+                },
+                {
+                    "label": "user",
+                    "value": "CPI_USER"
+                }
+            ]
 		}
 	],
 	"groups": [
@@ -487,11 +631,6 @@
 			"key": "4-dispatcher",
 			"title": "Dispatcher",
 			"status": "Warning"
-		},
-        {
-			"key": "5-destination",
-			"title": "Destination",
-			"status": "Success"
 		},
         {
 			"key": "6-s4",

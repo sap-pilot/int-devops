@@ -53,12 +53,13 @@
                                 <g:Line
                                         from="{routerLandscape>from}"
                                         to="{routerLandscape>to}"
+                                        lineType="{routerLandscape>lineType}"
                                         attributes="{path:'routerLandscape>attributes', templateShareable:true}"
                                         status="{routerLandscape>status}">
                                     <g:attributes>
                                         <g:ElementAttribute
-                                                label="{label}"
-                                                value="{value}"/>
+                                                label="{routerLandscape>label}"
+                                                value="{routerLandscape>value}"/>
                                     </g:attributes>
                                 </g:Line>
                             </g:lines>

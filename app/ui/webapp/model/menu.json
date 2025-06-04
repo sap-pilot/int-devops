@@ -27,6 +27,12 @@
 			"icon": "sap-icon://quality-issue",
 			"url": "https://me.sap.com/createIssue/0/overview",
 			"target": "_blank"
+		},
+		{
+			"title": "SAPUX Analytics",
+			"icon": "sap-icon://globe",
+			"url": "https://analytics.sapux.org/1/realtime",
+			"target": "_blank"
 		}
 	]
 }

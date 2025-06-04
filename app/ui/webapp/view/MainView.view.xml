@@ -59,11 +59,15 @@
                                             press="onPressCasLink"/>
                                     </g:actionButtons> -->
                                     <g:actionLinks>
-                                        <Link text="Content Agent for {landscape>tmsNode}" 
+                                        <Link text="{landscape>tmsNode} - Inetgration Suite" 
+                                                href="{landscape>intUrl}" 
+                                                enabled="{=${landscape>intUrl} !== undefined}" 
+                                                target="_blank" />
+                                        <Link text="{landscape>tmsNode} - Content Agent" 
                                                 href="{landscape>casUrl}" 
                                                 enabled="{=${landscape>casUrl} !== undefined}" 
                                                 target="_blank" />
-                                        <Link text="TMS Import Queue of {landscape>tmsNode}" 
+                                        <Link text="{landscape>tmsNode} - TMS Import Queue" 
                                                 href="{casResources>/value/tmsUrl}#/nodeObject/{landscape>tmsNodeId}" 
                                                 enabled="{=${casResources>/value/tmsUrl} !== undefined &amp;&amp; ${landscape>tmsNodeId} !== undefined}" 
                                                 target="_blank" />
@@ -112,7 +116,8 @@
 									ariaLabelledBy="title">
 								<table:extension>
 									<OverflowToolbar style="Clear">
-										<SearchField id="treeFilter" width="18rem" 
+										<SearchField id="treeFilter" width="19rem" 
+                                            placeholder="Search by name, id, type or version"
                                             enabled="{=!${viewState>/busy}}"
                                             change="onTreeFilterChange"/>
 										<ToolbarSpacer/>
@@ -141,21 +146,21 @@
                                     }" highlightText="{casResources>s}"/>
                                 </table:rowSettingsTemplate>
 								<table:columns>
-									<table:Column width="16rem">
+									<table:Column width="17rem">
 										<Label text="Content Resources"/>
 										<table:template>
                                             <Link text="{casResources>n}" wrapping="false" 
                                                 href="{casResources>/value/repoUrl}{casResources>p}" target="_blank"/>
 										</table:template>
 									</table:Column>
-                                    <table:Column width="5rem">
+                                    <table:Column width="6rem">
 										<Label text="ID"/>
 										<table:template>
 											<Text text="{casResources>i}" wrapping="false" />
 										</table:template>
 									</table:Column>
-									<table:Column width="7rem">
-										<Label text="Sub-Type/Type"/>
+									<table:Column width="6rem">
+										<Label text="Sub-Type"/>
 										<table:template>
 											<Text text="{=${casResources>st} === undefined? ${casResources>t} : ${casResources>st}}" wrapping="false" />
 										</table:template>

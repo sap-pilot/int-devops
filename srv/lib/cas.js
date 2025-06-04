@@ -43,7 +43,7 @@ const { getTmsLandscapeAsync } = require("./tms");
 const getContentResources = async function(req) {
     try {
         // get list of destinations
-        const allDestinations = await getAllDestinationsFromDestinationService();
+        const allDestinations = await getAllDestinationsFromDestinationService({useCache: false});
         // extract tms url
         const tmsDestination = allDestinations.find( dest => dest.name === config.tmsDestination );
         const tmsUrl = tmsDestination?.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
@@ -62,6 +62,10 @@ const getContentResources = async function(req) {
             casDest: dest.name, // cas destination name
             casUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
                 return `https://${subdomain}.${region}.content-agent.cloud.sap/index.html`
+            }),
+            intUrl: dest.tokenServiceUrl?.replace(/https:\/\/([^.]+).authentication.([^.]+).(.+)/, (match, subdomain, region) => {
+                const intRegion = dest.originalProperties.NODE_REGION || region;
+                return `https://${subdomain}.integrationsuite.cfapps.${intRegion}.hana.ondemand.com/shell/home`
             }),
             resources: {},
             obj: {}, // result object to be deleted after merge
@@ -93,10 +97,10 @@ const getContentResources = async function(req) {
                     node.obj = _reorgResources(result.data, node.resources); // parse/reorg and count resources by subType
                 }
             })
-            // .catch(error => {
-            //     node.error = error.message;
-            //     logger.warn(`failed to load contentResource from destination ${node.casDest}: ${error}`,error);
-            // })
+            .catch(error => {
+                nodes.error = error.reason?.message || `unknown error`;
+                logger.warn(`failed to load contentResource from destination ${node.casDest}: ${error}`,error);
+            })
             .finally(() => {
                 const durationMs = Date.now() - startTime;
                 logger.debug(`completed loading contentResource from ${node.casDest}, takes time ${durationMs} ms, result: ${JSON.stringify(node.resources,null,2)}`);
@@ -105,12 +109,12 @@ const getContentResources = async function(req) {
         }
         // wait for all promises to complete
         const results = await Promise.allSettled(promises);
-        results.forEach((result, index) => {
-            if (result.status === "rejected") {
-                nodes[index].error = result.reason.message;
-                logger.warn(`Failed to load contentResource from destination ${nodes[index].casDest}: ${result.reason}`);
-            }
-        });
+        // results.forEach((result, index) => {
+        //     if (result.status === "rejected") {
+        //         nodes[index].error = result.reason?.message || `unknown error`;
+        //         logger.warn(`Failed to load contentResource from destination ${nodes[index].casDest}: ${result.reason}`);
+        //     }
+        // });
         const durationMs = Date.now() - startTime;
         logger.debug(`completed loading contentResources from all nodes, takes time ${durationMs} ms`);
        
@@ -230,6 +234,8 @@ const _recursiveDelete = function(obj, keysToDelete) {
 }
 
 const _recursiveMerge = function(obj, merged, vProp, iNodes) {
+    if (!obj || !obj.c)
+        return; // nothing to merge
     for (const entry of obj.c) {
         let mergedEntry = merged.table[entry.i];
         if (!mergedEntry) {

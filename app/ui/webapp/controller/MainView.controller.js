@@ -196,7 +196,7 @@ sap.ui.define([
 							target:"_blank",  wrapping: false})
 						: new Text({text: node.alias, wrapping: false}),
 					template: new Text({text: `{${sModelName}>v${node.idx}}`, wrapping: false}),
-					width: "5em",
+					width: "4em",
 					visible: columnVisible
 				});
 				oTreeTable.addColumn(column);

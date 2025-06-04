@@ -2,17 +2,18 @@
 	"selectedKey": "home",
 	"navigation": [
 		{
-			"title": "Overview",
+			"title": "Transport Landscape",
 			"icon": "sap-icon://home",
-			"key": "Overview",
-			"items": [
-				{
-					"title": "System Landscape",
-					"key": "Landscape",
-					"url": "#",
-					"target": "_self"
-				}
-			]
+			"key": "Main",
+			"url": "#",
+			"target": "_self"
+		},
+		{
+			"title": "Routes & Destinations",
+			"icon": "sap-icon://journey-arrive",
+			"key": "Router",
+			"url": "#router",
+			"target": "_self"
 		}
 	],
 	"fixedNavigation": [

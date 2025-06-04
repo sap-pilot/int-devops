@@ -24,9 +24,9 @@
 		"dataSources": {},
 		"crossNavigation": {
 			"inbounds": {
-				"BtpPilot-overview": {
+				"IntDevOps-main": {
 					"semanticObject": "IntDevOps",
-					"action": "overview",
+					"action": "main",
 					"title": "{{flpTitle}}",
 					"subTitle": "{{flpSubtitle}}",
 					"signature": {
@@ -105,9 +105,14 @@
 			},
 			"routes": [
 				{
-					"name": "Overview",
+					"name": "Main",
 					"pattern": ":?query:",
 					"target": "Main"
+				},
+				{
+					"name": "Router",
+					"pattern": "router",
+					"target": "Router"
 				}
 			],
 			"targets": {
@@ -117,6 +122,13 @@
 					"clearControlAggregation": false,
 					"viewId": "MainView",
 					"viewName": "MainView"
+				},
+				"Router": {
+					"viewType": "XML",
+					"transition": "slide",
+					"clearControlAggregation": false,
+					"viewId": "RouterView",
+					"viewName": "RouterView"
 				}
 			}
 		},

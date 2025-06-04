@@ -1,0 +1,502 @@
+{
+	"nodes": [
+		{
+			"key": "route-api-dev2",
+			"title": "api-dev2",
+			"group": "1-route",
+			"status": "Warning",
+			"attributes": [
+				{
+					"label": "route",
+					"value": "api-dev2"
+				},
+				{
+					"label": "domain",
+					"value": "cvx.one"
+				}
+			]
+		},
+		{
+			"key": "route-api-dev2b",
+			"title": "api-dev2b",
+			"group": "1-route",
+			"status": "Warning",
+			"attributes": [
+				{
+					"label": "route",
+					"value": "api-dev2b"
+				},
+				{
+					"label": "domain",
+					"value": "cvx.one"
+				}
+			]
+		},
+        {
+			"key": "route-api-dev4a",
+			"title": "api-dev4a",
+			"group": "1-route",
+			"status": "",
+			"attributes": [
+				{
+					"label": "route",
+					"value": "api-dev4a"
+				},
+				{
+					"label": "domain",
+					"value": "cvx.one"
+				}
+			]
+		},
+        {
+			"key": "proxy-dev2",
+			"title": "proxy-dev2",
+			"group": "2-proxy",
+			"status": "Warning",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "ncfaws-20"
+				},
+				{
+					"label": "space",
+					"value": "utl"
+				},
+				{
+					"label": "app",
+					"value": "int-proxy"
+				}
+			]
+		},
+        {
+			"key": "proxy-dev2b",
+			"title": "proxy-dev2b",
+			"group": "2-proxy",
+			"status": "Warning",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "cvx-int-dev2"
+				},
+				{
+					"label": "space",
+					"value": "utl"
+				},
+				{
+					"label": "app",
+					"value": "int-proxy"
+				}
+			]
+		},
+        {
+			"key": "int-dev2",
+			"title": "int-dev2",
+			"group": "3-int",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "ncfaws-20"
+				},
+				{
+					"label": "subdomain",
+					"value": "ncfaws-20"
+				}
+			]
+		},
+        {
+			"key": "int-dev2b",
+			"title": "int-dev2b",
+			"group": "3-int",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "cvx-int-dev2"
+				},
+				{
+					"label": "subdomain",
+					"value": "cvx-int-dev2"
+				}
+			]
+		},
+        {
+			"key": "dispatcher-dev2",
+			"title": "dispatcher-dev2",
+			"group": "4-dispatcher",
+			"status": "Warning",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "ncfaws-20"
+				},
+				{
+					"label": "space",
+					"value": "utl"
+				},
+				{
+					"label": "app",
+					"value": "int-dispatcher"
+				}
+			]
+		},
+        {
+			"key": "dispatcher-dev2b",
+			"title": "dispatcher-dev2b",
+			"group": "4-dispatcher",
+			"status": "Warning",
+			"attributes": [
+                {
+					"label": "region",
+					"value": "us10"
+				},
+				{
+					"label": "org",
+					"value": "cvx-int-dev2"
+				},
+				{
+					"label": "space",
+					"value": "utl"
+				},
+				{
+					"label": "app",
+					"value": "int-dispatcher"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dr2-http-pp",
+			"title": "API_DR2_HTTP_PP",
+			"group": "5-destination",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dr2"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "PP"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dr2-http-basic",
+			"title": "API_DR2_HTTP_BASIC",
+			"group": "5-destination",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dr2-basic"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "Basic"
+				},
+                {
+					"label": "user",
+					"value": "CPI_USER"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dru-http-pp",
+			"title": "API_DRU_HTTP_PP",
+			"group": "5-destination",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dru"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "PP"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dru-http-basic",
+			"title": "API_DRU_HTTP_BASIC",
+			"group": "5-destination",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dru-basic"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "Basic"
+				},
+                {
+					"label": "user",
+					"value": "CPI_USER"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dr4-http-pp",
+			"title": "API_DR4_HTTP_PP",
+			"group": "5-destination",
+			"status": "",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dr4"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "PP"
+				}
+			]
+		},
+        {
+			"key": "dest-api-dr4-http-basic",
+			"title": "API_DR4_HTTP_BASIC",
+			"group": "5-destination",
+			"status": "",
+			"attributes": [
+                {
+					"label": "type",
+					"value": "HTTP"
+				},
+                {
+					"label": "host",
+					"value": "dr4-basic"
+				},
+                {
+					"label": "sap-client",
+					"value": "200"
+				},
+				{
+					"label": "authentication",
+					"value": "Basic"
+				},
+                {
+					"label": "user",
+					"value": "CPI_USER"
+				}
+			]
+		},
+        {
+			"key": "s4-dr2",
+			"title": "DR2",
+			"group": "6-s4",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "host",
+					"value": "dr2"
+				},
+                {
+					"label": "port",
+					"value": "443"
+				}
+			]
+		},
+        {
+			"key": "s4-dru",
+			"title": "DRU",
+			"group": "6-s4",
+			"status": "Success",
+			"attributes": [
+                {
+					"label": "host",
+					"value": "dru"
+				},
+                {
+					"label": "port",
+					"value": "443"
+				}
+			]
+		},
+        {
+			"key": "s4-dr4",
+			"title": "DR4",
+			"group": "6-s4",
+			"status": "",
+			"attributes": [
+                {
+					"label": "host",
+					"value": "dr4"
+				},
+                {
+					"label": "port",
+					"value": "443"
+				}
+			]
+		}
+	],
+	"lines": [
+		{
+			"from": "route-api-dev2",
+			"to": "proxy-dev2"
+		},
+		{
+			"from": "route-api-dev2b",
+			"to": "proxy-dev2b"
+		},
+        {
+			"from": "route-api-dev4a",
+			"to": "proxy-dev2b"
+		},
+		{
+			"from": "proxy-dev2",
+			"to": "int-dev2"
+		},
+        {
+			"from": "proxy-dev2b",
+			"to": "int-dev2b"
+		},
+        {
+			"from": "int-dev2",
+			"to": "dispatcher-dev2"
+		},
+        {
+			"from": "int-dev2b",
+			"to": "dispatcher-dev2b"
+		},
+        {
+			"from": "dispatcher-dev2",
+			"to": "dest-api-dr2-http-pp"
+		},
+        {
+			"from": "dispatcher-dev2",
+			"to": "dest-api-dr2-http-basic"
+		},
+        {
+			"from": "dispatcher-dev2b",
+			"to": "dest-api-dru-http-pp"
+		},
+        {
+			"from": "dispatcher-dev2b",
+			"to": "dest-api-dru-http-basic"
+		},
+        {
+			"from": "dispatcher-dev2b",
+			"to": "dest-api-dr4-http-pp"
+		},
+        {
+			"from": "dispatcher-dev2b",
+			"to": "dest-api-dr4-http-basic"
+		},
+        {
+			"from": "dest-api-dr2-http-pp",
+			"to": "s4-dr2"
+		},
+        {
+			"from": "dest-api-dr2-http-basic",
+			"to": "s4-dr2"
+		},
+        {
+			"from": "dest-api-dru-http-pp",
+			"to": "s4-dru"
+		},
+        {
+			"from": "dest-api-dru-http-basic",
+			"to": "s4-dru"
+		},
+        {
+			"from": "dest-api-dr4-http-pp",
+			"to": "s4-dr4"
+		},
+        {
+			"from": "dest-api-dr4-http-basic",
+			"to": "s4-dr4"
+		}
+	],
+	"groups": [
+		{
+			"key": "1-route",
+			"title": "Route",
+			"status": "Warning"
+		},
+		{
+			"key": "2-proxy",
+			"title": "Proxy",
+			"status": "Warning"
+		},
+        {
+			"key": "3-int",
+			"title": "Integration Suite",
+			"status": "Success"
+		},
+        {
+			"key": "4-dispatcher",
+			"title": "Dispatcher",
+			"status": "Warning"
+		},
+        {
+			"key": "5-destination",
+			"title": "Destination",
+			"status": "Success"
+		},
+        {
+			"key": "6-s4",
+			"title": "S4HANA",
+			"status": "Success"
+		}
+	]
+}

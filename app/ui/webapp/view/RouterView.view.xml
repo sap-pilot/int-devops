@@ -1,0 +1,88 @@
+<mvc:View
+	controllerName="org.sapux.int.controller.RouterView"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+    xmlns:g="sap.suite.ui.commons.networkgraph"
+    xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table">
+	<Page
+		showHeader="false"
+		enableScrolling="false"
+		showNavButton="false">
+		<content>
+            <l:ResponsiveSplitter defaultPane="contePane" height="100%">
+                <l:PaneContainer>
+                    <l:SplitPane id="routerGraphPane">
+                        <g:Graph enableWheelZoom="false"
+                            id="graph"
+                            height="100%"
+                            width="100%"
+                            busy="{viewState>/busy}"
+                            selectionChange="onGraphSelectionChange"
+                            orientation="{appState>/routerLandscapeOrientation}"
+                            nodes="{routerLandscape>/nodes}"
+                            lines="{routerLandscape>/lines}"
+                            groups="{routerLandscape>/groups}">
+                            <g:statuses>
+                                <g:Status key="CustomStatus" backgroundColor="darkblue" />
+                            </g:statuses>
+                            <g:nodes>
+                                <g:Node
+                                        key="{routerLandscape>key}"
+                                        title="{routerLandscape>title}"
+                                        group="{routerLandscape>group}"
+                                        icon="{routerLandscape>icon}"
+                                        attributes="{path:'routerLandscape>attributes', templateShareable:true}"
+                                        showActionLinksButton="true"
+                                        showDetailButton="false"
+                                        status="{routerLandscape>status}"
+                                        headerCheckBoxState="{routerLandscape>checkboxState}"
+                                        selected="{routerLandscape>selected}"
+                                        press="onNodePress"
+                                        width="180"
+                                        shape="Box">
+                                    <g:attributes>
+                                        <g:ElementAttribute
+                                                label="{routerLandscape>label}"
+                                                value="{routerLandscape>value}"/>
+                                    </g:attributes>
+                                </g:Node>
+                            </g:nodes>
+                            <g:lines>
+                                <g:Line
+                                        from="{routerLandscape>from}"
+                                        to="{routerLandscape>to}"
+                                        attributes="{path:'routerLandscape>attributes', templateShareable:true}"
+                                        status="{routerLandscape>status}">
+                                    <g:attributes>
+                                        <g:ElementAttribute
+                                                label="{label}"
+                                                value="{value}"/>
+                                    </g:attributes>
+                                </g:Line>
+                            </g:lines>
+                            <g:groups>
+                                <g:Group
+                                    headerCheckBoxState="{routerLandscape>headerCheckboxState}"
+                                    status="{routerLandscape>status}"
+                                    collapsed="{routerLandscape>collapsed}"
+                                    key="{routerLandscape>key}"
+                                    title="{routerLandscape>title}">
+                                </g:Group>
+                            </g:groups>
+                        </g:Graph>
+                     </l:SplitPane>
+                    <l:SplitPane id="routerRulesPane">   
+                        <l:layoutData>
+                            <l:SplitterLayoutData size="{appState>/routerRulesWidth}" />
+                        </l:layoutData>
+                        <Panel class="sapUiNoContentPadding" height="100%">
+                        
+                        </Panel>
+                    </l:SplitPane>
+                </l:PaneContainer>
+            </l:ResponsiveSplitter> 
+		</content>
+	</Page>
+</mvc:View>

@@ -32,6 +32,8 @@ sap.ui.define([
 			// setTimeout(function(){this.loadContentResources(false)}.bind(this),100);
 			this.oRouterLandscapeModel = new JSONModel("model/router-landscape.json");
 			this.getView().setModel(this.oRouterLandscapeModel,"routerLandscape");
+			this.oRouterRulesModel = new JSONModel("model/router-rules.json");
+			this.getView().setModel(this.oRouterRulesModel,"routerRules");
 		},
 
 		setupGraphControls: function () {

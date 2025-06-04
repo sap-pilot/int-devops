@@ -78,7 +78,44 @@
                             <l:SplitterLayoutData size="{appState>/routerRulesWidth}" />
                         </l:layoutData>
                         <Panel class="sapUiNoContentPadding" height="100%">
-                        
+                            <table:Table
+                                rows="{routerRules>/rules}"
+                                selectionMode="MultiToggle"
+                                rowMode="Auto"
+                                ariaLabelledBy="title">
+                                <table:extension>
+                                    <OverflowToolbar style="Clear">
+                                        <Title id="title" text="Routing Rules"/>
+                                    </OverflowToolbar>
+                                </table:extension>
+                                <table:columns>
+                                    <table:Column width="9rem">
+                                        <Label text="Route" />
+                                        <table:template>
+                                            <ComboBox value="{routerRules>route}" items="{ path: 'routerRules>/routes', templateShareable: false }">
+                                                <core:Item text="{routerRules>route}"/>
+                                            </ComboBox>
+                                            <!-- <m:Input value="{routerRules>route}"/> -->
+                                        </table:template>
+                                    </table:Column>
+                                    <table:Column width="9rem">
+                                        <Label text="System Alias" />
+                                        <table:template>
+                                            <ComboBox value="{routerRules>alias}" items="{ path: 'routerRules>/systemAlias', templateShareable: false }">
+                                                <core:Item text="{routerRules>alias}"/>
+                                            </ComboBox>
+                                        </table:template>
+                                    </table:Column>
+                                     <table:Column width="12rem">
+                                        <Label text="Destination" />
+                                        <table:template>
+                                            <ComboBox value="{routerRules>destination}" items="{ path: 'routerRules>/destinations', templateShareable: false }">
+                                                <core:Item text="{routerRules>name}"/>
+                                            </ComboBox>
+                                        </table:template>
+                                    </table:Column>
+                                </table:columns>
+                            </table:Table>
                         </Panel>
                     </l:SplitPane>
                 </l:PaneContainer>

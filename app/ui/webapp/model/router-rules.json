@@ -8,15 +8,25 @@
         {"alias": "s4-http-pp"},
         {"alias": "s4-http-basic"},
         {"alias": "mdg-http-pp"},
-        {"alias": "mdg-http-basic"}
+        {"alias": "mdg-http-basic"},
+        {"alias": "s4-rfc-pp"},
+        {"alias": "s4-rfc-basic"},
+        {"alias": "mdg-rfc-pp"},
+        {"alias": "mdg-rfc-basic"}
     ],
     "destinations": [
         {"name":"API_DR2_HTTP_PP"},
         {"name":"API_DR2_HTTP_BASIC"},
+        {"name":"API_DR2_RFC_PP"},
+        {"name":"API_DR2_RFC_BASIC"},
         {"name":"API_DRU_HTTP_PP"},
         {"name":"API_DRU_HTTP_BASIC"},
+        {"name":"API_DRU_RFC_PP"},
+        {"name":"API_DRU_RFC_BASIC"},
         {"name":"API_DR4_HTTP_PP"},
-        {"name":"API_DR4_HTTP_BASIC"}
+        {"name":"API_DR4_HTTP_BASIC"},
+        {"name":"API_DR4_RFC_PP"},
+        {"name":"API_DR4_RFC_BASIC"}
     ],
     "rules": [
         {"route":"api-dev2","alias":"s4-http-pp","destination":"API_DR2_HTTP_PP"},

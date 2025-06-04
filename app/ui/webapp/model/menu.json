@@ -2,7 +2,7 @@
 	"selectedKey": "home",
 	"navigation": [
 		{
-			"title": "Transport Landscape",
+			"title": "Transport Management",
 			"icon": "sap-icon://home",
 			"key": "Main",
 			"url": "#",

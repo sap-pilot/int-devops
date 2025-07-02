@@ -91,7 +91,7 @@
                                 </table:extension>
                                 <table:columns>
                                     <table:Column width="9rem">
-                                        <Label text="Route" />
+                                        <Label text="cvx-env" />
                                         <table:template>
                                             <ComboBox value="{routerRules>route}" items="{ path: 'routerRules>/routes', templateShareable: false }">
                                                 <core:Item text="{routerRules>route}"/>
@@ -100,7 +100,7 @@
                                         </table:template>
                                     </table:Column>
                                     <table:Column width="9rem">
-                                        <Label text="System Alias" />
+                                        <Label text="system-alias" />
                                         <table:template>
                                             <ComboBox value="{routerRules>alias}" items="{ path: 'routerRules>/systemAlias', templateShareable: false }">
                                                 <core:Item text="{routerRules>alias}"/>
@@ -108,7 +108,7 @@
                                         </table:template>
                                     </table:Column>
                                      <table:Column width="12rem">
-                                        <Label text="Destination" />
+                                        <Label text="destination" />
                                         <table:template>
                                             <ComboBox value="{routerRules>destination}" items="{ path: 'routerRules>/destinations', templateShareable: false }">
                                                 <core:Item text="{routerRules>name}"/>

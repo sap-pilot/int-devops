@@ -1,8 +1,8 @@
 {
     "routes": [
-        {"route":"api-dev2"},
-        {"route":"api-dev2b"},
-        {"route":"api-dev4a"}
+        {"route":"r2-dev"},
+        {"route":"r2b-dev"},
+        {"route":"r4a-dev"}
     ],
     "systemAlias": [
         {"alias": "s4-http-pp"},
@@ -19,27 +19,39 @@
         {"name":"API_DR2_HTTP_BASIC"},
         {"name":"API_DR2_RFC_PP"},
         {"name":"API_DR2_RFC_BASIC"},
+        {"name":"API_DRG_HTTP_PP"},
+        {"name":"API_DRG_HTTP_BASIC"},
+        {"name":"API_DRG_RFC_PP"},
+        {"name":"API_DRG_RFC_BASIC"},
         {"name":"API_DRU_HTTP_PP"},
         {"name":"API_DRU_HTTP_BASIC"},
         {"name":"API_DRU_RFC_PP"},
         {"name":"API_DRU_RFC_BASIC"},
+        {"name":"API_DGU_HTTP_PP"},
+        {"name":"API_DGU_HTTP_BASIC"},
+        {"name":"API_DGU_RFC_PP"},
+        {"name":"API_DGU_RFC_BASIC"},
         {"name":"API_DR4_HTTP_PP"},
         {"name":"API_DR4_HTTP_BASIC"},
         {"name":"API_DR4_RFC_PP"},
-        {"name":"API_DR4_RFC_BASIC"}
+        {"name":"API_DR4_RFC_BASIC"},
+        {"name":"API_DG4_HTTP_PP"},
+        {"name":"API_DG4_HTTP_BASIC"},
+        {"name":"API_DG4_RFC_PP"},
+        {"name":"API_DG4_RFC_BASIC"}
     ],
     "rules": [
-        {"route":"api-dev2","alias":"s4-http-pp","destination":"API_DR2_HTTP_PP"},
-        {"route":"api-dev2","alias":"s4-http-basic","destination":"API_DR2_HTTP_BASIC"},
-        {"route":"api-dev2","alias":"mdg-http-pp","destination":"API_DG2_HTTP_PP"},
-        {"route":"api-dev2","alias":"mdg-http-basic","destination":"API_DG2_HTTP_BASIC"},
-        {"route":"api-dev2b","alias":"s4-http-pp","destination":"API_DRU_HTTP_PP"},
-        {"route":"api-dev2b","alias":"s4-http-basic","destination":"API_DRU_HTTP_BASIC"},
-        {"route":"api-dev2b","alias":"mdg-http-pp","destination":"API_DGU_HTTP_PP"},
-        {"route":"api-dev2b","alias":"mdg-http-basic","destination":"API_DGU_HTTP_BASIC"},
-        {"route":"api-dev4a","alias":"s4-http-pp","destination":"API_DR4_HTTP_PP"},
-        {"route":"api-dev4a","alias":"s4-http-basic","destination":"API_DR4_HTTP_BASIC"},
-        {"route":"api-dev4a","alias":"mdg-http-pp","destination":"API_DG4_HTTP_PP"},
-        {"route":"api-dev4a","alias":"mdg-http-basic","destination":"API_DG4_HTTP_BASIC"}
+        {"route":"r2-dev","alias":"s4-http-pp","destination":"API_DR2_HTTP_PP"},
+        {"route":"r2-dev","alias":"s4-http-basic","destination":"API_DR2_HTTP_BASIC"},
+        {"route":"r2-dev","alias":"mdg-http-pp","destination":"API_DG2_HTTP_PP"},
+        {"route":"r2-dev","alias":"mdg-http-basic","destination":"API_DG2_HTTP_BASIC"},
+        {"route":"r2b-dev","alias":"s4-http-pp","destination":"API_DRU_HTTP_PP"},
+        {"route":"r2b-dev","alias":"s4-http-basic","destination":"API_DRU_HTTP_BASIC"},
+        {"route":"r2b-dev","alias":"mdg-http-pp","destination":"API_DGU_HTTP_PP"},
+        {"route":"r2b-dev","alias":"mdg-http-basic","destination":"API_DGU_HTTP_BASIC"},
+        {"route":"r4a-dev","alias":"s4-http-pp","destination":"API_DR4_HTTP_PP"},
+        {"route":"r4a-dev","alias":"s4-http-basic","destination":"API_DR4_HTTP_BASIC"},
+        {"route":"r4a-dev","alias":"mdg-http-pp","destination":"API_DG4_HTTP_PP"},
+        {"route":"r4a-dev","alias":"mdg-http-basic","destination":"API_DG4_HTTP_BASIC"}
     ]
 }

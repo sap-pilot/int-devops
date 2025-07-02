@@ -2,13 +2,13 @@
 	"nodes": [
 		{
 			"key": "route-api-dev2",
-			"title": "api-dev2",
+			"title": "cvx-r2-dev",
 			"group": "1-route",
 			"status": "Warning",
 			"attributes": [
 				{
-					"label": "route",
-					"value": "api-dev2"
+					"label": "cvx-env",
+					"value": "r2-dev"
 				},
 				{
 					"label": "domain",
@@ -18,13 +18,13 @@
 		},
 		{
 			"key": "route-api-dev2b",
-			"title": "api-dev2b",
+			"title": "cvx-r2b-dev",
 			"group": "1-route",
 			"status": "Warning",
 			"attributes": [
 				{
-					"label": "route",
-					"value": "api-dev2b"
+					"label": "cvx-env",
+					"value": "r2b-dev"
 				},
 				{
 					"label": "domain",
@@ -34,13 +34,13 @@
 		},
         {
 			"key": "route-api-dev4a",
-			"title": "api-dev4a",
+			"title": "cvx-r4a-dev",
 			"group": "1-route",
 			"status": "",
 			"attributes": [
 				{
-					"label": "route",
-					"value": "api-dev4a"
+					"label": "cvx-env",
+					"value": "r4a-dev"
 				},
 				{
 					"label": "domain",
@@ -268,7 +268,15 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR2_HTTP_PP"
                 },
                 {
@@ -295,8 +303,16 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
-                    "value": "API_DR2_HTTP_BAASIC"
+                    "label": "cvx-env",
+                    "value": "r2-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-basic"
+                },
+                {
+                    "label": "destination",
+                    "value": "API_DR2_HTTP_BASIC"
                 },
                 {
                     "label": "type",
@@ -326,7 +342,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR2_RFC_PP"
                 },
                 {
@@ -353,7 +377,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-basic"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR2_RFC_BASIC"
                 },
                 {
@@ -384,7 +416,15 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2b-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DRU_HTTP_PP"
                 },
                 {
@@ -411,8 +451,16 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
-                    "value": "API_DRU_HTTP_BAASIC"
+                    "label": "cvx-env",
+                    "value": "r2b-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-basic"
+                },
+                {
+                    "label": "destination",
+                    "value": "API_DRU_HTTP_BASIC"
                 },
                 {
                     "label": "type",
@@ -442,7 +490,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2b-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DRU_RFC_PP"
                 },
                 {
@@ -469,7 +525,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r2b-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-basic"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DRU_RFC_BASIC"
                 },
                 {
@@ -500,7 +564,15 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r4a-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR4_HTTP_PP"
                 },
                 {
@@ -527,7 +599,15 @@
             "lineType": "Solid",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r4a-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-http-basic"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR4_HTTP_BASIC"
                 },
                 {
@@ -558,7 +638,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r4a-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-pp"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR4_RFC_PP"
                 },
                 {
@@ -585,7 +673,15 @@
             "lineType": "Dotted",
             "attributes": [
                 {
-                    "label": "dest",
+                    "label": "cvx-env",
+                    "value": "r4a-dev"
+                },
+                {
+                    "label": "system-alias",
+                    "value": "s4-rfc-basic"
+                },
+                {
+                    "label": "destination",
                     "value": "API_DR4_RFC_BASIC"
                 },
                 {

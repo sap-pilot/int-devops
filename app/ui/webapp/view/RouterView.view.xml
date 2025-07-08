@@ -93,24 +93,24 @@
                                     <table:Column width="9rem">
                                         <Label text="cvx-env" />
                                         <table:template>
-                                            <ComboBox value="{routerRules>route}" items="{ path: 'routerRules>/routes', templateShareable: false }">
+                                            <ComboBox value="{routerRules>route}" items="{ path: 'routerRules>/routes', templateShareable: false }" width="100%">
                                                 <core:Item text="{routerRules>route}"/>
                                             </ComboBox>
                                             <!-- <m:Input value="{routerRules>route}"/> -->
                                         </table:template>
                                     </table:Column>
-                                    <table:Column width="9rem">
+                                    <table:Column width="11rem" >
                                         <Label text="system-alias" />
                                         <table:template>
-                                            <ComboBox value="{routerRules>alias}" items="{ path: 'routerRules>/systemAlias', templateShareable: false }">
+                                            <ComboBox value="{routerRules>alias}" items="{ path: 'routerRules>/systemAlias', templateShareable: false }" width="100%">
                                                 <core:Item text="{routerRules>alias}"/>
                                             </ComboBox>
                                         </table:template>
                                     </table:Column>
-                                     <table:Column width="12rem">
+                                     <table:Column width="16rem">
                                         <Label text="destination" />
                                         <table:template>
-                                            <ComboBox value="{routerRules>destination}" items="{ path: 'routerRules>/destinations', templateShareable: false }">
+                                            <ComboBox value="{routerRules>destination}" items="{ path: 'routerRules>/destinations', templateShareable: false }" width="100%">
                                                 <core:Item text="{routerRules>name}"/>
                                             </ComboBox>
                                         </table:template>

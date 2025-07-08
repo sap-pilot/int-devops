@@ -60,7 +60,7 @@ sap.ui.define([
 				oGraph.setOrientation(sKey);
 			});
 			let oTitleLabel = new sap.m.Link({
-				text:"Router Landscape",
+				text:"Integration Landscape",
 				href:"#router",
 				emphasized: true
 			});

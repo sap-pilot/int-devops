@@ -24,10 +24,6 @@ sap.ui.define([
 			oGraph.setLayoutAlgorithm(new SwimLaneChainLayout());
 			this.setupGraphControls();
 
-			// listen to appState>/liveMode change event
-			const appStateModel = this.getOwnerComponent().getModel("appState");
-			appStateModel.bindProperty("/liveMode").attachChange(function(){this.loadContentResources(false)}.bind(this));
-
 			// now load resource tree, delay a bit otherwise busy indicator wont work on initial load
 			// setTimeout(function(){this.loadContentResources(false)}.bind(this),100);
 			this.oRouterLandscapeModel = new JSONModel("model/router-landscape.json");
